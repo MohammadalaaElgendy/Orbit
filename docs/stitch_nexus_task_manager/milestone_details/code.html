@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#ffd2be",
+                        "secondary-fixed": "#d3e4fe",
+                        "error": "#ba1a1a",
+                        "on-secondary-container": "#54647a",
+                        "surface-container-low": "#f2f4f6",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed": "#0f0069",
+                        "primary": "#3525cd",
+                        "on-surface": "#191c1e",
+                        "on-error-container": "#93000a",
+                        "inverse-on-surface": "#eff1f3",
+                        "surface-variant": "#e0e3e5",
+                        "secondary": "#505f76",
+                        "on-primary-fixed-variant": "#3323cc",
+                        "error-container": "#ffdad6",
+                        "tertiary-container": "#a44100",
+                        "surface-container-high": "#e6e8ea",
+                        "surface-container": "#eceef0",
+                        "background": "#f7f9fb",
+                        "secondary-container": "#d0e1fb",
+                        "inverse-primary": "#c3c0ff",
+                        "on-surface-variant": "#464555",
+                        "on-secondary-fixed": "#0b1c30",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#dad7ff",
+                        "on-tertiary-fixed": "#351000",
+                        "primary-container": "#4f46e5",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#f7f9fb",
+                        "surface-tint": "#4d44e3",
+                        "tertiary": "#7e3000",
+                        "surface-dim": "#d8dadc",
+                        "tertiary-fixed-dim": "#ffb695",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "primary-fixed-dim": "#c3c0ff",
+                        "surface-container-highest": "#e0e3e5",
+                        "inverse-surface": "#2d3133",
+                        "primary-fixed": "#e2dfff",
+                        "outline": "#777587",
+                        "on-background": "#191c1e",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#f7f9fb",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#7b2f00",
+                        "tertiary-fixed": "#ffdbcc",
+                        "outline-variant": "#c7c4d8"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "gutter": "20px",
+                        "unit": "4px",
+                        "xl": "32px",
+                        "md": "16px",
+                        "lg": "24px",
+                        "container-margin": "32px",
+                        "sm": "8px",
+                        "2xl": "48px"
+                    },
+                    "fontFamily": {
+                        "h1": ["manrope"],
+                        "h3": ["manrope"],
+                        "h2": ["manrope"],
+                        "body-md": ["inter"],
+                        "label-sm": ["inter"],
+                        "button": ["inter"],
+                        "body-lg": ["inter"]
+                    },
+                    "fontSize": {
+                        "h1": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "h3": ["20px", {"lineHeight": "1.4", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "h2": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "button": ["14px", {"lineHeight": "1", "letterSpacing": "0", "fontWeight": "600"}],
+                        "body-lg": ["16px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-surface {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.8);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md min-h-screen pb-24">
+<!-- TopAppBar Navigation Shell (Back to Project) -->
+<header class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200/50 dark:border-slate-800/50 shadow-sm flex justify-between items-center px-6 h-16 w-full">
+<div class="flex items-center gap-4">
+<button class="flex items-center justify-center w-10 h-10 rounded-full hover:bg-slate-100/50 transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-slate-500">arrow_back</span>
+</button>
+<div class="flex flex-col">
+<span class="font-manrope text-lg font-bold text-slate-900 leading-tight">Timeline</span>
+<span class="font-label-sm text-slate-500">Project Beta • Phase 2</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center overflow-hidden">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="close-up portrait of a professional woman with a friendly expression in a brightly lit modern office environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7PEwXIlc-kdtr2O7Wm7f91OxNmOEYPemuaajUFKzxUJIOx6EIoCTLA1hKo0d0U7it1Qv6UQyxF37dB4wWo6mlSD50cXH8cDJnCb1zSvfd3QaJKrczNr7MsZvXaijQevmKbUMafO8dciO5JCaX1CsOlvt0jWM4uPgXY7Pn1bAFIjtpyjOxMhXhNdZew1SGKvsEH6TC82nBREOESZxWLYEKXfEzE3gthUmHDD16m8MbEIUYbBQ1GTaBRNHZt98x43PAFpI6htzRRg"/>
+</div>
+</div>
+</header>
+<main class="pt-24 px-6 max-w-5xl mx-auto space-y-8">
+<!-- Milestone Summary Hero -->
+<section class="space-y-4">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div class="space-y-2">
+<div class="flex items-center gap-2 text-indigo-600">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">flag</span>
+<span class="font-label-sm uppercase tracking-widest font-bold">Milestone Active</span>
+</div>
+<h1 class="font-h1 text-h1 text-on-background">Interface Design System V2</h1>
+<p class="text-body-lg text-on-surface-variant max-w-2xl">Finalizing the core component library, documenting accessibility standards, and establishing the motion guideline for the primary design token set.</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="px-lg h-11 bg-primary text-on-primary font-button rounded-xl flex items-center gap-2 shadow-sm hover:opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-[18px]">check_circle</span>
+                        Mark as Complete
+                    </button>
+<button class="w-11 h-11 border border-outline-variant flex items-center justify-center rounded-xl hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-on-surface-variant">more_horiz</span>
+</button>
+</div>
+</div>
+<!-- Summary Stats Bento Grid -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
+<div class="p-lg bg-surface-container-lowest border border-outline-variant/30 rounded-2xl shadow-sm">
+<span class="text-label-sm text-secondary block mb-1">Completion</span>
+<span class="text-h3 font-h3 text-on-surface">68%</span>
+<div class="w-full bg-surface-container-high h-1.5 rounded-full mt-3 overflow-hidden">
+<div class="bg-primary h-full w-[68%]"></div>
+</div>
+</div>
+<div class="p-lg bg-surface-container-lowest border border-outline-variant/30 rounded-2xl shadow-sm">
+<span class="text-label-sm text-secondary block mb-1">Deadline</span>
+<span class="text-h3 font-h3 text-on-surface">Oct 24</span>
+<span class="text-label-sm text-error block mt-1 font-medium">12 Days Left</span>
+</div>
+<div class="p-lg bg-surface-container-lowest border border-outline-variant/30 rounded-2xl shadow-sm">
+<span class="text-label-sm text-secondary block mb-1">Tasks</span>
+<span class="text-h3 font-h3 text-on-surface">24 / 35</span>
+<span class="text-label-sm text-on-surface-variant block mt-1">11 Remaining</span>
+</div>
+<div class="p-lg bg-surface-container-lowest border border-outline-variant/30 rounded-2xl shadow-sm">
+<span class="text-label-sm text-secondary block mb-1">Collaborators</span>
+<div class="flex -space-x-2 mt-2">
+<img alt="team" class="w-8 h-8 rounded-full border-2 border-surface-container-lowest" data-alt="professional headshot of a team member in a creative studio" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDx9cQLnl0-3-gk-LJhSegLKJrj3L84KuR56ODGCeaEX3LPBCLMcGPlWAhdehxNqxkcM2kI_q_0nwgI4Owan1nwPFfvEFvPSJ27ip62aGJi3SSm--7UgKLKuTsvXaMYiQqX6xhyt_4zl-Kh5CuyrYQMTAoCnwOyNicKqH1B4mkZtBcvz4lOJ9bzfuoniWK6EpUqnxSXUZyU1RbigRfBgUnJDI3mVF7UvlK1N2t_G3gQmCgP3bMA4TEp6tenhjRJ5-eqSTGQnU9g2Q"/>
+<img alt="team" class="w-8 h-8 rounded-full border-2 border-surface-container-lowest" data-alt="professional headshot of a software engineer with glasses" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBA2j5m70dlQBRKYll5LWElakHWHwlBLtjGp3EbqwOGE2pggv6kpaq_lJKGC5rFFpyyVSDBuDjkm1LilQ-NzL1XdfRewBIrOxuusSeEu2965PKOUepeLiX7_EnU0srAudsipnBofidcvwjLOmeXSbzeh0spy-1_smyd208WE0D9e2H91yVdi-Ey9cvZQ1a6eNUUZYvCP5LSQJ6nRlcZkCJ_AqEYR8-095oncjd7gM1Y1mrXn6ggcp3wV70hboNe6L_lzgnrGra39g"/>
+<img alt="team" class="w-8 h-8 rounded-full border-2 border-surface-container-lowest" data-alt="professional headshot of a creative director" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbbZKF0bOtoFPuHu0PKm90IUmmGI06nEtoH7-lzqUxOQrXc4mwRhO-OQj28Y-6FuXsGUXzpOiw_w-U9yvI9qRNC_Up92ztpHc3BntDu3Nh85YrrZnt-50IHLqmMmC3PeWXR1xT5_TnMd_QnV8cux-UQpWUWgUGdb1jUsIuSWsepyVh3npjv0OmAf1cm0avyI_Oe6UEW8mO9Id-V-JlQaeAXd0Av82JqjtNDMk1zUPWa_0UfrxlKNNWZfWZG1pTh6a2ZZmfSYFFMw"/>
+<div class="w-8 h-8 rounded-full bg-surface-container border-2 border-surface-container-lowest flex items-center justify-center text-[10px] font-bold">+4</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Main Content Area: Tasks & Timeline -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+<!-- Linked Tasks List -->
+<div class="lg:col-span-2 space-y-6">
+<div class="flex items-center justify-between">
+<h2 class="font-h2 text-h2">Linked Tasks</h2>
+<button class="text-primary font-button flex items-center gap-1 hover:underline">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                        Add Task
+                    </button>
+</div>
+<div class="space-y-3">
+<!-- Task Item -->
+<div class="group p-md bg-white border border-outline-variant/20 rounded-xl flex items-center gap-4 hover:shadow-md transition-shadow">
+<div class="w-6 h-6 border-2 border-outline-variant rounded flex items-center justify-center text-white hover:border-primary transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[16px]">check</span>
+</div>
+<div class="flex-grow">
+<span class="font-h3 text-body-lg block">Audit existing component accessibility</span>
+<div class="flex items-center gap-3 mt-1">
+<span class="text-label-sm bg-secondary-container text-on-secondary-container px-2 py-0.5 rounded-full">High Priority</span>
+<span class="text-label-sm text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">event</span>
+                                    Due Today
+                                </span>
+</div>
+</div>
+<img alt="owner" class="w-7 h-7 rounded-full" data-alt="small circular avatar of a project manager" src="https://lh3.googleusercontent.com/aida-public/AB6AXuArpnCgoSQjuAl6X8RQqDMAyGvFa1e2utnDJspRhrVjC-hQmSscRAhtmIW8OdeD1Nn33tAPogklrm6mTXMqN0BaV89Drc96lo9paeBinV-UDC_jPxwybdhoYKv2uU1Sr4zysBe21s8RZrtzg7tX24Fi_64eh6snSVsNLZ-Cm1oyjozGDDf_G3UxC99F8bMOtmkc59HZXxmUufOAGR6nj_odzkk0A7124QeSm3Xuh9n1ZtgibqUKb4H4XEWmn-Hx6OQNEHf4VAUoxQ"/>
+</div>
+<!-- Task Item Completed -->
+<div class="group p-md bg-surface-container-low border border-outline-variant/10 rounded-xl flex items-center gap-4 opacity-70">
+<div class="w-6 h-6 bg-primary border-2 border-primary rounded flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-[16px]">check</span>
+</div>
+<div class="flex-grow">
+<span class="font-h3 text-body-lg block line-through">Define color token scale for light/dark modes</span>
+<div class="flex items-center gap-3 mt-1">
+<span class="text-label-sm text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">history</span>
+                                    Completed 2d ago
+                                </span>
+</div>
+</div>
+<img alt="owner" class="w-7 h-7 rounded-full" data-alt="small circular avatar of a developer" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbUvjhs-p3gOA6hohIYNbbqyw77ydRkePBo69hTCdBa81q0xuIDVs3-7T121qTQdWe6VmM-BNE7EroKCUnmzJXufFljGdCZx1eI_QjqJuVImNmXiYAU2axPH0mkp0t6Z2kAgePDi8IQXC3m3D3ueNeUaLHpchvwOSXFahuKPwaqy8Npi6VcKBRJm_e-WK5WeN9GGQfY5rNVmLC2YR7Q8j2nLpsIFyoY_A3MUbnMJ6QnTVvpluY4YKiCDKJWkbjto-Xo4C8I4_J0Q"/>
+</div>
+<!-- Task Item -->
+<div class="group p-md bg-white border border-outline-variant/20 rounded-xl flex items-center gap-4 hover:shadow-md transition-shadow">
+<div class="w-6 h-6 border-2 border-outline-variant rounded flex items-center justify-center text-white hover:border-primary transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-[16px]">check</span>
+</div>
+<div class="flex-grow">
+<span class="font-h3 text-body-lg block">Create motion guidelines documentation</span>
+<div class="flex items-center gap-3 mt-1">
+<span class="text-label-sm bg-surface-container-high text-on-surface-variant px-2 py-0.5 rounded-full">Documentation</span>
+<span class="text-label-sm text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">event</span>
+                                    Oct 18
+                                </span>
+</div>
+</div>
+<img alt="owner" class="w-7 h-7 rounded-full" data-alt="small circular avatar of a motion designer" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA_oXbqCnpPRzh1gYVIRePXh21Re7p400BoMng93IM4QhsS4lpIsZhzm9HMBcvhsKdesLI_DFOEdjwti7dOPHXsVOTwks5najd3AWuAycKF2hzsr1fGtnjtmL8rjXoCWnG8TKieNf5M627eOEc9JU_q_XMmtX3wNy35tJ2DQuS0_R9T2fkZItXMbuM4VaQbEUyPoOoN3kIj6mr5hKGmDqOdlhoddLOJ6rSeO22BOMt3IGYQE85gVTG2iUTx8FtsbWfooGX17yyi4A"/>
+</div>
+</div>
+</div>
+<!-- Mini Timeline & Context Sidebar -->
+<div class="space-y-6">
+<div class="p-lg bg-surface-container-lowest border border-outline-variant/30 rounded-2xl shadow-sm space-y-6">
+<h3 class="font-h3 text-h3">Mini Timeline</h3>
+<div class="space-y-6 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-[2px] before:bg-surface-container-high">
+<!-- Timeline Node -->
+<div class="relative pl-8">
+<div class="absolute left-0 top-1 w-6 h-6 bg-primary rounded-full flex items-center justify-center text-white shadow-sm ring-4 ring-white">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">flag</span>
+</div>
+<span class="text-label-sm font-bold text-primary block">Upcoming Phase</span>
+<span class="text-body-md font-semibold block mt-1">Handoff to Development</span>
+<span class="text-label-sm text-secondary">October 28, 2023</span>
+</div>
+<!-- Timeline Node -->
+<div class="relative pl-8">
+<div class="absolute left-0 top-1 w-6 h-6 bg-white border-2 border-outline-variant rounded-full flex items-center justify-center text-slate-400 ring-4 ring-white">
+<span class="material-symbols-outlined text-[14px]">adjust</span>
+</div>
+<span class="text-label-sm font-bold text-on-surface-variant block">Current Status</span>
+<span class="text-body-md font-semibold block mt-1">Design System V2 Active</span>
+<span class="text-label-sm text-secondary">Started Oct 1, 2023</span>
+</div>
+<!-- Timeline Node -->
+<div class="relative pl-8">
+<div class="absolute left-0 top-1 w-6 h-6 bg-surface-container-high rounded-full flex items-center justify-center text-secondary ring-4 ring-white">
+<span class="material-symbols-outlined text-[14px]">check</span>
+</div>
+<span class="text-label-sm font-bold text-on-surface-variant block">Completed</span>
+<span class="text-body-md font-semibold block mt-1">Wireframe Approval</span>
+<span class="text-label-sm text-secondary">Sep 24, 2023</span>
+</div>
+</div>
+</div>
+<!-- Attachment Card -->
+<div class="p-lg bg-indigo-50 border border-indigo-100 rounded-2xl space-y-4">
+<div class="flex items-center justify-between">
+<span class="font-button text-indigo-900">Attachments</span>
+<span class="text-indigo-600 material-symbols-outlined text-[20px]">attach_file</span>
+</div>
+<div class="flex items-center gap-3 p-3 bg-white/60 rounded-xl border border-white">
+<span class="material-symbols-outlined text-indigo-600">description</span>
+<div class="flex-grow">
+<span class="text-label-sm font-bold text-indigo-950 block">spec-v2-final.pdf</span>
+<span class="text-[10px] text-indigo-700">12.4 MB • Updated yesterday</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar Navigation Shell -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 py-3 pb-safe bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg rounded-t-2xl border-t border-slate-200/50 dark:border-slate-800/50 shadow-[0_-4px_12px_0_rgba(0,0,0,0.05)]">
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-indigo-500 transition-transform active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="today">today</span>
+<span class="font-manrope text-[11px] font-medium">Today</span>
+</a>
+<a class="flex flex-col items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold active:scale-90 transition-transform duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="view_timeline" style="font-variation-settings: 'FILL' 1;">view_timeline</span>
+<span class="font-manrope text-[11px]">Timeline</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-indigo-500 transition-transform active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="flag">flag</span>
+<span class="font-manrope text-[11px] font-medium">Milestones</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 hover:text-indigo-500 transition-transform active:scale-90 duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-manrope text-[11px] font-medium">Account</span>
+</a>
+</nav>
+</body></html>

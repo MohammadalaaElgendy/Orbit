@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "inverse-primary": "#c3c0ff",
+                    "on-primary": "#ffffff",
+                    "surface-dim": "#d8dadc",
+                    "inverse-surface": "#2d3133",
+                    "error": "#ba1a1a",
+                    "tertiary-fixed-dim": "#ffb695",
+                    "on-primary-fixed": "#0f0069",
+                    "secondary-container": "#d0e1fb",
+                    "tertiary": "#7e3000",
+                    "error-container": "#ffdad6",
+                    "primary": "#3525cd",
+                    "on-tertiary": "#ffffff",
+                    "surface-container-high": "#e6e8ea",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-variant": "#e0e3e5",
+                    "outline": "#777587",
+                    "on-secondary-fixed-variant": "#38485d",
+                    "tertiary-fixed": "#ffdbcc",
+                    "inverse-on-surface": "#eff1f3",
+                    "on-surface": "#191c1e",
+                    "outline-variant": "#c7c4d8",
+                    "secondary-fixed": "#d3e4fe",
+                    "primary-container": "#4f46e5",
+                    "surface-container-low": "#f2f4f6",
+                    "primary-fixed": "#e2dfff",
+                    "on-secondary-fixed": "#0b1c30",
+                    "on-primary-container": "#dad7ff",
+                    "surface-tint": "#4d44e3",
+                    "on-tertiary-container": "#ffd2be",
+                    "on-error-container": "#93000a",
+                    "primary-fixed-dim": "#c3c0ff",
+                    "secondary": "#505f76",
+                    "surface-container-highest": "#e0e3e5",
+                    "secondary-fixed-dim": "#b7c8e1",
+                    "surface-container": "#eceef0",
+                    "on-surface-variant": "#464555",
+                    "on-tertiary-fixed": "#351000",
+                    "on-error": "#ffffff",
+                    "background": "#f7f9fb",
+                    "surface": "#f7f9fb",
+                    "surface-bright": "#f7f9fb",
+                    "on-secondary": "#ffffff",
+                    "on-secondary-container": "#54647a",
+                    "on-tertiary-fixed-variant": "#7b2f00",
+                    "tertiary-container": "#a44100",
+                    "on-primary-fixed-variant": "#3323cc",
+                    "on-background": "#191c1e"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "2xl": "1rem",
+                    "3xl": "28px",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "unit": "4px",
+                    "md": "16px",
+                    "2xl": "48px",
+                    "sm": "8px",
+                    "gutter": "20px",
+                    "xs": "4px",
+                    "lg": "24px",
+                    "container-margin": "32px",
+                    "xl": "32px"
+            },
+            "fontFamily": {
+                    "h1": ["Manrope"],
+                    "body-md": ["Inter"],
+                    "button": ["Inter"],
+                    "h2": ["Manrope"],
+                    "label-sm": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "h3": ["Manrope"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md min-h-screen selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<header class="bg-white/70 backdrop-blur-xl border-b border-slate-200/50 shadow-sm docked full-width top-0 sticky z-50 flex justify-between items-center px-6 h-16 w-full">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-indigo-600" data-icon="rocket_launch">rocket_launch</span>
+<h1 class="text-2xl font-black text-indigo-600 tracking-tighter font-manrope">Orbit</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-slate-100/50 transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="search">search</span>
+</button>
+<div class="h-10 w-10 rounded-full border-2 border-primary-container overflow-hidden active:scale-95 transition-transform cursor-pointer">
+<img alt="User Profile" class="h-full w-full object-cover" data-alt="close-up professional headshot of a creative professional with a soft minimalist studio background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPbezU94eMAKkhj0bJzOmI-VkOQcd0j84XpptDl4w9xJTp9yOTIyG0RRvNUw4kntA1kxhkXdIwrrNGgxx4pFEOlhGjcOZzM7-xs4nTaX6sdoRyR3m9kuvCljOehN9_O9QSntvWyovgnML2iXqKoERvOAHBelUG0BXES8lXPAKbPT5GCuXgwq0eT0COwAAIzr--enb7rjEPem8FgSMfqyncH2zugE6VhjBFQ1V8g2Q81XBR7zf4px7aX8cRqZY1JcT5G6wzfq8-iA"/>
+</div>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-container-margin py-xl">
+<div class="mb-2xl flex flex-col md:flex-row md:items-end justify-between gap-md">
+<div>
+<h2 class="font-h1 text-h1 text-on-surface mb-xs">Welcome back, Orbiters</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl">Choose your workspace to continue your journey through the galaxy of productivity.</p>
+</div>
+<div class="flex items-center gap-unit text-label-sm font-label-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]" data-icon="cloud_done">cloud_done</span>
+<span>Everything synced</span>
+</div>
+</div>
+<!-- Asymmetric Bento-style Grid for Workspaces -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-lg">
+<!-- Workspace Card: Design Studio (Large) -->
+<div class="md:col-span-8 group cursor-pointer">
+<div class="glass-card rounded-3xl p-lg h-full min-h-[320px] relative overflow-hidden flex flex-col justify-between shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+<div class="absolute top-0 right-0 p-lg">
+<span class="bg-white/80 text-primary font-label-sm px-3 py-1 rounded-full border border-white/50">Active Now</span>
+</div>
+<div class="absolute -bottom-12 -right-12 w-64 h-64 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-colors"></div>
+<div>
+<div class="h-14 w-14 bg-primary-container text-on-primary rounded-2xl flex items-center justify-center mb-md shadow-lg">
+<span class="material-symbols-outlined text-3xl" data-icon="brush">brush</span>
+</div>
+<h3 class="font-h2 text-h2 text-on-surface">Design Studio</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">12 active projects • 8 collaborators</p>
+</div>
+<div class="flex items-center justify-between mt-xl relative z-10">
+<div class="flex -space-x-3">
+<img alt="Member" class="w-8 h-8 rounded-full border-2 border-white" data-alt="profile avatar of a person smiling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDv-IhRHCmdtrGJ_ozp0ML4Kk9AJwgRAAabgg-o1NH4TLFQXbXbCuvWEwVEwyh0kl_ZngKh02dlAdj47A0C9dknU4sfppU0tTNZPyCmsONAUS6du1Mw1Cp1dzXKO9cYDoR19qgBCPE0GR27YbEEK1ZeoIMwJPQxTm3wuTsGxMu3m3RIAvW2v56PSqh4OKLz-xKs1RN1odanBYSGgpvY2TQCg205Qz8ssqTJfKYD5AwT0-mN-hsFdlbdpxeNm690Nua5bsAokpkEXw"/>
+<img alt="Member" class="w-8 h-8 rounded-full border-2 border-white" data-alt="profile avatar of a man with glasses" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDUGOeiN1TVHjHr7MFpBGPQqcLACRj9WXgPhgh-LBYj4Z5hytD5289NrFRnsEntpZsrmYHj48tGExHAAWvyzNYrJ6jeYI5N8C9PozyGF7SpfXOd9AMI07jwDEZWr1OG5NygRVBmsTA2n9c4iFIMbUU0-4m7buVDqzKj0PLoFlFFqXfBI6ZQ9OxeAdwccjDSMRC5cpqZJOFZU7VYWENyml21baeGF8Oj_3j4vVyDhNzb7OGKdq1W5eFrXs5ARNpfChF2SzIsjyhZag"/>
+<img alt="Member" class="w-8 h-8 rounded-full border-2 border-white" data-alt="profile avatar of a woman with curly hair" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBv6zZeNwqcXDqd9e6o2vDIuYRYxr_QdnTuAfQx0zbh3bkpON_BlYQ0PhKkY1HpqS9_Ynn61QHpfGvPBPYUVeJbMNYF0mKpkkYQXO98USOr7chd_0Mqd-VUDv2L9V0b5nXGMgeIZFT8F0Cv60qo1svR1OfO9fbV7T1Iar07drR-QtXPTrcaIJ8C5-kvWc-wD1bTlHHocD8E-vyjULYbpnvCJrz2tGVsYfd3sUXUJ4YIqzbNFpTRb2xLtM2jr_nX-9l3bDh4eOgItQ"/>
+<div class="w-8 h-8 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-slate-500">+5</div>
+</div>
+<button class="bg-indigo-600 text-white font-button text-button px-6 py-3 rounded-xl flex items-center gap-2 hover:bg-indigo-700 transition-colors">
+                            Enter Space <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Workspace Card: Dev Team (Medium) -->
+<div class="md:col-span-4 group cursor-pointer">
+<div class="glass-card rounded-3xl p-lg h-full min-h-[320px] flex flex-col justify-between shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+<div>
+<div class="h-14 w-14 bg-secondary-container text-on-secondary-container rounded-2xl flex items-center justify-center mb-md">
+<span class="material-symbols-outlined text-3xl" data-icon="terminal">terminal</span>
+</div>
+<h3 class="font-h3 text-h3 text-on-surface">Dev Team</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-xs">4 repositories • Next release in 2 days</p>
+</div>
+<div class="mt-xl">
+<div class="flex items-center gap-2 mb-md">
+<div class="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+<div class="w-3/4 h-full bg-primary rounded-full"></div>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">75%</span>
+</div>
+<button class="w-full border border-outline-variant text-on-surface font-button text-button px-6 py-3 rounded-xl hover:bg-white/50 transition-colors">
+                            Manage
+                        </button>
+</div>
+</div>
+</div>
+<!-- Workspace Card: Marketing Ops -->
+<div class="md:col-span-4 group cursor-pointer">
+<div class="glass-card rounded-3xl p-lg h-full flex flex-col justify-between shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+<div class="flex items-start justify-between">
+<div class="h-12 w-12 bg-tertiary-container text-on-tertiary-container rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="campaign">campaign</span>
+</div>
+<span class="material-symbols-outlined text-slate-300" data-icon="more_vert">more_vert</span>
+</div>
+<div class="mt-md">
+<h3 class="font-h3 text-h3 text-on-surface">Marketing Ops</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Q4 Campaign Planning</p>
+</div>
+</div>
+</div>
+<!-- Workspace Card: Personal Cloud -->
+<div class="md:col-span-4 group cursor-pointer">
+<div class="glass-card rounded-3xl p-lg h-full flex flex-col justify-between shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+<div class="flex items-start justify-between">
+<div class="h-12 w-12 bg-surface-container-high text-on-surface-variant rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="cloud_queue">cloud_queue</span>
+</div>
+<span class="material-symbols-outlined text-slate-300" data-icon="more_vert">more_vert</span>
+</div>
+<div class="mt-md">
+<h3 class="font-h3 text-h3 text-on-surface">Personal Cloud</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Private sandbox</p>
+</div>
+</div>
+</div>
+<!-- Workspace Card: Client Portal -->
+<div class="md:col-span-4 group cursor-pointer">
+<div class="glass-card rounded-3xl p-lg h-full flex flex-col justify-between shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+<div class="flex items-start justify-between">
+<div class="h-12 w-12 bg-on-secondary-container text-white rounded-xl flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="handshake">handshake</span>
+</div>
+<span class="material-symbols-outlined text-slate-300" data-icon="more_vert">more_vert</span>
+</div>
+<div class="mt-md">
+<h3 class="font-h3 text-h3 text-on-surface">Client Portal</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">External shared space</p>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action Button -->
+<button class="fixed bottom-lg right-lg bg-indigo-600 text-white h-16 w-16 md:w-auto md:px-lg rounded-2xl md:rounded-full shadow-2xl flex items-center justify-center gap-2 hover:bg-indigo-700 hover:scale-105 active:scale-95 transition-all z-50">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+<span class="hidden md:block font-button text-button">Create New Workspace</span>
+</button>
+<!-- Shared Navigation Filter: Workspace selection is top-level but focus-driven -->
+<!-- Navigation Drawer (Represented as a side rail for desktop) -->
+<nav class="hidden xl:flex flex-col gap-2 p-4 h-screen fixed left-0 top-16 w-[280px] bg-slate-50/50 backdrop-blur-lg border-r border-slate-200/50 font-manrope text-sm font-medium z-40">
+<div class="mb-lg px-4 pt-4">
+<p class="text-[10px] uppercase tracking-widest text-slate-400 font-bold mb-4">Navigation</p>
+</div>
+<a class="flex items-center gap-3 px-4 py-3 text-indigo-600 bg-white rounded-lg shadow-sm border-l-4 border-indigo-600" href="#">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:translate-x-1 transition-transform hover:bg-slate-100" href="#">
+<span class="material-symbols-outlined" data-icon="account_tree">account_tree</span>
+<span>Projects</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:translate-x-1 transition-transform hover:bg-slate-100" href="#">
+<span class="material-symbols-outlined" data-icon="flag">flag</span>
+<span>Milestones</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:translate-x-1 transition-transform hover:bg-slate-100" href="#">
+<span class="material-symbols-outlined" data-icon="assignment">assignment</span>
+<span>Tasks</span>
+</a>
+<div class="mt-auto border-t border-slate-200/50 pt-4">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-slate-100 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+</div>
+</nav>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden bg-white/80 backdrop-blur-xl border-t border-slate-200/50 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] fixed bottom-0 w-full z-50 rounded-t-2xl flex justify-around items-center pt-2 pb-6 px-4">
+<div class="flex flex-col items-center justify-center text-indigo-600 bg-indigo-50 rounded-2xl px-3 py-1 active:scale-90 transition-transform">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-manrope text-[11px] font-medium">Workspace</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 hover:text-indigo-500 active:scale-90 transition-transform">
+<span class="material-symbols-outlined" data-icon="folder_open">folder_open</span>
+<span class="font-manrope text-[11px] font-medium">Projects</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 hover:text-indigo-500 active:scale-90 transition-transform">
+<span class="material-symbols-outlined" data-icon="check_circle">check_circle</span>
+<span class="font-manrope text-[11px] font-medium">Tasks</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 hover:text-indigo-500 active:scale-90 transition-transform">
+<span class="material-symbols-outlined" data-icon="insights">insights</span>
+<span class="font-manrope text-[11px] font-medium">Activity</span>
+</div>
+</nav>
+</body></html>

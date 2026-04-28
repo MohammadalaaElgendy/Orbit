@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Orbit | Launch Your Productivity</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "inverse-primary": "#c3c0ff",
+                        "on-primary": "#ffffff",
+                        "surface-dim": "#d8dadc",
+                        "inverse-surface": "#2d3133",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed-dim": "#ffb695",
+                        "on-primary-fixed": "#0f0069",
+                        "secondary-container": "#d0e1fb",
+                        "tertiary": "#7e3000",
+                        "error-container": "#ffdad6",
+                        "primary": "#3525cd",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-high": "#e6e8ea",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-variant": "#e0e3e5",
+                        "outline": "#777587",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "tertiary-fixed": "#ffdbcc",
+                        "inverse-on-surface": "#eff1f3",
+                        "on-surface": "#191c1e",
+                        "outline-variant": "#c7c4d8",
+                        "secondary-fixed": "#d3e4fe",
+                        "primary-container": "#4f46e5",
+                        "surface-container-low": "#f2f4f6",
+                        "primary-fixed": "#e2dfff",
+                        "on-secondary-fixed": "#0b1c30",
+                        "on-primary-container": "#dad7ff",
+                        "surface-tint": "#4d44e3",
+                        "on-tertiary-container": "#ffd2be",
+                        "on-error-container": "#93000a",
+                        "primary-fixed-dim": "#c3c0ff",
+                        "secondary": "#505f76",
+                        "surface-container-highest": "#e0e3e5",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "surface-container": "#eceef0",
+                        "on-surface-variant": "#464555",
+                        "on-tertiary-fixed": "#351000",
+                        "on-error": "#ffffff",
+                        "background": "#f7f9fb",
+                        "surface": "#f7f9fb",
+                        "surface-bright": "#f7f9fb",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-container": "#54647a",
+                        "on-tertiary-fixed-variant": "#7b2f00",
+                        "tertiary-container": "#a44100",
+                        "on-primary-fixed-variant": "#3323cc",
+                        "on-background": "#191c1e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "md": "16px",
+                        "2xl": "48px",
+                        "sm": "8px",
+                        "gutter": "20px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "container-margin": "32px",
+                        "xl": "32px"
+                    },
+                    "fontFamily": {
+                        "h1": ["Manrope"],
+                        "body-md": ["Inter"],
+                        "button": ["Inter"],
+                        "h2": ["Manrope"],
+                        "label-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "h3": ["Manrope"]
+                    },
+                    "fontSize": {
+                        "h1": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["14px", {"lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400"}],
+                        "button": ["14px", {"lineHeight": "1", "letterSpacing": "0", "fontWeight": "600"}],
+                        "h2": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "body-lg": ["16px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                        "h3": ["20px", {"lineHeight": "1.4", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-glow {
+            background: radial-gradient(circle at center, rgba(79, 70, 229, 0.4) 0%, rgba(15, 0, 105, 0) 70%);
+        }
+        .bg-mesh {
+            background-color: #0f0069;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(53, 37, 205, 0.4) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(79, 70, 229, 0.3) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(164, 65, 0, 0.1) 0px, transparent 50%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-mesh min-h-screen flex flex-col items-center justify-center overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
+<!-- Primary Layout Container -->
+<main class="relative w-full max-w-screen-xl px-container-margin flex flex-col items-center">
+<!-- Decorative Ambient Elements (Level 0) -->
+<div class="absolute -z-10 w-[600px] h-[600px] glass-glow blur-3xl opacity-60"></div>
+<!-- Hero Branding Section -->
+<div class="flex flex-col items-center text-center">
+<!-- Rocket Icon Container with Glassmorphism -->
+<div class="relative mb-lg group">
+<div class="absolute inset-0 bg-primary/30 blur-2xl rounded-full scale-110 opacity-50 group-hover:opacity-80 transition-opacity duration-700"></div>
+<div class="relative bg-white/10 backdrop-blur-2xl border border-white/20 p-8 rounded-[2.5rem] shadow-2xl">
+<span class="material-symbols-outlined text-[80px] text-on-primary-container" data-icon="rocket_launch" data-weight="fill" style="font-variation-settings: 'FILL' 1;">
+                        rocket_launch
+                    </span>
+</div>
+</div>
+<!-- Brand Identity from JSON Authority -->
+<div class="space-y-xs">
+<h1 class="font-h1 text-h1 text-white tracking-tighter sm:text-[64px] leading-none">
+                    Orbit
+                </h1>
+<p class="font-body-lg text-body-lg text-primary-fixed/70 tracking-wide">
+                    Your focus, elevated.
+                </p>
+</div>
+</div>
+<!-- Call to Action / Entry Point (Level 2 Elevation) -->
+<div class="mt-2xl flex flex-col items-center w-full max-w-xs space-y-md">
+<button class="w-full bg-on-primary text-primary font-button text-button h-14 rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] hover:bg-primary-fixed transition-all active:scale-95 flex items-center justify-center gap-2">
+                Launch Workspace
+                <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<button class="w-full bg-white/5 backdrop-blur-md text-white/80 border border-white/10 font-button text-button h-14 rounded-xl hover:bg-white/10 transition-all active:scale-95">
+                Join Orbit Cloud
+            </button>
+</div>
+<!-- Feature Bento Peek (Subtle Context) -->
+<div class="mt-2xl grid grid-cols-3 gap-md w-full max-w-md opacity-40">
+<div class="bg-white/5 border border-white/10 p-4 rounded-xl flex flex-col items-center gap-2">
+<span class="material-symbols-outlined text-white/60" data-icon="dashboard">dashboard</span>
+<span class="font-label-sm text-label-sm text-white/40">Workspace</span>
+</div>
+<div class="bg-white/5 border border-white/10 p-4 rounded-xl flex flex-col items-center gap-2">
+<span class="material-symbols-outlined text-white/60" data-icon="folder_open">folder_open</span>
+<span class="font-label-sm text-label-sm text-white/40">Projects</span>
+</div>
+<div class="bg-white/5 border border-white/10 p-4 rounded-xl flex flex-col items-center gap-2">
+<span class="material-symbols-outlined text-white/60" data-icon="assignment">assignment</span>
+<span class="font-label-sm text-label-sm text-white/40">Tasks</span>
+</div>
+</div>
+</main>
+<!-- Bottom Branding Footnote -->
+<footer class="fixed bottom-xl text-center">
+<div class="flex items-center gap-3 bg-white/5 px-md py-sm rounded-full border border-white/10 backdrop-blur-sm">
+<div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+<span class="font-label-sm text-label-sm text-primary-fixed/50 uppercase tracking-[0.2em]">All Systems Nominal</span>
+</div>
+</footer>
+<!-- Background Decoration Images -->
+<div class="fixed top-0 left-0 w-full h-full -z-20 pointer-events-none opacity-20">
+<img alt="" class="absolute top-0 right-0 w-1/2 h-1/2 object-cover mix-blend-overlay" data-alt="abstract cosmic satellite view of earth with deep indigo and purple light trails and digital network nodes" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkOgEzNMnmLJR3QGHiR6DqCBYtSOA3rpEVX8r5SuAdlLpa_pyLU0dad8b6Sr57NMCCmGe-fuBPDDQm-0rWusIgwP4z2NYVczXMObOXeLf_wyTPkcqbtAOPoz1SKXZPLqgpG1A9lahfxxriMz9CqFZvnZRRA_CEpy3MMvhdkcCvtSHQpiyE7SBKKSSUrz6BgE5u7FbcjBZWfGU_i7gL-CJGOez9PUhVHfQgvHZWEu1hX5FCw7rMGiHGnbVU-fYxWeDTryq9_Jhk-w"/>
+<img alt="" class="absolute bottom-0 left-0 w-1/2 h-1/2 object-cover mix-blend-soft-light" data-alt="dramatic starry night sky with deep violet nebulas and soft glowing stellar dust for a premium cosmic atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2iKAF7awBpP9jRuUekuxJBiVfXSdLK2nvl-HtPzYhblAgkXlBJ22NM47os9TCd6eIY-IFOD-fd1sMhEGVkTkHoSyU-v-hcPYK79yyRHKfSu3-JWOLPDhD_GBrwRTcz80Mn1nxwyspL6J58dPoK-O8O8kKWHmZR3uq6SOMpNcrNxYh7AmEeRLRwTi3gb1ReJlS9qypge0D93B2F89d0gc-thPI4scbG0vU6uII_2sDifyinfxJAR6_DMhmvfWijtTJ2LXyLcLe7w"/>
+</div>
+</body></html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed": "#e7deff",
+                        "on-secondary": "#332664",
+                        "on-tertiary-container": "#3e2b00",
+                        "error-container": "#93000a",
+                        "surface-tint": "#bdc2ff",
+                        "on-tertiary-fixed": "#261900",
+                        "surface-container-highest": "#353437",
+                        "on-secondary-container": "#baabf3",
+                        "outline-variant": "#454653",
+                        "on-surface": "#e5e1e4",
+                        "on-error": "#690005",
+                        "inverse-surface": "#e5e1e4",
+                        "inverse-on-surface": "#313032",
+                        "secondary-container": "#4a3d7c",
+                        "primary-fixed": "#e0e0ff",
+                        "surface-container-lowest": "#0e0e10",
+                        "surface-container-high": "#2a2a2c",
+                        "surface-variant": "#353437",
+                        "on-primary": "#131e8c",
+                        "inverse-primary": "#4953bc",
+                        "on-background": "#e5e1e4",
+                        "secondary-fixed-dim": "#ccbeff",
+                        "on-primary-fixed": "#000767",
+                        "tertiary-fixed": "#ffdea3",
+                        "on-primary-container": "#101b8a",
+                        "surface-container-low": "#1c1b1d",
+                        "surface-dim": "#131315",
+                        "surface": "#131315",
+                        "primary-container": "#818cf8",
+                        "background": "#131315",
+                        "on-primary-fixed-variant": "#2f3aa3",
+                        "secondary": "#ccbeff",
+                        "primary": "#bdc2ff",
+                        "tertiary-fixed-dim": "#f7bd3e",
+                        "tertiary": "#f7bd3e",
+                        "on-secondary-fixed": "#1e0e4e",
+                        "outline": "#908f9e",
+                        "on-tertiary": "#402d00",
+                        "error": "#ffb4ab",
+                        "on-error-container": "#ffdad6",
+                        "surface-bright": "#39393b",
+                        "on-tertiary-fixed-variant": "#5d4200",
+                        "on-surface-variant": "#c6c5d5",
+                        "primary-fixed-dim": "#bdc2ff",
+                        "surface-container": "#201f22",
+                        "tertiary-container": "#c08d00",
+                        "on-secondary-fixed-variant": "#4a3d7c"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "xxl": "28px",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "gutter": "20px",
+                        "container-margin": "32px",
+                        "lg": "24px",
+                        "xl": "40px",
+                        "md": "16px",
+                        "unit": "4px",
+                        "xs": "4px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Manrope"],
+                        "body-base": ["Manrope"],
+                        "headline-md": ["Manrope"],
+                        "display-lg": ["Manrope"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["13px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "body-base": ["16px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}]
+                    },
+                    "boxShadow": {
+                        "inner-glow": "inset 0 1px 0 0 rgba(255, 255, 255, 0.05)",
+                        "glass-highlight": "inset 0 1px 1px 0 rgba(255, 255, 255, 0.12)"
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #09090b;
+            color: #e5e1e4;
+            font-family: 'Manrope', sans-serif;
+        }
+        .glass-card {
+            backdrop-filter: blur(20px);
+            background: rgba(32, 31, 34, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .glass-card:hover {
+            background: rgba(32, 31, 34, 0.8);
+            border-color: rgba(129, 140, 248, 0.3);
+            box-shadow: 0 0 20px rgba(129, 140, 248, 0.1);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 bg-zinc-900/60 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-6 py-4">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center overflow-hidden border border-white/10">
+<img alt="User Profile" data-alt="close up professional portrait of a user with neutral lighting and minimalist background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZdRoNEdg0EORt_EaV5wpARXzRg5qVFSMN6Go5HZ8_D31wB7C3EdWffKXztfKi9LmEnq3O0urwYpkXLMVVKbe4aOTciZzWIJvTQ6jepzvj84qxdAAkstGofckwOEsJREa7cCbXZ3_vWQOKu0gLIe7AmogAs-fTNVQAWQwDavGZWOgIVS8M0a7rF5Zf27PBPm0EUcGB2Ma9HlqXIKk_z7nHaqQebHUma78uN1XrbrPtfyAhtgN5uGyzI6E2OLZ5HxkzyaClRRpzUw"/>
+</div>
+<h1 class="text-xl font-bold text-indigo-400 tracking-tighter">Studio</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-zinc-400 hover:bg-white/5 transition-colors rounded-full active:scale-95 duration-200">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</button>
+</div>
+</header>
+<main class="flex-grow pt-32 pb-20 px-gutter max-w-7xl mx-auto w-full">
+<!-- Hero Header -->
+<div class="mb-xl text-center md:text-left">
+<h2 class="font-display-lg text-display-lg text-zinc-50 mb-md">Welcome back.</h2>
+<p class="font-body-base text-body-base text-zinc-400 max-w-xl">
+                Choose an environment to continue your focus session or create a new dedicated workspace.
+            </p>
+</div>
+<!-- Workspace Selection Grid (Asymmetric Bento) -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-lg">
+<!-- Primary Workspace Card -->
+<div class="md:col-span-8 group cursor-pointer glass-card rounded-xxl p-lg transition-all duration-300 shadow-inner-glow relative overflow-hidden h-[320px] flex flex-col justify-end">
+<div class="absolute inset-0 z-0 opacity-40 grayscale group-hover:grayscale-0 transition-all duration-700">
+<img class="w-full h-full object-cover" data-alt="minimalist architectural office interior with large windows and soft natural light casting long shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBbOH2CjYqulAuAlwrkz5sLbYMjjZNjO6AzP_mVo7N9x0d3RjJUpPIb2Ou5yNSQcQKK-RpnXipm2zRbIFY0HAI-xpg6afeGWVQMQ_OCZYnwcHR_ThMVLXJfQIacmyFQUlFWhnaNHG3VyRkUzMDnk2ndMxqaTXXvcqq0q44n2r1yAm-SUCf1EuM4PiMWeXvyfVoLHZ22CgXPj3qknnj2nlV8HGSt1Cr2YS7gEjeE_u9hXjoNDZeOHj9KkiE1P0mBUJYelZfH3J1b4Q"/>
+<div class="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/40 to-transparent"></div>
+</div>
+<div class="relative z-10">
+<div class="flex items-center gap-sm mb-xs">
+<span class="px-sm py-[2px] bg-indigo-400 text-zinc-950 text-[10px] font-bold uppercase tracking-widest rounded-full">Active Now</span>
+<span class="text-label-sm font-label-sm text-zinc-400">• 12 members</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-zinc-50 mb-xs">Creative Direction</h3>
+<p class="text-zinc-400 text-sm max-w-md">The primary hub for brand identity, motion design, and interactive prototypes.</p>
+</div>
+</div>
+<!-- Secondary Workspace Card -->
+<div class="md:col-span-4 group cursor-pointer glass-card rounded-xxl p-lg transition-all duration-300 shadow-inner-glow flex flex-col justify-between">
+<div class="w-12 h-12 rounded-xl bg-zinc-800/50 flex items-center justify-center border border-white/5 group-hover:border-indigo-400/50 transition-colors">
+<span class="material-symbols-outlined text-indigo-400" data-icon="terminal">terminal</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-zinc-50 mb-xs">Engineering</h3>
+<p class="text-zinc-400 text-sm">System architecture and deployment pipelines.</p>
+<div class="mt-md flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-zinc-900 bg-zinc-800"></div>
+<div class="w-8 h-8 rounded-full border-2 border-zinc-900 bg-zinc-700"></div>
+<div class="w-8 h-8 rounded-full border-2 border-zinc-900 bg-zinc-600"></div>
+</div>
+</div>
+</div>
+<!-- Vault Card -->
+<div class="md:col-span-4 group cursor-pointer glass-card rounded-xxl p-lg transition-all duration-300 shadow-inner-glow flex flex-col justify-between border-t-weighted">
+<div class="w-12 h-12 rounded-xl bg-zinc-800/50 flex items-center justify-center border border-white/5 group-hover:border-indigo-400/50 transition-colors">
+<span class="material-symbols-outlined text-indigo-400" data-icon="folder_open">folder_open</span>
+</div>
+<div>
+<h3 class="font-headline-md text-headline-md text-zinc-50 mb-xs">Vault</h3>
+<p class="text-zinc-400 text-sm">Private research and historical assets.</p>
+</div>
+</div>
+<!-- Create New Workspace Card -->
+<div class="md:col-span-4 group cursor-pointer border-2 border-dashed border-zinc-800 rounded-xxl p-lg transition-all duration-300 hover:border-indigo-400/50 hover:bg-indigo-400/5 flex flex-col items-center justify-center text-center">
+<div class="w-14 h-14 rounded-full bg-zinc-900 flex items-center justify-center mb-md border border-zinc-800 group-hover:scale-110 transition-transform">
+<span class="material-symbols-outlined text-zinc-500 group-hover:text-indigo-400" data-icon="add">add</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-zinc-300">New Studio</h3>
+<p class="text-zinc-500 text-sm">Create a fresh focus environment</p>
+</div>
+<!-- Marketing / Upgrade Card -->
+<div class="md:col-span-4 group glass-card rounded-xxl p-lg transition-all duration-300 shadow-inner-glow bg-gradient-to-br from-zinc-900/40 to-indigo-950/20">
+<div class="h-full flex flex-col justify-between">
+<span class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Enterprise</span>
+<div>
+<h3 class="font-headline-md text-headline-md text-zinc-50 mb-xs">Scaling up?</h3>
+<p class="text-zinc-400 text-sm mb-md">Unlock unlimited collaborative workspaces and advanced security.</p>
+<button class="w-full h-11 bg-indigo-400 text-zinc-950 font-bold rounded-lg hover:bg-indigo-300 transition-colors active:scale-[0.98] duration-200">
+                            Learn More
+                        </button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Suppressed for focused selection, but included as per instructions for shell mapping if user were deeper) -->
+<!-- According to "The Destination Rule": This is a selection screen (transactional/linear flow), 
+         so we prioritize the canvas. However, we'll keep the structural shell as a template but HIDDEN to respect the relevance check. -->
+<nav class="hidden md:flex fixed bottom-0 left-0 w-full z-50 bg-zinc-900/80 backdrop-blur-xl border-t border-white/5 justify-around items-center px-4 pb-safe h-20 shadow-[0_-4px_20px_rgba(0,0,0,0.5)]">
+<div class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 transition-all cursor-pointer active:scale-90 duration-300">
+<span class="material-symbols-outlined mb-1" data-icon="check_circle">check_circle</span>
+<span class="font-manrope text-[11px] font-medium uppercase tracking-widest">Tasks</span>
+</div>
+<div class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 transition-all cursor-pointer active:scale-90 duration-300">
+<span class="material-symbols-outlined mb-1" data-icon="calendar_month">calendar_month</span>
+<span class="font-manrope text-[11px] font-medium uppercase tracking-widest">Schedule</span>
+</div>
+<div class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 transition-all cursor-pointer active:scale-90 duration-300">
+<span class="material-symbols-outlined mb-1" data-icon="timer">timer</span>
+<span class="font-manrope text-[11px] font-medium uppercase tracking-widest">Focus</span>
+</div>
+<!-- Semantic Mapping: Vault maps closest to workspace management -->
+<div class="flex flex-col items-center justify-center text-indigo-400 drop-shadow-[0_0_8px_rgba(129,140,248,0.4)] cursor-pointer active:scale-90 duration-300">
+<span class="material-symbols-outlined mb-1" data-icon="folder_open">folder_open</span>
+<span class="font-manrope text-[11px] font-medium uppercase tracking-widest">Vault</span>
+</div>
+</nav>
+</body></html>

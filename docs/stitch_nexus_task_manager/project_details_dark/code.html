@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "surface-container-high": "#2a2a2c",
+            "surface-variant": "#353437",
+            "on-primary": "#131e8c",
+            "inverse-primary": "#4953bc",
+            "inverse-on-surface": "#313032",
+            "secondary-container": "#4a3d7c",
+            "surface-container-lowest": "#0e0e10",
+            "primary-fixed": "#e0e0ff",
+            "outline-variant": "#454653",
+            "on-surface": "#e5e1e4",
+            "on-error": "#690005",
+            "inverse-surface": "#e5e1e4",
+            "surface-container-highest": "#353437",
+            "on-secondary-container": "#baabf3",
+            "on-tertiary-container": "#3e2b00",
+            "error-container": "#93000a",
+            "surface-tint": "#bdc2ff",
+            "on-tertiary-fixed": "#261900",
+            "on-secondary": "#332664",
+            "secondary-fixed": "#e7deff",
+            "primary-fixed-dim": "#bdc2ff",
+            "on-surface-variant": "#c6c5d5",
+            "surface-container": "#201f22",
+            "tertiary-container": "#c08d00",
+            "on-secondary-fixed-variant": "#4a3d7c",
+            "on-error-container": "#ffdad6",
+            "surface-bright": "#39393b",
+            "on-tertiary-fixed-variant": "#5d4200",
+            "on-secondary-fixed": "#1e0e4e",
+            "outline": "#908f9e",
+            "on-tertiary": "#402d00",
+            "error": "#ffb4ab",
+            "tertiary-fixed-dim": "#f7bd3e",
+            "tertiary": "#f7bd3e",
+            "background": "#131315",
+            "on-primary-fixed-variant": "#2f3aa3",
+            "secondary": "#ccbeff",
+            "primary": "#bdc2ff",
+            "surface-dim": "#131315",
+            "surface-container-low": "#1c1b1d",
+            "surface": "#131315",
+            "primary-container": "#818cf8",
+            "tertiary-fixed": "#ffdea3",
+            "on-primary-container": "#101b8a",
+            "on-background": "#e5e1e4",
+            "secondary-fixed-dim": "#ccbeff",
+            "on-primary-fixed": "#000767"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "sm": "8px",
+            "gutter": "20px",
+            "container-margin": "32px",
+            "xl": "40px",
+            "lg": "24px",
+            "xs": "4px",
+            "unit": "4px",
+            "md": "16px"
+          },
+          "fontFamily": {
+            "headline-md": ["Manrope"],
+            "display-lg": ["Manrope"],
+            "body-base": ["Manrope"],
+            "label-sm": ["Manrope"]
+          },
+          "fontSize": {
+            "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+            "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+            "body-base": ["16px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+            "label-sm": ["13px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500"}]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      background-color: #09090b;
+      color: #e5e1e4;
+      font-family: 'Manrope', sans-serif;
+    }
+    .glass-card {
+      background: rgba(28, 27, 29, 0.6);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .glass-card-high {
+      background: rgba(42, 42, 44, 0.8);
+      backdrop-filter: blur(40px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .inner-glow {
+      box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen pb-24 md:pb-0 md:pl-72">
+<!-- Navigation Drawer (Shell) -->
+<aside class="fixed left-0 top-0 z-50 flex flex-col p-4 bg-zinc-900/90 backdrop-blur-2xl border-r border-white/5 rounded-r-lg h-full w-72 hidden md:flex">
+<div class="flex flex-col gap-md mb-xl">
+<div class="flex items-center gap-md px-2">
+<div class="w-10 h-10 rounded-lg overflow-hidden border border-white/10">
+<img alt="Deep Work Logo" class="w-full h-full object-cover" data-alt="minimalist logo for a productivity software with deep indigo and white geometric shapes" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBOxr3dA3Pb0KrxvcTIsxltlhqrmRfItuJe-oCjJvgyrNSxM3Kow7iRGLR-Ig2KOsyGNyl87gBOkrTFC8Ge0jw3k-xE142EhL9vChaWExaO4CJnYbSNdCbGodkmIbdBd1_lJmPo6i7EQNOlO_u8o6ASyacEO0YdMaDnSohBqm3wN3Ve6x6X6VBkMPMp9ocq5RagyA-7mM6XN537UgQ4Xrd2rdsnOOpNehqNI0k3XuYFzN-xM1qsYg34-t5cwtV48sFEo6SbERI83A"/>
+</div>
+<div>
+<h2 class="text-lg font-black text-white font-headline-md">Deep Work</h2>
+<p class="text-[10px] text-indigo-400 font-bold uppercase tracking-widest">Pro Plan</p>
+</div>
+</div>
+</div>
+<nav class="flex flex-col gap-xs flex-1">
+<a class="flex items-center gap-md p-3 rounded-lg bg-indigo-400/10 text-indigo-400 border-l-2 border-indigo-400 duration-300 ease-in-out font-manrope text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="folder_open">folder_open</span>
+<span>All Projects</span>
+</a>
+<a class="flex items-center gap-md p-3 rounded-lg text-zinc-400 hover:bg-zinc-800/50 duration-300 ease-in-out font-manrope text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="ads_click">ads_click</span>
+<span>Milestones</span>
+</a>
+<a class="flex items-center gap-md p-3 rounded-lg text-zinc-400 hover:bg-zinc-800/50 duration-300 ease-in-out font-manrope text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="group_work">group_work</span>
+<span>Shared Workspaces</span>
+</a>
+<a class="flex items-center gap-md p-3 rounded-lg text-zinc-400 hover:bg-zinc-800/50 duration-300 ease-in-out font-manrope text-sm" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span>Settings</span>
+</a>
+</nav>
+<div class="mt-auto pt-lg border-t border-white/5">
+<div class="flex items-center gap-md px-2">
+<div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-[10px] font-bold">JD</div>
+<div class="flex-1 overflow-hidden">
+<p class="text-xs font-semibold text-white truncate">John Doe</p>
+<p class="text-[10px] text-zinc-500 truncate">john@deepwork.studio</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Top App Bar (Shell) -->
+<header class="fixed top-0 right-0 left-0 md:left-72 z-40 h-16 bg-zinc-950/80 backdrop-blur-md border-b border-white/5 flex justify-between items-center px-6 shadow-xl">
+<div class="flex items-center gap-md">
+<button class="md:hidden text-zinc-400">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h1 class="text-xl font-bold text-indigo-400 tracking-tight font-manrope">Workspace</h1>
+</div>
+<div class="flex items-center gap-lg">
+<div class="hidden sm:flex items-center bg-white/5 rounded-full px-4 py-1.5 border border-white/5">
+<span class="material-symbols-outlined text-sm text-zinc-500 mr-2" data-icon="search">search</span>
+<span class="text-xs text-zinc-400 font-label-sm">Search assets...</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center overflow-hidden">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="professional headshot of a creative director in soft cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCEDNK16Wqe9D7el__k3m4zK65fTeHKcM32inLgS-X7aII-_exizqS_CgOHqybsJ7BEqrvQMpxYY7NOV-bgv0r9xK1pVqybaqLBNPr3fj-9zXjCpvBGCi3YoDw_Njb2bwxaNCT7k-TrBV0Dsx4udV3cxg_IR3CbiucvCm7Vfc4AmUweRNg5hpvCdt6Xm2_foLEG8Lt1YHc0ZeCRsec7UEzYCdrVx4c1AeXFs8AsHoQsvP2d-tA9dzkvZF0tT1p818XvM2T_iR7Qkw"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-24 px-6 pb-12 max-w-7xl mx-auto space-y-lg">
+<!-- Hero Title & Global Progress -->
+<section class="flex flex-col lg:flex-row lg:items-end justify-between gap-lg">
+<div class="space-y-sm">
+<div class="flex items-center gap-sm">
+<span class="px-2 py-0.5 rounded bg-indigo-400/10 text-indigo-400 text-[10px] font-black uppercase tracking-wider">Active Project</span>
+<span class="text-zinc-500 text-xs font-label-sm">• Updated 2h ago</span>
+</div>
+<h2 class="text-display-lg font-display-lg text-white">Project Quantum</h2>
+<p class="text-zinc-400 font-body-base max-w-xl">Re-engineering the core compute engine for real-time distributed data visualization with sub-50ms latency goals.</p>
+</div>
+<div class="glass-card p-6 rounded-xl w-full lg:w-80 flex flex-col gap-sm inner-glow">
+<div class="flex justify-between items-end">
+<span class="text-zinc-500 text-xs font-label-sm uppercase tracking-widest">Overall Completion</span>
+<span class="text-2xl font-black text-indigo-400">68%</span>
+</div>
+<div class="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+<div class="bg-indigo-400 h-full rounded-full w-[68%] shadow-[0_0_15px_rgba(129,140,248,0.4)]"></div>
+</div>
+<div class="flex justify-between text-[10px] text-zinc-500 font-bold">
+<span>PHASE 2 OF 3</span>
+<span>14 DAYS REMAINING</span>
+</div>
+</div>
+</section>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Key Milestones (Large) -->
+<div class="md:col-span-8 glass-card rounded-2xl p-lg space-y-lg inner-glow">
+<div class="flex items-center justify-between">
+<h3 class="text-lg font-bold text-white font-headline-md flex items-center gap-sm">
+<span class="material-symbols-outlined text-indigo-400" data-icon="ads_click">ads_click</span>
+            Strategic Milestones
+          </h3>
+<button class="text-xs font-bold text-indigo-400 hover:underline">View Roadmap</button>
+</div>
+<div class="space-y-md">
+<!-- Milestone Item -->
+<div class="group relative flex gap-lg p-4 rounded-xl hover:bg-white/5 transition-colors border border-transparent hover:border-white/5">
+<div class="flex flex-col items-center">
+<div class="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30">
+<span class="material-symbols-outlined text-sm" data-icon="check" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<div class="w-0.5 h-full bg-white/5 my-1"></div>
+</div>
+<div class="flex-1 pb-4">
+<div class="flex justify-between">
+<h4 class="text-sm font-bold text-white">System Architecture Baseline</h4>
+<span class="text-[10px] text-zinc-500 font-bold uppercase">Completed Apr 12</span>
+</div>
+<p class="text-xs text-zinc-400 mt-1">Finalized documentation for the distributed node protocols and encryption layers.</p>
+</div>
+</div>
+<!-- Milestone Item -->
+<div class="group relative flex gap-lg p-4 rounded-xl bg-indigo-400/5 border border-indigo-400/10">
+<div class="flex flex-col items-center">
+<div class="w-8 h-8 rounded-full bg-indigo-400 text-zinc-950 flex items-center justify-center shadow-[0_0_15px_rgba(129,140,248,0.4)]">
+<span class="material-symbols-outlined text-sm" data-icon="bolt" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+<div class="w-0.5 h-full bg-white/5 my-1"></div>
+</div>
+<div class="flex-1 pb-4">
+<div class="flex justify-between">
+<h4 class="text-sm font-bold text-white">Real-time Stress Testing</h4>
+<span class="px-2 py-0.5 rounded-full bg-indigo-400 text-zinc-950 text-[9px] font-black">IN PROGRESS</span>
+</div>
+<p class="text-xs text-zinc-400 mt-1">Running 10k concurrent node simulations to monitor buffer overflow and synchronization peaks.</p>
+<div class="mt-3 w-48 h-1 bg-white/10 rounded-full overflow-hidden">
+<div class="bg-indigo-400 h-full w-2/3"></div>
+</div>
+</div>
+</div>
+<!-- Milestone Item -->
+<div class="group relative flex gap-lg p-4 rounded-xl">
+<div class="flex flex-col items-center">
+<div class="w-8 h-8 rounded-full bg-zinc-800 text-zinc-500 flex items-center justify-center border border-white/5">
+<span class="material-symbols-outlined text-sm" data-icon="lock">lock</span>
+</div>
+</div>
+<div class="flex-1">
+<div class="flex justify-between">
+<h4 class="text-sm font-bold text-zinc-500">Public Beta Deployment</h4>
+<span class="text-[10px] text-zinc-600 font-bold uppercase">Estimated June 15</span>
+</div>
+<p class="text-xs text-zinc-600 mt-1">Pending validation of stress test results and final UI polish.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Team & Contributors (Small) -->
+<div class="md:col-span-4 glass-card rounded-2xl p-lg flex flex-col inner-glow">
+<h3 class="text-sm font-bold text-white font-headline-md mb-lg flex items-center justify-between">
+          Active Collaborators
+          <span class="text-[10px] text-indigo-400 font-bold bg-indigo-400/10 px-2 py-0.5 rounded-full">8 ONLINE</span>
+</h3>
+<div class="space-y-sm flex-1">
+<div class="flex items-center gap-md p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer">
+<div class="relative">
+<img alt="Contributor" class="w-10 h-10 rounded-full border border-white/10" data-alt="portrait of a software engineer with glasses in a dark tech studio environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2b6SG3Wyy3C8gcKuKhc3sbwgcs-sGJiayEybMbN_AJRHzOI_myUS4uEzDC9yyURbrc7GUCi4_zdGwt5IBnuJ0sPRsoGEUF12chMxedPv5aLM5sBOBwJ9vFlOKaSLgofWIQySSCX517aWjRX4BjC-T9MMVK0JN9dXYpxJQ6YDdQupAweLEdm1ezC7eX2Gk1l-OUv982Nw3Et78bT_wrx3MV5AK20kVDvnur-O1l7V6EEP69s5gR8gT-Vy_oNbXC3eI4IpW7lj13A"/>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-zinc-900 rounded-full"></div>
+</div>
+<div>
+<p class="text-xs font-bold text-white">Sarah Koenig</p>
+<p class="text-[10px] text-zinc-500 font-medium">Lead Engine Architect</p>
+</div>
+</div>
+<div class="flex items-center gap-md p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer">
+<div class="relative">
+<img alt="Contributor" class="w-10 h-10 rounded-full border border-white/10" data-alt="creative designer with tattoos in a minimalist modern office setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsU7NUL9wEw-EABTqcXsNWRivb6pfMxdbPjrtiZssL-X4CqkrdJbuxdlPUz_ffvp7bHCMOQBne2Rfe9L8dIjGPHyWbLgwXUaMpWPRGVL6br1awvi5Yz0KI_vj_hitx6L_8ikNZa8A1lpmEAnZT2-NC9sPlNsihZci3Ib_WdYZxyP46nhr_nRrYzXfX5mJ2ao-2PjAKidu3mM_FR0n2hlUIuwpOxcOyx_ZZHMNqTDLasOt1i3rS2exWJ1CvVd1EYEQ9AWN2h70UFQ"/>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-zinc-900 rounded-full"></div>
+</div>
+<div>
+<p class="text-xs font-bold text-white">Marcus Aurelius</p>
+<p class="text-[10px] text-zinc-500 font-medium">UI/UX Designer</p>
+</div>
+</div>
+<div class="flex items-center gap-md p-2 rounded-lg hover:bg-white/5 transition-colors cursor-pointer opacity-60">
+<div class="relative">
+<img alt="Contributor" class="w-10 h-10 rounded-full border border-white/10" data-alt="smiling developer in a bright outdoor urban setting, bokeh effect" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLqwX-3x_oKa_iC6SA32L6P64Qas1_nnqA7xS-xf38PSNE_YVtHX2TBIc3eRFjdhzyIDKs8klBq3RXCGHAP9l-6NQnu0t0IWpY3vJve881frbLTfE_MlrlP6NQvldievqFSvrTNdkgFxtvcCPXCkO0YFbk5jB2gXM3R_ygE9OvvX9iVz6j4xpAGPsvMzcNEa047DpEtQTQWt1wfwedjLCVbY-G8n1y-48GFx6_GbA8n9t8kwoS3AQ5qzeJoXbOMOON2zEcxQKOUA"/>
+<div class="absolute bottom-0 right-0 w-3 h-3 bg-zinc-600 border-2 border-zinc-900 rounded-full"></div>
+</div>
+<div>
+<p class="text-xs font-bold text-white">Jamie Lannister</p>
+<p class="text-[10px] text-zinc-500 font-medium">DevOps Specialist</p>
+</div>
+</div>
+</div>
+<button class="mt-lg w-full py-3 rounded-xl bg-white/5 border border-white/10 text-xs font-bold text-zinc-300 hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="person_add">person_add</span>
+          Manage Permissions
+        </button>
+</div>
+<!-- Recent Task Activity (Full Width) -->
+<div class="md:col-span-12 glass-card rounded-2xl p-lg space-y-lg inner-glow">
+<div class="flex items-center justify-between">
+<div class="space-y-1">
+<h3 class="text-lg font-bold text-white font-headline-md">Task Activity</h3>
+<p class="text-xs text-zinc-500 font-body-base">Stream of latest changes and ticket updates</p>
+</div>
+<div class="flex gap-sm">
+<button class="px-4 py-2 rounded-lg bg-zinc-800 text-[11px] font-bold text-zinc-300 border border-white/5 hover:border-white/10">Filter</button>
+<button class="px-4 py-2 rounded-lg bg-indigo-400 text-zinc-950 text-[11px] font-black shadow-[0_4px_15px_rgba(129,140,248,0.2)]">New Task</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="text-[10px] font-black text-zinc-500 uppercase tracking-widest border-b border-white/5">
+<th class="pb-4 font-black">Ref</th>
+<th class="pb-4 font-black">Title &amp; Status</th>
+<th class="pb-4 font-black">Priority</th>
+<th class="pb-4 font-black">Assignee</th>
+<th class="pb-4 text-right font-black">Last Update</th>
+</tr>
+</thead>
+<tbody class="text-sm">
+<tr class="group hover:bg-white/5 transition-colors border-b border-white/5">
+<td class="py-4 font-mono text-[10px] text-zinc-600">QX-102</td>
+<td class="py-4">
+<div class="flex flex-col">
+<span class="font-bold text-zinc-100">Implement WebSocket Reconnection Logic</span>
+<span class="text-[10px] text-zinc-500 font-medium mt-0.5">Category: Infrastructure</span>
+</div>
+</td>
+<td class="py-4">
+<span class="px-2 py-1 rounded-full bg-red-500/10 text-red-400 text-[9px] font-black uppercase">Critical</span>
+</td>
+<td class="py-4">
+<div class="flex -space-x-2">
+<img alt="Member" class="w-6 h-6 rounded-full border-2 border-zinc-900" data-alt="abstract person placeholder" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD4Ohoc4mQbsrsrpxXFhehM9ldEQiOz0IedJ8qVBPZFC5iwbKjOkSQYWEnlY6dpfML55aIiGsDxlVMKt9IGe_qBsdP143VZI8ohaJxPmvPmDSEvVghpXWOVCuRdkkfiGs5Pz9jnwh9djcqjRrHRWzwYUueKUPNeKZKhzLi6tzyr3H2TDOZlkwdUwywHt4Vrb5ZpQaN6KZbg0KEYQW7UrTFE058fkrYDUTu_lcwfkWfjMmrRT0ZOR_lLbe0Uzy7BjBIhXYADrSEXVA"/>
+<img alt="Member" class="w-6 h-6 rounded-full border-2 border-zinc-900" data-alt="abstract person placeholder" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDee3OcPs4uUt0oywylyVnzI7CTTMo0EpZN00H9JK8gd-mDFYr0geLXuJGLrodLVjhjsz7UjHadpGcvWev57Mjogc9D7tcDQk5w7DIu65MzyGksntXHYHxDMMcRoY9Qt8NRjoDXpJo2cG5NAjeIwkVD51TLjfxCskGNNkVqoOlXgRCkjBxPb7vs6wOsaYvySrY87jay3jjd99WhHq-EaecNBEEh_2Dg0S3Yf7_8pLyVIRNjX34jvcqDB6d8eoq5VObJkdA9G-OSWw"/>
+</div>
+</td>
+<td class="py-4 text-right text-[11px] text-zinc-400 font-medium">12 mins ago</td>
+</tr>
+<tr class="group hover:bg-white/5 transition-colors border-b border-white/5">
+<td class="py-4 font-mono text-[10px] text-zinc-600">QX-098</td>
+<td class="py-4">
+<div class="flex flex-col">
+<span class="font-bold text-zinc-100">Dark Mode Toggle UI Polish</span>
+<span class="text-[10px] text-zinc-500 font-medium mt-0.5">Category: Frontend</span>
+</div>
+</td>
+<td class="py-4">
+<span class="px-2 py-1 rounded-full bg-zinc-800 text-zinc-400 text-[9px] font-black uppercase">Low</span>
+</td>
+<td class="py-4">
+<img alt="Member" class="w-6 h-6 rounded-full border-2 border-zinc-900" data-alt="abstract person placeholder" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBhgXPrH9Z5hz8XzrY9vQl661PdK5jq2RmEVnSM-QcPzK5KIxC8yFZKnCm2YgPOFuKKsbjHczGX5jmZTfmi8__3fX1ESH_RK5Yb1XylKZqbCwNfXSnpk6ohBHLSVLJGO9A9NN7uEpaIyq7POmuc0h_KLSo05GyeibUQPkZsjZ-u8hV9UvnlHzqwLftWeXWH4OaXX1Ibkk_Pz3l9MnTXCnvGAERab-VWENZNTJUBZCzFvYdcBqlp3FaHmf9RCTcwQ_oGa0tTGKRvEw"/>
+</td>
+<td class="py-4 text-right text-[11px] text-zinc-400 font-medium">2 hours ago</td>
+</tr>
+<tr class="group hover:bg-white/5 transition-colors">
+<td class="py-4 font-mono text-[10px] text-zinc-600">QX-085</td>
+<td class="py-4">
+<div class="flex flex-col">
+<span class="font-bold text-zinc-100">API Gateway Rate Limiting</span>
+<span class="text-[10px] text-zinc-500 font-medium mt-0.5">Category: Security</span>
+</div>
+</td>
+<td class="py-4">
+<span class="px-2 py-1 rounded-full bg-amber-500/10 text-amber-400 text-[9px] font-black uppercase">Medium</span>
+</td>
+<td class="py-4">
+<img alt="Member" class="w-6 h-6 rounded-full border-2 border-zinc-900" data-alt="abstract person placeholder" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyxNKqrnqO5n03f2d6UrzraOMmwv-NKSMcJVCy16itEqvTcv6kJCYjjOfXlyvPZ7_0n5gloX8zrhFnUMf4xdWpZiKgKeeM0sYII-6cB3GPzX7YlG-a5WCoJE0yuS5c4TYRJ42tAcIUgMb4UTGhoJFPIG9RE0vxsaEhQfSHQ51G-zIAdBb3cdAO_JBdcAXdbOmmoDuhLfAuUu3uE3thnOW-sa6lAKxza54-PEr-0GtANqdqCfUgWkcrvY0sH32GuMmd775NVvmLqw"/>
+</td>
+<td class="py-4 text-right text-[11px] text-zinc-400 font-medium">Yesterday</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar (Mobile Shell) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe bg-zinc-950/80 backdrop-blur-xl border-t border-white/10 rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.5)] md:hidden">
+<a class="flex flex-col items-center justify-center text-zinc-500 hover:text-indigo-300 transition-all duration-300 ease-spring" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-manrope text-[10px] font-semibold mt-1">Feed</span>
+</a>
+<a class="flex flex-col items-center justify-center text-indigo-400 scale-110 transition-all duration-300 ease-spring" href="#">
+<span class="material-symbols-outlined" data-icon="checklist" style="font-variation-settings: 'FILL' 1;">checklist</span>
+<span class="font-manrope text-[10px] font-semibold mt-1">Tasks</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-500 hover:text-indigo-300 transition-all duration-300 ease-spring" href="#">
+<span class="material-symbols-outlined" data-icon="analytics">analytics</span>
+<span class="font-manrope text-[10px] font-semibold mt-1">Stats</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-500 hover:text-indigo-300 transition-all duration-300 ease-spring" href="#">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+<span class="font-manrope text-[10px] font-semibold mt-1">Profile</span>
+</a>
+</nav>
+</body></html>

@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Orbit Profile - Alex Rivers</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed": "#ffdbcc",
+                        "inverse-surface": "#2d3133",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "on-secondary": "#ffffff",
+                        "inverse-on-surface": "#eff1f3",
+                        "primary": "#3525cd",
+                        "on-primary": "#ffffff",
+                        "primary-fixed-dim": "#c3c0ff",
+                        "on-primary-fixed-variant": "#3323cc",
+                        "on-error-container": "#93000a",
+                        "tertiary": "#7e3000",
+                        "on-background": "#191c1e",
+                        "on-surface": "#191c1e",
+                        "surface": "#f7f9fb",
+                        "outline-variant": "#c7c4d8",
+                        "on-primary-container": "#dad7ff",
+                        "error": "#ba1a1a",
+                        "surface-container-low": "#f2f4f6",
+                        "outline": "#777587",
+                        "on-tertiary-container": "#ffd2be",
+                        "surface-tint": "#4d44e3",
+                        "on-primary-fixed": "#0f0069",
+                        "on-tertiary-fixed": "#351000",
+                        "inverse-primary": "#c3c0ff",
+                        "background": "#f7f9fb",
+                        "surface-bright": "#f7f9fb",
+                        "error-container": "#ffdad6",
+                        "surface-dim": "#d8dadc",
+                        "surface-container-highest": "#e0e3e5",
+                        "tertiary-fixed-dim": "#ffb695",
+                        "secondary-container": "#d0e1fb",
+                        "primary-fixed": "#e2dfff",
+                        "on-surface-variant": "#464555",
+                        "surface-container": "#eceef0",
+                        "secondary-fixed": "#d3e4fe",
+                        "tertiary-container": "#a44100",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "secondary": "#505f76",
+                        "surface-variant": "#e0e3e5",
+                        "on-secondary-container": "#54647a",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "primary-container": "#4f46e5",
+                        "on-tertiary-fixed-variant": "#7b2f00",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed": "#0b1c30",
+                        "surface-container-high": "#e6e8ea"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "24px",
+                        "unit": "4px",
+                        "container-margin": "32px",
+                        "md": "16px",
+                        "xl": "32px",
+                        "xs": "4px",
+                        "gutter": "20px",
+                        "sm": "8px",
+                        "2xl": "48px"
+                    },
+                    "fontFamily": {
+                        "label-sm": ["Inter"],
+                        "h3": ["Manrope"],
+                        "body-md": ["Inter"],
+                        "h2": ["Manrope"],
+                        "button": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "h1": ["Manrope"]
+                    },
+                    "fontSize": {
+                        "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "h3": ["20px", {"lineHeight": "1.4", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400"}],
+                        "h2": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "button": ["14px", {"lineHeight": "1", "letterSpacing": "0", "fontWeight": "600"}],
+                        "body-lg": ["16px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                        "h1": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body-md text-on-surface antialiased min-h-screen pb-24 md:pb-0 md:pl-[280px]">
+<!-- TopAppBar -->
+<header class="bg-white/70 backdrop-blur-xl border-b border-white/20 shadow-sm font-manrope font-semibold text-lg docked full-width top-0 sticky z-50 flex justify-between items-center px-6 py-4 w-full">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-indigo-600" data-icon="grid_view">grid_view</span>
+<span class="text-xl font-bold text-slate-900 tracking-tight">Orbit</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="h-10 w-10 rounded-full border-2 border-primary-container overflow-hidden">
+<img alt="User avatar" class="h-full w-full object-cover" data-alt="Close up portrait of a professional man with a kind smile, studio lighting, neutral grey background, high detail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqaFgrzesGvCS0ldHEfBj4WoHkk4v_9qxzNBc2t0PkTUTwA5Q2h8QoPlbowiyX7_MsRgcZPE6vRH_A2L4hiLTBocqWg6zxwlgFTFvxlponXkOr3CsdsiC0haxwk2wVHJx-jgLLO4VgUej-5qnxNCK1Qw3Ti70LULEI08UaOkVPtXaaJDaxAya7hRqduyTvCPlu1ZNN0zXWyIZUsNalKQfAu28kkz_Tizcxdd-Z5wsRvUR3frxBFcVup3lKfJP2n5-cLkLNub2QuA"/>
+</div>
+</div>
+</header>
+<!-- NavigationDrawer (Sidebar for Desktop) -->
+<aside class="hidden md:flex fixed left-0 top-0 h-full w-[280px] shadow-2xl bg-white border-r border-slate-100 flex-col p-4 gap-2 z-40">
+<div class="flex items-center gap-4 mb-8 px-2 py-4">
+<div class="h-12 w-12 rounded-xl bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-white" data-icon="rocket_launch">rocket_launch</span>
+</div>
+<div>
+<h2 class="font-manrope font-bold text-slate-900 leading-tight">Alex Rivers</h2>
+<span class="text-label-sm font-label-sm text-primary">Pro Plan</span>
+</div>
+</div>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-50 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-manrope text-sm font-medium">Personal</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-50 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="business_center">business_center</span>
+<span class="font-manrope text-sm font-medium">Work</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-50 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="event">event</span>
+<span class="font-manrope text-sm font-medium">Upcoming</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-600 hover:bg-slate-50 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="filter_list">filter_list</span>
+<span class="font-manrope text-sm font-medium">Filters</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg bg-indigo-50 text-indigo-600 border-l-4 border-indigo-600 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-manrope text-sm font-medium">Settings</span>
+</a>
+</nav>
+<div class="mt-auto border-t border-slate-100 pt-4 px-2">
+<button class="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-error hover:bg-error-container/20 transition-all active:scale-95">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+<span class="font-manrope text-sm font-medium">Log Out</span>
+</button>
+<div class="px-4 py-2 mt-2">
+<span class="text-[10px] text-slate-400 font-medium">v2.4.0</span>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="max-w-5xl mx-auto p-gutter md:p-xl space-y-lg">
+<!-- Profile Hero Section -->
+<section class="relative overflow-hidden rounded-[32px] bg-white border border-slate-200 shadow-sm p-xl">
+<div class="absolute top-0 right-0 w-64 h-64 bg-primary-container/10 blur-[80px] -mr-32 -mt-32"></div>
+<div class="relative flex flex-col md:flex-row items-center md:items-start gap-xl">
+<div class="relative">
+<div class="h-32 w-32 rounded-3xl overflow-hidden shadow-xl border-4 border-white">
+<img alt="User avatar" class="h-full w-full object-cover" data-alt="Modern close-up of a business professional looking at camera, high quality photography, soft natural office lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCr6NVup06kRheFbEVjgX3_2FjuKvoFscvNJ5ZlLycjsTb9Dk66t7AXmaOjlY8JjRhWUqkYodmC-OruGzz2LMXm5bbKZph6tpFPUSntD2ix56e4l9YyCmatwq99l-KX-EHi25bPV_-yui-HtdoZZlNEfvm5GOUKT1PypP8wIEDuQFQuwb2Qy0As2t9Lt94qifJ8BX1uLDbHxnITUHvgGoR3gWUFFFKfrcSD8vN0PAZOHtHS14fpDC8QnDT9CUfX8Gw9v3FP7JgzQw"/>
+</div>
+<div class="absolute -bottom-2 -right-2 bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-lg border-2 border-white">
+                        PRO
+                    </div>
+</div>
+<div class="text-center md:text-left flex-1">
+<h1 class="font-h1 text-h1 text-on-background mb-unit">Alex Rivers</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant mb-md">Product Lead at Orbit Dynamics</p>
+<div class="flex flex-wrap justify-center md:justify-start gap-sm">
+<span class="bg-secondary-container text-on-secondary-container px-3 py-1 rounded-full text-label-sm font-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="location_on">location_on</span> San Francisco, CA
+                        </span>
+<span class="bg-surface-container-highest text-on-surface-variant px-3 py-1 rounded-full text-label-sm font-label-sm">
+                            Joined March 2023
+                        </span>
+</div>
+</div>
+<div class="flex gap-md">
+<button class="bg-primary text-on-primary font-button text-button px-6 py-3 rounded-xl shadow-md hover:brightness-110 active:scale-95 transition-all">
+                        Edit Profile
+                    </button>
+</div>
+</div>
+</section>
+<!-- Bento Grid Settings Sections -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-lg">
+<!-- Personal Info Card -->
+<div class="md:col-span-8 bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden flex flex-col">
+<div class="p-lg border-b border-slate-100 flex items-center justify-between">
+<div class="flex items-center gap-3">
+<div class="p-2 bg-indigo-50 rounded-lg">
+<span class="material-symbols-outlined text-indigo-600" data-icon="person">person</span>
+</div>
+<h3 class="font-h3 text-h3">Personal Information</h3>
+</div>
+<button class="text-primary font-button text-button hover:underline">Update</button>
+</div>
+<div class="p-lg grid grid-cols-1 md:grid-cols-2 gap-xl">
+<div class="space-y-unit">
+<label class="text-label-sm font-label-sm text-on-surface-variant">Full Name</label>
+<p class="font-body-md text-body-md text-on-surface font-semibold">Alex Rivers</p>
+</div>
+<div class="space-y-unit">
+<label class="text-label-sm font-label-sm text-on-surface-variant">Email Address</label>
+<p class="font-body-md text-body-md text-on-surface font-semibold">alex.rivers@orbit.io</p>
+</div>
+<div class="space-y-unit">
+<label class="text-label-sm font-label-sm text-on-surface-variant">Phone Number</label>
+<p class="font-body-md text-body-md text-on-surface font-semibold">+1 (555) 234-8910</p>
+</div>
+<div class="space-y-unit">
+<label class="text-label-sm font-label-sm text-on-surface-variant">Timezone</label>
+<p class="font-body-md text-body-md text-on-surface font-semibold">Pacific Time (PT)</p>
+</div>
+</div>
+</div>
+<!-- Security Summary Card -->
+<div class="md:col-span-4 bg-white rounded-3xl border border-slate-200 shadow-sm p-lg space-y-md">
+<div class="flex items-center gap-3 mb-4">
+<div class="p-2 bg-error-container/30 rounded-lg">
+<span class="material-symbols-outlined text-error" data-icon="security">security</span>
+</div>
+<h3 class="font-h3 text-h3">Security</h3>
+</div>
+<div class="space-y-md">
+<div class="flex items-center justify-between p-3 rounded-2xl bg-surface-container-low border border-slate-100">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400" data-icon="fingerprint">fingerprint</span>
+<span class="text-body-md font-medium">2FA Enabled</span>
+</div>
+<span class="w-3 h-3 rounded-full bg-emerald-500"></span>
+</div>
+<div class="flex items-center justify-between p-3 rounded-2xl bg-surface-container-low border border-slate-100">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400" data-icon="lock">lock</span>
+<span class="text-body-md font-medium">Password</span>
+</div>
+<button class="text-xs text-primary font-bold">Change</button>
+</div>
+<div class="pt-4">
+<p class="text-label-sm text-on-surface-variant leading-relaxed">
+                            Last password change was 4 months ago. We recommend updating it every 6 months.
+                        </p>
+</div>
+</div>
+</div>
+<!-- Billing & Subscription -->
+<div class="md:col-span-12 bg-white rounded-3xl border border-slate-200 shadow-sm p-lg overflow-hidden relative">
+<div class="absolute top-0 right-0 -mt-12 -mr-12 w-64 h-64 bg-tertiary-fixed/20 rounded-full blur-[60px]"></div>
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-xl relative z-10">
+<div class="flex gap-lg">
+<div class="p-4 bg-tertiary-fixed rounded-2xl self-start">
+<span class="material-symbols-outlined text-tertiary text-3xl" data-icon="credit_card">credit_card</span>
+</div>
+<div>
+<h3 class="font-h3 text-h3 mb-xs">Billing &amp; Subscription</h3>
+<p class="font-body-md text-on-surface-variant">Your next billing date is <span class="text-on-surface font-semibold">Dec 14, 2023</span> for <span class="text-on-surface font-semibold">$19.00</span></p>
+</div>
+</div>
+<div class="flex flex-wrap gap-md">
+<div class="flex items-center gap-3 bg-surface-container px-4 py-3 rounded-2xl border border-slate-200">
+<img alt="Mastercard" class="h-6" data-alt="Small Mastercard logo icon with the classic red and orange overlapping circles" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBFvQFFT391zY0xf7o_7X7Fs428HRaeCMgFw8wUxR-iM7A2AqbaYiEwBU35gbAtlMP64_OSkmJItvgRdas1vu6Qrq5ET6j_WUOP2ns_Il9H5LnFbucjxLqSlX9WcATiucv5RUxkUeA5owiCJydsNakbF1UN6Agg_yFxm4hdxTIhfyZYXlWxM6ro8SVrAFyMiNBlRk5HZpHkr9OjUpbboweKKjabCttJ99iwwq4dH_Xq1qRB0PWjVv26HIgLOkd_uEyPZKEYRW4Zbg"/>
+<div>
+<p class="text-xs text-on-surface-variant">Mastercard</p>
+<p class="text-sm font-bold">•••• 4412</p>
+</div>
+</div>
+<button class="bg-surface-container-lowest border border-slate-200 font-button text-button px-6 py-3 rounded-2xl hover:bg-slate-50 transition-all active:scale-95">
+                            Manage Methods
+                        </button>
+</div>
+</div>
+</div>
+<!-- Quick Actions / App Prefs -->
+<div class="md:col-span-6 bg-white rounded-3xl border border-slate-200 shadow-sm p-lg">
+<h4 class="font-manrope font-bold text-slate-800 mb-md">App Preferences</h4>
+<div class="space-y-sm">
+<div class="flex items-center justify-between py-2">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400" data-icon="dark_mode">dark_mode</span>
+<span class="text-body-md">Dark Mode</span>
+</div>
+<div class="w-12 h-6 bg-surface-container-highest rounded-full p-1 cursor-pointer">
+<div class="w-4 h-4 bg-white rounded-full shadow-sm"></div>
+</div>
+</div>
+<div class="flex items-center justify-between py-2 border-t border-slate-50">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400" data-icon="notifications">notifications</span>
+<span class="text-body-md">Email Notifications</span>
+</div>
+<div class="w-12 h-6 bg-primary rounded-full p-1 cursor-pointer flex justify-end">
+<div class="w-4 h-4 bg-white rounded-full shadow-sm"></div>
+</div>
+</div>
+<div class="flex items-center justify-between py-2 border-t border-slate-50">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400" data-icon="language">language</span>
+<span class="text-body-md">System Language</span>
+</div>
+<span class="text-xs font-semibold text-primary">English (US)</span>
+</div>
+</div>
+</div>
+<!-- Integrated Logout for Mobile & Extra spacing -->
+<div class="md:col-span-6 flex flex-col justify-center">
+<div class="p-lg bg-surface-container-low rounded-3xl border border-dashed border-slate-300 text-center">
+<p class="text-label-sm text-on-surface-variant mb-md">Need to step away from your orbit?</p>
+<button class="w-full flex items-center justify-center gap-2 bg-white text-error border border-error/20 font-button px-6 py-4 rounded-2xl hover:bg-error-container/10 transition-all active:scale-95">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+                        Log Out of All Devices
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-white/80 backdrop-blur-2xl border-t border-white/20 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] rounded-t-[28px]">
+<a class="flex flex-col items-center justify-center text-slate-400 transition-all active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="task_alt">task_alt</span>
+<span class="font-manrope text-[11px] font-medium mt-1">Tasks</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 transition-all active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+<span class="font-manrope text-[11px] font-medium mt-1">Search</span>
+</a>
+<a class="flex flex-col items-center justify-center text-slate-400 transition-all active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="font-manrope text-[11px] font-medium mt-1">Activity</span>
+</a>
+<a class="flex flex-col items-center justify-center text-indigo-600 bg-indigo-50 rounded-2xl px-3 py-1 transition-all active:scale-90 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-manrope text-[11px] font-medium mt-1">Settings</span>
+</a>
+</nav>
+</body></html>

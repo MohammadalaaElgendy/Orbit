@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Studio - Home Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .shadow-inner-glow {
+            box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.05);
+        }
+        .glass-card {
+            backdrop-filter: blur(20px);
+            background: rgba(24, 24, 27, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .glass-card-high {
+            backdrop-filter: blur(40px);
+            background: rgba(24, 24, 27, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #09090b;
+            color: #e5e1e4;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "secondary-fixed": "#e7deff",
+                      "on-secondary": "#332664",
+                      "on-tertiary-container": "#3e2b00",
+                      "error-container": "#93000a",
+                      "surface-tint": "#bdc2ff",
+                      "on-tertiary-fixed": "#261900",
+                      "surface-container-highest": "#353437",
+                      "on-secondary-container": "#baabf3",
+                      "outline-variant": "#454653",
+                      "on-surface": "#e5e1e4",
+                      "on-error": "#690005",
+                      "inverse-surface": "#e5e1e4",
+                      "inverse-on-surface": "#313032",
+                      "secondary-container": "#4a3d7c",
+                      "primary-fixed": "#e0e0ff",
+                      "surface-container-lowest": "#0e0e10",
+                      "surface-container-high": "#2a2a2c",
+                      "surface-variant": "#353437",
+                      "on-primary": "#131e8c",
+                      "inverse-primary": "#4953bc",
+                      "on-background": "#e5e1e4",
+                      "secondary-fixed-dim": "#ccbeff",
+                      "on-primary-fixed": "#000767",
+                      "tertiary-fixed": "#ffdea3",
+                      "on-primary-container": "#101b8a",
+                      "surface-container-low": "#1c1b1d",
+                      "surface-dim": "#131315",
+                      "surface": "#131315",
+                      "primary-container": "#818cf8",
+                      "background": "#131315",
+                      "on-primary-fixed-variant": "#2f3aa3",
+                      "secondary": "#ccbeff",
+                      "primary": "#bdc2ff",
+                      "tertiary-fixed-dim": "#f7bd3e",
+                      "tertiary": "#f7bd3e",
+                      "on-secondary-fixed": "#1e0e4e",
+                      "outline": "#908f9e",
+                      "on-tertiary": "#402d00",
+                      "error": "#ffb4ab",
+                      "on-error-container": "#ffdad6",
+                      "surface-bright": "#39393b",
+                      "on-tertiary-fixed-variant": "#5d4200",
+                      "on-surface-variant": "#c6c5d5",
+                      "primary-fixed-dim": "#bdc2ff",
+                      "surface-container": "#201f22",
+                      "tertiary-container": "#c08d00",
+                      "on-secondary-fixed-variant": "#4a3d7c"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "sm": "8px",
+                      "gutter": "20px",
+                      "container-margin": "32px",
+                      "lg": "24px",
+                      "xl": "40px",
+                      "md": "16px",
+                      "unit": "4px",
+                      "xs": "4px"
+              },
+              "fontFamily": {
+                      "label-sm": ["Manrope"],
+                      "body-base": ["Manrope"],
+                      "headline-md": ["Manrope"],
+                      "display-lg": ["Manrope"]
+              },
+              "fontSize": {
+                      "label-sm": ["13px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                      "body-base": ["16px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}]
+              }
+            },
+          },
+        }
+      </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-base text-on-surface bg-surface-dim min-h-screen pb-24">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 z-50 bg-zinc-900/60 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-6 py-4 w-full shadow-inner-glow">
+<div class="flex items-center gap-4">
+<div class="w-8 h-8 rounded-full overflow-hidden bg-zinc-800">
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="Close-up portrait of a professional man in a dark turtleneck with soft cinematic rim lighting against a blurred office background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAc1G74n664GAboxtZazN5k42hsu77WezgT8x8aTCZCfkTfH95yV0C1N1yXzjcnNgun9QoFPf7WQdvn3MvpgQWataRhZMOK3QnaVn8u4YXbjYfpr8gk-gnjHpSD5ZMWFSDVpXfB-kvt4zqS37IGoGWFoHPuWdVcaHZNAsU97mk6KzcFwt8qKj2kCH0Vk5kfLNblpkFrh2shqjQlFbofn3D8JJZTKmBajEH0FzkGynRILU8jH5AE4vN3MoE5pdvNGUP8Wc9fjmEPlg"/>
+</div>
+<span class="text-xl font-bold text-indigo-400 tracking-tighter font-manrope">Studio</span>
+</div>
+<div class="hidden md:flex gap-8">
+<a class="text-indigo-400 font-semibold font-manrope text-[14px]" href="#">Dashboard</a>
+<a class="text-zinc-400 hover:bg-white/5 transition-colors font-manrope text-[14px] px-2 rounded" href="#">Projects</a>
+<a class="text-zinc-400 hover:bg-white/5 transition-colors font-manrope text-[14px] px-2 rounded" href="#">Workspaces</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-indigo-400 active:scale-95 duration-200 material-symbols-outlined">search</button>
+<button class="p-2 rounded-full hover:bg-white/5 text-zinc-400 material-symbols-outlined">notifications</button>
+</div>
+</header>
+<main class="pt-24 px-6 md:px-12 max-w-7xl mx-auto space-y-xl">
+<!-- Welcome Section -->
+<section class="space-y-sm">
+<h1 class="font-display-lg text-display-lg text-zinc-50 tracking-tight">Morning, Julian.</h1>
+<p class="text-zinc-400 font-body-base max-w-xl">You have 3 deadlines approaching today. Your productivity score is up 12% this week.</p>
+</section>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Active Projects - Large Column -->
+<div class="md:col-span-8 space-y-lg">
+<div class="flex items-center justify-between">
+<h2 class="font-headline-md text-headline-md text-zinc-100">Active Projects</h2>
+<button class="text-indigo-400 text-label-sm font-label-sm hover:underline">View All</button>
+</div>
+<div class="grid grid-cols-1 gap-md">
+<!-- Project Card 1 -->
+<div class="glass-card p-lg rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-lg hover:border-white/10 transition-all group">
+<div class="flex items-center gap-lg">
+<div class="w-12 h-12 rounded-lg bg-indigo-500/10 flex items-center justify-center border border-indigo-400/20">
+<span class="material-symbols-outlined text-indigo-400" data-weight="fill">architecture</span>
+</div>
+<div>
+<h3 class="font-semibold text-zinc-50 text-body-base">Neo-Modern UI Kit</h3>
+<p class="text-label-sm text-zinc-500 font-label-sm">High-fidelity components for Studio</p>
+</div>
+</div>
+<div class="flex flex-col md:items-end gap-xs w-full md:w-48">
+<div class="flex justify-between w-full text-label-sm font-label-sm">
+<span class="text-zinc-400">Progress</span>
+<span class="text-indigo-400">65%</span>
+</div>
+<div class="w-full bg-zinc-800 h-1.5 rounded-full overflow-hidden">
+<div class="bg-indigo-400 h-full rounded-full shadow-[0_0_8px_rgba(129,140,248,0.4)]" style="width: 65%"></div>
+</div>
+</div>
+</div>
+<!-- Project Card 2 -->
+<div class="glass-card p-lg rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-lg hover:border-white/10 transition-all">
+<div class="flex items-center gap-lg">
+<div class="w-12 h-12 rounded-lg bg-tertiary-container/10 flex items-center justify-center border border-tertiary/20">
+<span class="material-symbols-outlined text-tertiary" data-weight="fill">token</span>
+</div>
+<div>
+<h3 class="font-semibold text-zinc-50 text-body-base">Blockchain Explorer</h3>
+<p class="text-label-sm text-zinc-500 font-label-sm">Finalizing smart contract visuals</p>
+</div>
+</div>
+<div class="flex flex-col md:items-end gap-xs w-full md:w-48">
+<div class="flex justify-between w-full text-label-sm font-label-sm">
+<span class="text-zinc-400">Progress</span>
+<span class="text-tertiary">32%</span>
+</div>
+<div class="w-full bg-zinc-800 h-1.5 rounded-full overflow-hidden">
+<div class="bg-tertiary h-full rounded-full shadow-[0_0_8px_rgba(247,189,62,0.4)]" style="width: 32%"></div>
+</div>
+</div>
+</div>
+<!-- Project Card 3 -->
+<div class="glass-card p-lg rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-lg hover:border-white/10 transition-all">
+<div class="flex items-center gap-lg">
+<div class="w-12 h-12 rounded-lg bg-secondary-container/10 flex items-center justify-center border border-secondary/20">
+<span class="material-symbols-outlined text-secondary" data-weight="fill">cloud_sync</span>
+</div>
+<div>
+<h3 class="font-semibold text-zinc-50 text-body-base">SaaS Migration</h3>
+<p class="text-label-sm text-zinc-500 font-label-sm">Moving assets to decentralized node</p>
+</div>
+</div>
+<div class="flex flex-col md:items-end gap-xs w-full md:w-48">
+<div class="flex justify-between w-full text-label-sm font-label-sm">
+<span class="text-zinc-400">Progress</span>
+<span class="text-secondary">88%</span>
+</div>
+<div class="w-full bg-zinc-800 h-1.5 rounded-full overflow-hidden">
+<div class="bg-secondary h-full rounded-full shadow-[0_0_8px_rgba(204,190,255,0.4)]" style="width: 88%"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Deadlines & Insights - Small Column -->
+<div class="md:col-span-4 space-y-lg">
+<h2 class="font-headline-md text-headline-md text-zinc-100">Deadlines</h2>
+<div class="glass-card-high rounded-xl p-6 space-y-lg relative overflow-hidden">
+<!-- Subtle Radial Glow -->
+<div class="absolute -top-12 -left-12 w-32 h-32 bg-indigo-500/10 blur-[60px]"></div>
+<div class="flex flex-col gap-md relative z-10">
+<div class="flex items-start gap-md">
+<div class="min-w-[4px] h-12 bg-error rounded-full"></div>
+<div class="flex flex-col">
+<span class="text-label-sm font-label-sm text-error">Today, 5:00 PM</span>
+<span class="text-zinc-50 font-semibold text-body-base">Client Review: Studio App</span>
+</div>
+</div>
+<div class="flex items-start gap-md">
+<div class="min-w-[4px] h-12 bg-tertiary rounded-full"></div>
+<div class="flex flex-col">
+<span class="text-label-sm font-label-sm text-tertiary">Tomorrow, 10:00 AM</span>
+<span class="text-zinc-50 font-semibold text-body-base">Developer Handoff docs</span>
+</div>
+</div>
+<div class="flex items-start gap-md">
+<div class="min-w-[4px] h-12 bg-zinc-700 rounded-full"></div>
+<div class="flex flex-col">
+<span class="text-label-sm font-label-sm text-zinc-400">Thursday, Oct 12</span>
+<span class="text-zinc-50 font-semibold text-body-base">UX Audit Submission</span>
+</div>
+</div>
+</div>
+<button class="w-full py-3 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-label-sm font-label-sm transition-colors border border-white/5">
+                        Open Schedule
+                    </button>
+</div>
+<div class="glass-card rounded-xl p-6 flex items-center justify-between">
+<div>
+<p class="text-zinc-500 text-label-sm font-label-sm">Weekly Focus</p>
+<p class="text-zinc-100 font-semibold text-headline-md">24.5h</p>
+</div>
+<div class="w-16 h-16 rounded-full border-4 border-indigo-400/20 border-t-indigo-400 flex items-center justify-center">
+<span class="text-xs font-bold text-indigo-400">75%</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Workspaces -->
+<section class="space-y-lg">
+<h2 class="font-headline-md text-headline-md text-zinc-100">Recent Workspaces</h2>
+<div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-gutter">
+<!-- Workspace 1 -->
+<div class="glass-card rounded-xl p-md flex flex-col gap-md hover:bg-white/5 transition-all cursor-pointer group">
+<div class="aspect-square w-full rounded-lg overflow-hidden bg-zinc-800">
+<img alt="Design Workspace" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Modern minimalist office interior with concrete walls, floor-to-ceiling windows, and elegant dark furniture in soft overcast lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQl95_yCMRXDchJKefRJeOyzUKxQ5LkvFhoV0NW-iO53kfeHPEnkJIt6ZkA8qkh6Z-Qc4aKJ3Fg3sD7WnWone_nzClnBNS-6AgM_a6WVgtHr5bBOoIz-zpoYqu1nIRq1KFC2x-NJBixQe_n3dq1sd8PWlfcy3iC4I21RWS-0x38Wd2HLlM81IPXnCYkq1sTlq3N0IOS5FLXJT3UxxqkRGdeiq-CNjoRlSvt51QlYwuMPzbH0hcuNpHDGl7kDFgceWuxJ3y3kaRMA"/>
+</div>
+<div>
+<h4 class="text-body-base font-semibold text-zinc-50">Design Assets</h4>
+<p class="text-label-sm text-zinc-500">12 members</p>
+</div>
+</div>
+<!-- Workspace 2 -->
+<div class="glass-card rounded-xl p-md flex flex-col gap-md hover:bg-white/5 transition-all cursor-pointer group">
+<div class="aspect-square w-full rounded-lg overflow-hidden bg-zinc-800">
+<img alt="Project Horizon" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Sleek glass skyscraper reflecting a dark dramatic sky at twilight with blue and purple tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3zbpvhsRPGdsmkQI7cPe-ptk7XllFz_svKSgoBeSJVcbYjMzQSpiuxHWDwretay-l9TCp-xz1E-onPl68qbwNz3QKIGAaL9REk_BsoBDKKzvDEls7jgnoMPAd2MvZ53fUMD94IQor_sgKz040IBIdIA2ewFzGE3c-HqtDEzMltcjpOQyhwrcwZC1V-LLeom1InWUs9PFGw9z1I2GIbkfQxmG0ws60U0YtekdewbaLRry3qREU-X9CqVq7ART65l911FB3IGhDWw"/>
+</div>
+<div>
+<h4 class="text-body-base font-semibold text-zinc-50">Horizon Lab</h4>
+<p class="text-label-sm text-zinc-500">4 members</p>
+</div>
+</div>
+<!-- Workspace 3 -->
+<div class="glass-card rounded-xl p-md flex flex-col gap-md hover:bg-white/5 transition-all cursor-pointer group">
+<div class="aspect-square w-full rounded-lg overflow-hidden bg-zinc-800">
+<img alt="Retail Hub" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Interior of a luxury boutique store with minimalist shelving and soft spot lighting in a high-end monochrome style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpgza3JvL05FSDujrrKTfNAaoPL4_OBkiwfgQgm6B_Aq2_yVCBVxHtqdG-Bujd9SFWDlO5cQ-d3D6h-AWdVOttbsIJVDcwbHD70OuVt_dEYFooogvq-YZUTR38pnAocZ1JroJw3imqGJB9mtFm3D4PTu4cgCoXzXdFg2spKXSkpk9ebvSKdIGqmTgnMvWNkNoDOYGbzic0Rss_dz-etvuG6r8HblpxSfCkXFm8HLEHh7XqUI52w6ZfcVlT7RsrddD2v6KXO_A-Ag"/>
+</div>
+<div>
+<h4 class="text-body-base font-semibold text-zinc-50">Retail Hub</h4>
+<p class="text-label-sm text-zinc-500">8 members</p>
+</div>
+</div>
+<!-- Workspace 4 -->
+<div class="glass-card rounded-xl p-md flex flex-col gap-md hover:bg-white/5 transition-all cursor-pointer group">
+<div class="aspect-square w-full rounded-lg overflow-hidden bg-zinc-800">
+<img alt="AI Research" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Digital network visualization of light particles and glowing lines in a deep blue digital space" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWTQfn1ZDT4BQPa_0ezbEpE785g5PbToRLeIFycInnUom7Q6NEmPOwMnJDTU7n7jOtgX7G1DuyB2M68gCUy325z8klsVVkfJScbsyQZt-devRAMWn8M6kZ8KVwBingJ1gawr7KkCgjkXBrga7_HTP0Pi4TFQ3U-KZJXmbIAtlauzxhLuK3GeJvitjZkwRhiJyCZNLS5dGXeNZ3jg5bd9YQLE5--Hok4mlnl8zb6NiN4cHOJBBIuojlCt9AtmRy_e1l6k6Zy8G9RA"/>
+</div>
+<div>
+<h4 class="text-body-base font-semibold text-zinc-50">Core AI</h4>
+<p class="text-label-sm text-zinc-500">22 members</p>
+</div>
+</div>
+<!-- Add Workspace -->
+<div class="border-2 border-dashed border-zinc-800 rounded-xl p-md flex flex-col items-center justify-center gap-md hover:border-zinc-700 transition-all cursor-pointer group text-zinc-500 hover:text-zinc-300">
+<span class="material-symbols-outlined text-[32px]">add_circle</span>
+<span class="text-label-sm font-label-sm">Create Workspace</span>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe h-20 bg-zinc-900/80 backdrop-blur-xl border-t border-white/5 shadow-[0_-4px_20px_rgba(0,0,0,0.5)] md:hidden">
+<div class="flex flex-col items-center justify-center text-indigo-400 drop-shadow-[0_0_8px_rgba(129,140,248,0.4)] active:scale-90 duration-300">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-manrope text-[11px] font-medium uppercase tracking-widest mt-1">Tasks</span>
+</div>
+<div class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 transition-all active:scale-90 duration-300">
+<span class="material-symbols-outlined">calendar_month</span>
+<span class="font-manrope text-[11px] font-medium uppercase tracking-widest mt-1">Schedule</span>
+</div>
+<div class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 transition-all active:scale-90 duration-300">
+<span class="material-symbols-outlined">timer</span>
+<span class="font-manrope text-[11px] font-medium uppercase tracking-widest mt-1">Focus</span>
+</div>
+<div class="flex flex-col items-center justify-center text-zinc-500 hover:text-zinc-200 transition-all active:scale-90 duration-300">
+<span class="material-symbols-outlined">folder_open</span>
+<span class="font-manrope text-[11px] font-medium uppercase tracking-widest mt-1">Vault</span>
+</div>
+</nav>
+<!-- Contextual FAB - Only on Home -->
+<button class="fixed bottom-24 right-6 md:bottom-8 md:right-8 w-14 h-14 bg-indigo-400 text-zinc-950 rounded-full shadow-[0_4px_20px_rgba(129,140,248,0.4)] flex items-center justify-center active:scale-95 duration-200 z-40">
+<span class="material-symbols-outlined">add</span>
+</button>
+</body></html>

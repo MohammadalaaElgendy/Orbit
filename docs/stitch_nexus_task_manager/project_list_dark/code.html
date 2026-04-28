@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Workspace Projects</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-high": "#2a2a2c",
+                        "surface-variant": "#353437",
+                        "on-primary": "#131e8c",
+                        "inverse-primary": "#4953bc",
+                        "inverse-on-surface": "#313032",
+                        "secondary-container": "#4a3d7c",
+                        "surface-container-lowest": "#0e0e10",
+                        "primary-fixed": "#e0e0ff",
+                        "outline-variant": "#454653",
+                        "on-surface": "#e5e1e4",
+                        "on-error": "#690005",
+                        "inverse-surface": "#e5e1e4",
+                        "surface-container-highest": "#353437",
+                        "on-secondary-container": "#baabf3",
+                        "on-tertiary-container": "#3e2b00",
+                        "error-container": "#93000a",
+                        "surface-tint": "#bdc2ff",
+                        "on-tertiary-fixed": "#261900",
+                        "on-secondary": "#332664",
+                        "secondary-fixed": "#e7deff",
+                        "primary-fixed-dim": "#bdc2ff",
+                        "on-surface-variant": "#c6c5d5",
+                        "surface-container": "#201f22",
+                        "tertiary-container": "#c08d00",
+                        "on-secondary-fixed-variant": "#4a3d7c",
+                        "on-error-container": "#ffdad6",
+                        "surface-bright": "#39393b",
+                        "on-tertiary-fixed-variant": "#5d4200",
+                        "on-secondary-fixed": "#1e0e4e",
+                        "outline": "#908f9e",
+                        "on-tertiary": "#402d00",
+                        "error": "#ffb4ab",
+                        "tertiary-fixed-dim": "#f7bd3e",
+                        "tertiary": "#f7bd3e",
+                        "background": "#131315",
+                        "on-primary-fixed-variant": "#2f3aa3",
+                        "secondary": "#ccbeff",
+                        "primary": "#bdc2ff",
+                        "surface-dim": "#131315",
+                        "surface-container-low": "#1c1b1d",
+                        "surface": "#131315",
+                        "primary-container": "#818cf8",
+                        "tertiary-fixed": "#ffdea3",
+                        "on-primary-container": "#101b8a",
+                        "on-background": "#e5e1e4",
+                        "secondary-fixed-dim": "#ccbeff",
+                        "on-primary-fixed": "#000767"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "2xl": "1.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "gutter": "20px",
+                        "container-margin": "32px",
+                        "xl": "40px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "unit": "4px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Manrope"],
+                        "display-lg": ["Manrope"],
+                        "body-base": ["Manrope"],
+                        "label-sm": ["Manrope"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "body-base": ["16px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                        "label-sm": ["13px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #09090b;
+            color: #e5e1e4;
+            font-family: 'Manrope', sans-serif;
+        }
+        .glass-card {
+            background: rgba(32, 31, 34, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+        .inner-glow {
+            border-top: 1px solid rgba(255, 255, 255, 0.12);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen">
+<!-- TopAppBar -->
+<header class="bg-zinc-950/80 backdrop-blur-md font-manrope text-zinc-50 font-medium docked full-width top-0 border-b border-white/5 shadow-xl fixed top-0 left-0 w-full z-50 flex justify-between items-center w-full px-6 h-16">
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-zinc-400 hover:bg-white/5 transition-colors p-2 rounded-lg">menu</button>
+<h1 class="text-xl font-bold text-indigo-400 tracking-tight">Workspace</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-zinc-400 hover:bg-white/5 transition-colors p-2 rounded-lg">search</button>
+<img alt="User Profile" class="w-8 h-8 rounded-full border border-white/10" data-alt="Close up portrait of a professional man with a neutral expression against a soft-focus studio background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFNs4qXMOx0cyUUdbCElZIybltHc5ROtrOWjuKMpsg1QmHmi4TjGHJnAsPoMffImn6w3EXjAbe1RFhuifaJb1F8FQliKLmYu1FRTKLAypnQ1hWlu-09aAu8cpOEnpXVaMWEPNAdIIKkjcGySwTVZaOfscOLsUR6ar6ktu7yUOuOraNBPSjxqSHl0ZTmtmCK1Hqa8EowFOiSYpToAePXD658skkcDNWhxUJe18DpGqeROxxay_4Sw7xNPFY8c8kCyEXN_aoYmHRBg"/>
+</div>
+</header>
+<!-- NavigationDrawer -->
+<aside class="hidden md:flex bg-zinc-900/90 backdrop-blur-2xl font-manrope text-zinc-300 text-sm rounded-r-lg h-full w-72 border-r border-white/5 shadow-2xl fixed left-0 top-0 z-50 flex-col p-4 pt-20">
+<div class="flex items-center gap-3 px-4 mb-8">
+<div class="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center border border-indigo-500/30">
+<span class="material-symbols-outlined text-indigo-400">layers</span>
+</div>
+<div>
+<h2 class="text-lg font-black text-white leading-none">Deep Work</h2>
+<span class="text-[10px] text-zinc-500 font-bold tracking-widest uppercase">Pro Plan</span>
+</div>
+</div>
+<nav class="space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl bg-indigo-400/10 text-indigo-400 border-l-2 border-indigo-400 transition-all" href="#">
+<span class="material-symbols-outlined">folder_open</span>
+<span class="font-medium">All Projects</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-400 hover:bg-zinc-800/50 transition-all" href="#">
+<span class="material-symbols-outlined">ads_click</span>
+<span class="font-medium">Milestones</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-400 hover:bg-zinc-800/50 transition-all" href="#">
+<span class="material-symbols-outlined">group_work</span>
+<span class="font-medium">Shared Workspaces</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-zinc-400 hover:bg-zinc-800/50 transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-medium">Settings</span>
+</a>
+</nav>
+<div class="mt-auto p-4 glass-card rounded-2xl inner-glow">
+<div class="flex items-center justify-between mb-2">
+<span class="text-xs text-zinc-400">Storage</span>
+<span class="text-xs text-indigo-400 font-bold">82%</span>
+</div>
+<div class="h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden">
+<div class="h-full bg-indigo-400 w-[82%]"></div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="md:ml-72 pt-24 pb-32 px-6 lg:px-12 max-w-7xl mx-auto">
+<!-- Welcome Section -->
+<div class="mb-12">
+<h2 class="font-display-lg text-display-lg mb-2">Active Projects</h2>
+<p class="font-body-base text-zinc-400 max-w-2xl">Manage and monitor the progress of your active work streams and collaborative initiatives within the workspace.</p>
+</div>
+<!-- Project Grid (Bento Style) -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Project Card 1: Large Featured -->
+<div class="lg:col-span-2 glass-card rounded-2xl inner-glow p-8 flex flex-col justify-between min-h-[320px] relative overflow-hidden group">
+<div class="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-[100px] -mr-32 -mt-32"></div>
+<div>
+<div class="flex justify-between items-start mb-6">
+<div class="flex gap-2">
+<span class="px-3 py-1 bg-indigo-500 text-zinc-950 text-[10px] font-bold rounded-full uppercase tracking-tighter">High Priority</span>
+<span class="px-3 py-1 bg-zinc-800 text-zinc-300 text-[10px] font-bold rounded-full uppercase tracking-tighter">Design</span>
+</div>
+<button class="material-symbols-outlined text-zinc-500 hover:text-white transition-colors">more_vert</button>
+</div>
+<h3 class="text-3xl font-bold text-white mb-2 tracking-tight">Enterprise Design System</h3>
+<p class="text-zinc-400 max-w-md">Developing a unified visual language and component library for the core platform update.</p>
+</div>
+<div class="mt-8">
+<div class="flex justify-between items-end mb-3">
+<div>
+<span class="text-zinc-500 text-xs block mb-1">Completion</span>
+<span class="text-2xl font-bold text-white">74%</span>
+</div>
+<div class="flex -space-x-3">
+<img alt="Member" class="w-10 h-10 rounded-full border-2 border-zinc-900" data-alt="Close up of a young man with glasses smiling, professional headshot in high-key lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB2CiB7V9hxk0iwwULQahdRSVAFYC4j68AZAotOOwlhUQg5eVT6YaLA4DWMYI6OxHtUBjywbU7qwxubman41gXESl_ikjQfkHuT2071FQm2phMRnHmQXmECLk4LCZXgrz_2QOjbA2LJA-zA41lMvvLCG4qWOhkW7m1Xtlser_uS4LHQucIk-5gAnmLHYiWzivHvmKSW1-8qMb3tli_76uS7_Om4zSlN9ARel0HDlUe2yk3Q2eBeaWdiaF6CMHjmFuXaxZzd7J5YDg"/>
+<img alt="Member" class="w-10 h-10 rounded-full border-2 border-zinc-900" data-alt="Portrait of a woman with curly hair, natural outdoor lighting with soft green background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAoQoZDH_dB09q2Ct-Q7xyRglIjojymkGs0URct1SPP9XZHLkN6dRJe1rJid8E7Mt_XCR6TfIKkafj3YkC4kheIlJoDKMx1bjNYbiCRhfLHnVEvh2PYUVv4NyChG7QgmKA_dbIdLEx_PEXax0FRxQn1L7LFQlDkrEDdW3dwCb5yTLPovlh7MSRfv34PX90QgML3rXLDXGNta1pdGsnbtelBu2IpxlMKhTTM-SidbnhY5hENzZNEdRWR0LuvGMTCJQ7gDlnOwaHoKA"/>
+<img alt="Member" class="w-10 h-10 rounded-full border-2 border-zinc-900" data-alt="Middle-aged man with a beard and confident expression, dramatic studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCOxPpxfkTqLhWoBSQGWgBfOIjsHaOM0-TbM7rV8DNfWvvE6byK8wG2x2iGeWPwuFQb6iEMoJku8Dk2xaCUdxkLz_qxCNWGoklftSV7le9SuAzISQ4jDypEDCCgG9_5itnOdFVwVxOUWODGFLO6_JvZD6f11viJYTFy7gJoA8wJqoarhGU0vQ9mSCSqDUEy292kFqw3vnwIfvmGtNEmb3Y0TMv0PYZkg7F_yblBMXjg4VvWBhmQZYxVpf4zQwVGNRGeI1GPJV-vMA"/>
+<div class="w-10 h-10 rounded-full border-2 border-zinc-900 bg-zinc-800 flex items-center justify-center text-[10px] font-bold text-zinc-400">+5</div>
+</div>
+</div>
+<div class="h-2 w-full bg-zinc-800/50 rounded-full overflow-hidden">
+<div class="h-full bg-indigo-400 rounded-full w-[74%] shadow-[0_0_15px_rgba(129,140,248,0.5)]"></div>
+</div>
+</div>
+</div>
+<!-- Project Card 2: Small -->
+<div class="glass-card rounded-2xl inner-glow p-6 flex flex-col justify-between group">
+<div>
+<div class="flex justify-between items-start mb-6">
+<span class="px-3 py-1 bg-zinc-800 text-zinc-300 text-[10px] font-bold rounded-full uppercase tracking-tighter">Marketing</span>
+<button class="material-symbols-outlined text-zinc-500">more_vert</button>
+</div>
+<h3 class="text-xl font-bold text-white mb-2">Q4 Product Launch</h3>
+<div class="flex items-center gap-2 text-zinc-500 text-sm mb-4">
+<span class="material-symbols-outlined text-sm">checklist</span>
+<span>12 Active Tasks</span>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-center mb-2">
+<span class="text-xs text-zinc-500">Progress</span>
+<span class="text-xs text-white font-bold">45%</span>
+</div>
+<div class="h-1.5 w-full bg-zinc-800/50 rounded-full overflow-hidden">
+<div class="h-full bg-indigo-400 rounded-full w-[45%]"></div>
+</div>
+<div class="flex mt-6 gap-2">
+<img alt="Member" class="w-8 h-8 rounded-full border border-white/5" data-alt="Headshot of a young woman with light skin and blond hair, professional lighting, soft bokeh" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIPnjdxhNj9NkLNlXJ3ep1V5uEgJBIrOIzqb15HwGQ1HPIOJKdojcXqqttzGO2-fY8JUGXkkYYI_V7ovrnJVNYVHtPGXJ3bu5k1MM5O8xuWqgVxkLrascsmjE562uOKQrLSV1jTdpvSGRt_6-y8xGWHNquZR03hi5PMn-JfdLAZNm_AyCeS5ER7IF0iE4SlzvCwtgMeLMrKmn4c0PoAluUOVEN0xvXjeFAPoDDiswGf4ry4WnFuUi44t3axiKPHTrCBY0_wlqaQw"/>
+<img alt="Member" class="w-8 h-8 rounded-full border border-white/5" data-alt="Portrait of a young woman with a thoughtful gaze, artistic lighting with deep shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0CzSl2-MUl5Hl82Z_Ov2sPrppSyF5vUrsxeurx2V246J14gkC4gfN1iV1Pxiv6DP6e65oxyAXKUyakVY0BYRDcFnYxNxOk46GSk5rjw4ZDz241GG8guQY9g9auiiTC-BLMGoA66u3rW8TSE9pyQ-kcOJys8pzNB7GOqilryH4T5M2ZAk3WPqE6atsQXJrnutLyuQq3dhB_kAUS7DuLi4qNmB5rQ5br278LVlmdud3XG8ndEd4Xw44PvL45l-a1rxJtyeGPwGmJg"/>
+</div>
+</div>
+</div>
+<!-- Project Card 3: Small -->
+<div class="glass-card rounded-2xl inner-glow p-6 flex flex-col justify-between group">
+<div>
+<div class="flex justify-between items-start mb-6">
+<span class="px-3 py-1 bg-zinc-800 text-zinc-300 text-[10px] font-bold rounded-full uppercase tracking-tighter">Backend</span>
+<button class="material-symbols-outlined text-zinc-500">more_vert</button>
+</div>
+<h3 class="text-xl font-bold text-white mb-2">API Documentation</h3>
+<div class="flex items-center gap-2 text-zinc-500 text-sm mb-4">
+<span class="material-symbols-outlined text-sm">checklist</span>
+<span>8 Active Tasks</span>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-center mb-2">
+<span class="text-xs text-zinc-500">Progress</span>
+<span class="text-xs text-white font-bold">92%</span>
+</div>
+<div class="h-1.5 w-full bg-zinc-800/50 rounded-full overflow-hidden">
+<div class="h-full bg-indigo-400 rounded-full w-[92%] shadow-[0_0_10px_rgba(129,140,248,0.3)]"></div>
+</div>
+<div class="flex mt-6 gap-2">
+<img alt="Member" class="w-8 h-8 rounded-full border border-white/5" data-alt="Portrait of a man with dark skin, smiling warmly, studio lighting with neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDI5F4N_sM7B_NRE2cnKHkuAa5CPMmZLzq14E7vdRpxbCb-1MdZnhHTTwRyibjKwBXmKIejOrjeP2GEkWanFXy41gss_qC_RGPsVIcoYQIvyMdOgbCGHX57D39tnHW069lQomKYSuOULVf2YjNMl7XJfHic2Y9XT42xN06rzTTG_sEU7MMfWrYnuIQz2Ctu1uYiMg7X3MFkxPUfvLtFrOMesDe27X6tUpg7rLC0k4UyhdP-Xzjdrc7FMp4kL-UD7IYLzqtwhR1dmg"/>
+</div>
+</div>
+</div>
+<!-- Project Card 4: Small -->
+<div class="glass-card rounded-2xl inner-glow p-6 flex flex-col justify-between group">
+<div>
+<div class="flex justify-between items-start mb-6">
+<span class="px-3 py-1 bg-zinc-800 text-zinc-300 text-[10px] font-bold rounded-full uppercase tracking-tighter">Security</span>
+<button class="material-symbols-outlined text-zinc-500">more_vert</button>
+</div>
+<h3 class="text-xl font-bold text-white mb-2">Auth Migration</h3>
+<div class="flex items-center gap-2 text-zinc-500 text-sm mb-4">
+<span class="material-symbols-outlined text-sm">checklist</span>
+<span>24 Active Tasks</span>
+</div>
+</div>
+<div>
+<div class="flex justify-between items-center mb-2">
+<span class="text-xs text-zinc-500">Progress</span>
+<span class="text-xs text-white font-bold">18%</span>
+</div>
+<div class="h-1.5 w-full bg-zinc-800/50 rounded-full overflow-hidden">
+<div class="h-full bg-indigo-400 rounded-full w-[18%]"></div>
+</div>
+<div class="flex mt-6 gap-2">
+<img alt="Member" class="w-8 h-8 rounded-full border border-white/5" data-alt="Candid portrait of a professional woman looking away from camera, soft morning light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKoVNTh79koRWdOgZkAp4Ljt_5aXRATu5Wlho6F61iOWw7SnxMy7z5jb_J_JFbWL1GliPVXxAnj6WKIyUirL5s4JHuR77sYXwJ0KXUMz7KxLeGcOP3Yn52YqLlqGz_zyx0WbfjUcF3kLXG0zjgyLHjolHH2DVEL6eYFCqwDPbj2wIQ5ov9kT1VFzCCV3GcVagtkzkEfDdCYaOofr2_9SmcweF6TJDLAox26jRnTrT9ppTGWU_GKSCd59yvX-LxvCOHoCsjyMl0fA"/>
+<img alt="Member" class="w-8 h-8 rounded-full border border-white/5" data-alt="Headshot of a man with a professional look, blue shirt, natural daylight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBow0670In6ZWSdbW9j3CNTm3lb0nAoRHzFV2FGksPj071jdjmJYcvKEbMFYM4ZCVV5lJca-_QoTjdDY6Xdhp-4XnstMFOQmjQDDryzV97M6J2aUzf_-sifqLyO6pqTPC0WCsfKLlLP-_dZ5KNels2KGW9eUlw3d40EfauZbl9QNbrtkrgEtTWiI6ezLM6UxPIHtjWUnCmhejlzHpax4RFOzyrV4R41j3kobQ-D-hZzTlxZUpoojfro4ED8dTSzo9Yu7kWZj8yNLw"/>
+</div>
+</div>
+</div>
+<!-- Project Card 5: Empty State Add -->
+<div class="border-2 border-dashed border-zinc-800 rounded-2xl flex flex-col items-center justify-center p-8 group hover:border-indigo-400/50 transition-colors cursor-pointer">
+<div class="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center mb-4 group-hover:bg-indigo-400/10 group-hover:text-indigo-400 transition-colors">
+<span class="material-symbols-outlined">add</span>
+</div>
+<span class="text-zinc-300 font-bold">Create New Project</span>
+<span class="text-zinc-500 text-xs mt-1">Start a new workspace initiative</span>
+</div>
+</div>
+<!-- Recent Activities (List Section) -->
+<div class="mt-16">
+<h3 class="font-headline-md text-headline-md mb-6">Recent Updates</h3>
+<div class="glass-card rounded-2xl inner-glow divide-y divide-white/5 overflow-hidden">
+<div class="p-4 flex items-center justify-between hover:bg-white/[0.02] transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-emerald-400 text-sm">check_circle</span>
+</div>
+<div>
+<p class="text-sm font-medium text-white">Alex completed <span class="text-indigo-400 font-bold">Homepage Wireframes</span></p>
+<p class="text-[10px] text-zinc-500 uppercase tracking-widest mt-0.5">Enterprise Design System • 2m ago</p>
+</div>
+</div>
+<button class="material-symbols-outlined text-zinc-500 text-sm">chevron_right</button>
+</div>
+<div class="p-4 flex items-center justify-between hover:bg-white/[0.02] transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-blue-400 text-sm">attachment</span>
+</div>
+<div>
+<p class="text-sm font-medium text-white">Sarah uploaded <span class="text-indigo-400 font-bold">Final Assets v2.zip</span></p>
+<p class="text-[10px] text-zinc-500 uppercase tracking-widest mt-0.5">Q4 Product Launch • 45m ago</p>
+</div>
+</div>
+<button class="material-symbols-outlined text-zinc-500 text-sm">chevron_right</button>
+</div>
+<div class="p-4 flex items-center justify-between hover:bg-white/[0.02] transition-colors">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-amber-400 text-sm">comment</span>
+</div>
+<div>
+<p class="text-sm font-medium text-white">Mark commented on <span class="text-indigo-400 font-bold">API Endpoints</span></p>
+<p class="text-[10px] text-zinc-500 uppercase tracking-widest mt-0.5">API Documentation • 3h ago</p>
+</div>
+</div>
+<button class="material-symbols-outlined text-zinc-500 text-sm">chevron_right</button>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden bg-zinc-950/80 backdrop-blur-xl font-manrope text-[10px] font-semibold docked full-width bottom-0 rounded-t-2xl border-t border-white/10 shadow-[0_-4px_20px_rgba(0,0,0,0.5)] fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe">
+<a class="flex flex-col items-center justify-center text-zinc-500 transition-all duration-300 ease-spring" href="#">
+<span class="material-symbols-outlined mb-1">dashboard</span>
+<span>Feed</span>
+</a>
+<a class="flex flex-col items-center justify-center text-indigo-400 scale-110 transition-all duration-300 ease-spring" href="#">
+<span class="material-symbols-outlined mb-1">checklist</span>
+<span>Tasks</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-500 transition-all duration-300 ease-spring" href="#">
+<span class="material-symbols-outlined mb-1">analytics</span>
+<span>Stats</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-500 transition-all duration-300 ease-spring" href="#">
+<span class="material-symbols-outlined mb-1">account_circle</span>
+<span>Profile</span>
+</a>
+</nav>
+<!-- Floating Action Button -->
+<button class="fixed bottom-24 right-6 md:bottom-8 md:right-8 w-14 h-14 bg-indigo-400 text-zinc-950 rounded-full shadow-[0_8px_30px_rgba(129,140,248,0.4)] flex items-center justify-center z-40 active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined">add</span>
+</button>
+</body></html>

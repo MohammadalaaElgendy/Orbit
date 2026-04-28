@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Timeline - Calendar View</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-container": "#ffd2be",
+                        "secondary-fixed": "#d3e4fe",
+                        "error": "#ba1a1a",
+                        "on-secondary-container": "#54647a",
+                        "surface-container-low": "#f2f4f6",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed": "#0f0069",
+                        "primary": "#3525cd",
+                        "on-surface": "#191c1e",
+                        "on-error-container": "#93000a",
+                        "inverse-on-surface": "#eff1f3",
+                        "surface-variant": "#e0e3e5",
+                        "secondary": "#505f76",
+                        "on-primary-fixed-variant": "#3323cc",
+                        "error-container": "#ffdad6",
+                        "tertiary-container": "#a44100",
+                        "surface-container-high": "#e6e8ea",
+                        "surface-container": "#eceef0",
+                        "background": "#f7f9fb",
+                        "secondary-container": "#d0e1fb",
+                        "inverse-primary": "#c3c0ff",
+                        "on-surface-variant": "#464555",
+                        "on-secondary-fixed": "#0b1c30",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#dad7ff",
+                        "on-tertiary-fixed": "#351000",
+                        "primary-container": "#4f46e5",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#f7f9fb",
+                        "surface-tint": "#4d44e3",
+                        "tertiary": "#7e3000",
+                        "surface-dim": "#d8dadc",
+                        "tertiary-fixed-dim": "#ffb695",
+                        "secondary-fixed-dim": "#b7c8e1",
+                        "primary-fixed-dim": "#c3c0ff",
+                        "surface-container-highest": "#e0e3e5",
+                        "inverse-surface": "#2d3133",
+                        "primary-fixed": "#e2dfff",
+                        "outline": "#777587",
+                        "on-background": "#191c1e",
+                        "on-secondary-fixed-variant": "#38485d",
+                        "surface-container-lowest": "#ffffff",
+                        "surface": "#f7f9fb",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#7b2f00",
+                        "tertiary-fixed": "#ffdbcc",
+                        "outline-variant": "#c7c4d8"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "gutter": "20px",
+                        "unit": "4px",
+                        "xl": "32px",
+                        "md": "16px",
+                        "lg": "24px",
+                        "container-margin": "32px",
+                        "sm": "8px",
+                        "2xl": "48px"
+                    },
+                    "fontFamily": {
+                        "h1": ["manrope"],
+                        "h3": ["manrope"],
+                        "h2": ["manrope"],
+                        "body-md": ["inter"],
+                        "label-sm": ["inter"],
+                        "button": ["inter"],
+                        "body-lg": ["inter"]
+                    },
+                    "fontSize": {
+                        "h1": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "h3": ["20px", {"lineHeight": "1.4", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "h2": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-md": ["14px", {"lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                        "button": ["14px", {"lineHeight": "1", "letterSpacing": "0", "fontWeight": "600"}],
+                        "body-lg": ["16px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background font-body-md text-on-background selection:bg-primary-fixed selection:text-primary">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg shadow-sm border-b border-slate-200/50 dark:border-slate-800/50">
+<div class="flex justify-between items-center px-6 h-16 w-full max-w-7xl mx-auto">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-indigo-600 dark:text-indigo-400" data-icon="calendar_month">calendar_month</span>
+<h1 class="text-lg font-bold text-slate-900 dark:text-slate-100 font-manrope tracking-tight">Timeline</h1>
+</div>
+<div class="hidden md:flex items-center gap-lg">
+<nav class="flex gap-md">
+<button class="px-md py-sm rounded-lg text-indigo-600 dark:text-indigo-400 font-bold transition-colors">Today</button>
+<button class="px-md py-sm rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100/50 dark:hover:bg-slate-800/50 transition-colors">Timeline</button>
+<button class="px-md py-sm rounded-lg text-slate-500 dark:text-slate-400 hover:bg-slate-100/50 dark:hover:bg-slate-800/50 transition-colors">Milestones</button>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center border border-primary/20">
+<img alt="User Profile" class="w-full h-full rounded-full" data-alt="professional portrait of a creative professional in a minimalist digital avatar style with soft pastel colors" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDyVOvz8Ss0A1B-8-a9Xb_DLldh6Bc4IuwMKdr7U5DlNsqogMQ0F9_KwdkD4FfepGgetk6gV9CB82Gk4lGbJFvZNR-nnx4l5GNr78j0V8cQ-hTMzjQ5YJ9Oe_OkuXw7WJSc58X6RPprgKtdgOK6bBNmOdenqEQ5Favp4M3mk1Cv_SRWOiPPxSfnpbi4fzPt2zDQv93SXtAJRqFgBRWjt63MuRmYnemM6xIARx-X_t7LIljw76nXlKl-G76zEAaKZZ4jBHf6Um7xzQ"/>
+</div>
+</div>
+</div>
+</header>
+<main class="pt-24 pb-32 px-gutter max-w-7xl mx-auto min-h-screen">
+<!-- View Toggle & Header Navigation -->
+<section class="mb-lg flex flex-col md:flex-row md:items-center justify-between gap-md">
+<div>
+<h2 class="font-h1 text-h1 text-on-surface">September 2024</h2>
+<p class="text-on-surface-variant font-body-md">You have 12 deadlines this month.</p>
+</div>
+<div class="flex items-center gap-sm bg-surface-container rounded-xl p-1 shadow-inner">
+<button class="px-lg py-sm rounded-lg bg-surface-container-lowest text-primary shadow-sm font-button transition-all">Month</button>
+<button class="px-lg py-sm rounded-lg text-on-surface-variant hover:text-on-surface font-button transition-all">Week</button>
+</div>
+</section>
+<!-- Calendar Layout (Bento-style Monthly Grid) -->
+<div class="grid grid-cols-7 gap-xs mb-xl">
+<!-- Day Names -->
+<div class="text-center py-2 text-on-surface-variant font-label-sm uppercase tracking-widest opacity-60">Mon</div>
+<div class="text-center py-2 text-on-surface-variant font-label-sm uppercase tracking-widest opacity-60">Tue</div>
+<div class="text-center py-2 text-on-surface-variant font-label-sm uppercase tracking-widest opacity-60">Wed</div>
+<div class="text-center py-2 text-on-surface-variant font-label-sm uppercase tracking-widest opacity-60">Thu</div>
+<div class="text-center py-2 text-on-surface-variant font-label-sm uppercase tracking-widest opacity-60">Fri</div>
+<div class="text-center py-2 text-on-surface-variant font-label-sm uppercase tracking-widest opacity-60">Sat</div>
+<div class="text-center py-2 text-on-surface-variant font-label-sm uppercase tracking-widest opacity-60">Sun</div>
+<!-- Calendar Cells -->
+<!-- Previous Month Days -->
+<div class="aspect-square p-md border border-outline-variant/30 rounded-xl opacity-30 flex flex-col justify-between">
+<span class="font-h3 text-label-sm">26</span>
+</div>
+<div class="aspect-square p-md border border-outline-variant/30 rounded-xl opacity-30 flex flex-col justify-between">
+<span class="font-h3 text-label-sm">27</span>
+</div>
+<div class="aspect-square p-md border border-outline-variant/30 rounded-xl opacity-30 flex flex-col justify-between">
+<span class="font-h3 text-label-sm">28</span>
+</div>
+<div class="aspect-square p-md border border-outline-variant/30 rounded-xl opacity-30 flex flex-col justify-between">
+<span class="font-h3 text-label-sm">29</span>
+</div>
+<div class="aspect-square p-md border border-outline-variant/30 rounded-xl opacity-30 flex flex-col justify-between">
+<span class="font-h3 text-label-sm">30</span>
+</div>
+<div class="aspect-square p-md border border-outline-variant/30 rounded-xl opacity-30 flex flex-col justify-between">
+<span class="font-h3 text-label-sm">31</span>
+</div>
+<!-- Current Month Start -->
+<div class="aspect-square p-md border border-outline-variant/30 rounded-xl bg-surface-container-lowest flex flex-col justify-between group hover:border-primary/50 transition-colors">
+<span class="font-h3 text-h3">1</span>
+<div class="flex gap-1">
+<div class="w-1.5 h-1.5 rounded-full bg-primary"></div>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="aspect-square p-md border border-outline-variant/30 rounded-xl bg-surface-container-lowest flex flex-col justify-between hover:border-primary/50 transition-colors">
+<span class="font-h3 text-h3">2</span>
+</div>
+<div class="aspect-square p-md border border-outline-variant/30 rounded-xl bg-surface-container-lowest flex flex-col justify-between hover:border-primary/50 transition-colors">
+<span class="font-h3 text-h3">3</span>
+<div class="space-y-1">
+<div class="h-1.5 w-full bg-error rounded-full" title="High Priority Task"></div>
+</div>
+</div>
+<div class="aspect-square p-md border border-indigo-200 bg-primary-fixed/30 rounded-xl flex flex-col justify-between ring-2 ring-primary ring-offset-2">
+<span class="font-h3 text-h3 text-primary">4</span>
+<span class="font-label-sm text-primary font-bold">Today</span>
+</div>
+<div class="aspect-square p-md border border-outline-variant/30 rounded-xl bg-surface-container-lowest flex flex-col justify-between hover:border-primary/50 transition-colors">
+<span class="font-h3 text-h3">5</span>
+</div>
+<div class="aspect-square p-md border border-outline-variant/30 rounded-xl bg-surface-container-lowest flex flex-col justify-between hover:border-primary/50 transition-colors">
+<span class="font-h3 text-h3">6</span>
+<div class="space-y-1">
+<div class="h-1.5 w-full bg-tertiary-container rounded-full" title="Milestone"></div>
+</div>
+</div>
+<div class="aspect-square p-md border border-outline-variant/30 rounded-xl bg-surface-container-lowest flex flex-col justify-between opacity-80">
+<span class="font-h3 text-h3">7</span>
+</div>
+<div class="aspect-square p-md border border-outline-variant/30 rounded-xl bg-surface-container-lowest flex flex-col justify-between opacity-80">
+<span class="font-h3 text-h3">8</span>
+</div>
+<!-- Additional rows implied for standard layout -->
+<div class="aspect-square p-md border border-outline-variant/30 rounded-xl bg-surface-container-lowest flex flex-col justify-between">
+<span class="font-h3 text-h3">9</span>
+</div>
+<div class="aspect-square p-md border border-outline-variant/30 rounded-xl bg-surface-container-lowest flex flex-col justify-between">
+<span class="font-h3 text-h3">10</span>
+<div class="flex gap-1">
+<div class="w-1.5 h-1.5 rounded-full bg-secondary"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-primary"></div>
+</div>
+</div>
+<div class="aspect-square p-md border border-outline-variant/30 rounded-xl bg-surface-container-lowest flex flex-col justify-between">
+<span class="font-h3 text-h3">11</span>
+</div>
+<div class="aspect-square p-md border border-outline-variant/30 rounded-xl bg-surface-container-lowest flex flex-col justify-between">
+<span class="font-h3 text-h3">12</span>
+</div>
+<div class="aspect-square p-md border border-outline-variant/30 rounded-xl bg-surface-container-lowest flex flex-col justify-between">
+<span class="font-h3 text-h3">13</span>
+<div class="h-1.5 w-full bg-error rounded-full"></div>
+</div>
+<div class="aspect-square p-md border border-outline-variant/30 rounded-xl bg-surface-container-lowest flex flex-col justify-between opacity-80">
+<span class="font-h3 text-h3">14</span>
+</div>
+<div class="aspect-square p-md border border-outline-variant/30 rounded-xl bg-surface-container-lowest flex flex-col justify-between opacity-80">
+<span class="font-h3 text-h3">15</span>
+</div>
+</div>
+<!-- Details Section (Glassmorphic Side Info) -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-lg mt-2xl">
+<!-- Focus Card -->
+<div class="lg:col-span-2 glass-card rounded-2xl border border-white p-lg shadow-sm">
+<div class="flex items-center justify-between mb-lg">
+<h3 class="font-h2 text-h2">Today's Deadlines</h3>
+<span class="px-md py-1 bg-primary-fixed text-primary font-label-sm rounded-full">3 Tasks Remaining</span>
+</div>
+<div class="space-y-md">
+<div class="flex items-center gap-md p-md rounded-xl hover:bg-white/40 transition-colors group">
+<div class="w-2 h-10 bg-error rounded-full"></div>
+<div class="flex-1">
+<p class="font-h3 text-body-lg font-bold">Q3 Project Presentation</p>
+<p class="text-on-surface-variant font-label-sm">Due today at 4:30 PM • Marketing Team</p>
+</div>
+<button class="p-2 rounded-full opacity-0 group-hover:opacity-100 bg-white shadow-sm transition-all">
+<span class="material-symbols-outlined text-primary" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<div class="flex items-center gap-md p-md rounded-xl hover:bg-white/40 transition-colors group">
+<div class="w-2 h-10 bg-primary rounded-full"></div>
+<div class="flex-1">
+<p class="font-h3 text-body-lg font-bold">Review Design System Updates</p>
+<p class="text-on-surface-variant font-label-sm">Due today at 6:00 PM • Creative Lab</p>
+</div>
+<button class="p-2 rounded-full opacity-0 group-hover:opacity-100 bg-white shadow-sm transition-all">
+<span class="material-symbols-outlined text-primary" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+<div class="flex items-center gap-md p-md rounded-xl hover:bg-white/40 transition-colors group">
+<div class="w-2 h-10 bg-secondary rounded-full opacity-40"></div>
+<div class="flex-1">
+<p class="font-h3 text-body-lg font-bold opacity-60 line-through">Morning Standup Meeting</p>
+<p class="text-on-surface-variant font-label-sm">Completed at 10:15 AM</p>
+</div>
+<span class="material-symbols-outlined text-on-tertiary-fixed-variant" data-icon="check_circle" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+</div>
+<!-- Milestone Progress -->
+<div class="flex flex-col gap-lg">
+<div class="bg-indigo-600 rounded-2xl p-lg text-white shadow-xl relative overflow-hidden">
+<div class="relative z-10">
+<h3 class="font-h2 text-h2 mb-xs">Next Milestone</h3>
+<p class="text-indigo-100 font-body-md mb-lg">Launch Phase 01</p>
+<div class="flex items-end justify-between mb-sm">
+<span class="font-label-sm">Project Progress</span>
+<span class="font-h3 text-h3">68%</span>
+</div>
+<div class="w-full bg-white/20 h-2 rounded-full overflow-hidden">
+<div class="bg-white h-full" style="width: 68%"></div>
+</div>
+</div>
+<!-- Decorative background element -->
+<div class="absolute -right-8 -bottom-8 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+</div>
+<div class="glass-card rounded-2xl border border-white p-lg shadow-sm">
+<h3 class="font-h3 text-h3 mb-md">Upcoming Legend</h3>
+<div class="space-y-sm">
+<div class="flex items-center gap-sm">
+<span class="w-3 h-3 rounded-full bg-error"></span>
+<span class="font-label-sm text-on-surface">Critical/Urgent</span>
+</div>
+<div class="flex items-center gap-sm">
+<span class="w-3 h-3 rounded-full bg-primary"></span>
+<span class="font-label-sm text-on-surface">Main Task</span>
+</div>
+<div class="flex items-center gap-sm">
+<span class="w-3 h-3 rounded-full bg-tertiary-container"></span>
+<span class="font-label-sm text-on-surface">Major Milestone</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-2 py-3 pb-safe bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-t border-slate-200/50 dark:border-slate-800/50 shadow-[0_-4px_12px_0_rgba(0,0,0,0.05)] rounded-t-2xl">
+<button class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 font-medium font-manrope text-[11px] active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined" data-icon="today">today</span>
+<span>Today</span>
+</button>
+<button class="flex flex-col items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold font-manrope text-[11px] active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined" data-icon="view_timeline" style="font-variation-settings: 'FILL' 1;">view_timeline</span>
+<span>Timeline</span>
+</button>
+<button class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 font-medium font-manrope text-[11px] active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined" data-icon="flag">flag</span>
+<span>Milestones</span>
+</button>
+<button class="flex flex-col items-center justify-center text-slate-400 dark:text-slate-500 font-medium font-manrope text-[11px] active:scale-90 transition-transform duration-200">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span>Account</span>
+</button>
+</nav>
+<!-- Floating Action Button -->
+<button class="fixed right-lg bottom-24 md:bottom-lg w-14 h-14 rounded-full bg-indigo-600 text-white shadow-2xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all z-40 group">
+<span class="material-symbols-outlined group-hover:rotate-90 transition-transform" data-icon="add">add</span>
+</button>
+</body></html>

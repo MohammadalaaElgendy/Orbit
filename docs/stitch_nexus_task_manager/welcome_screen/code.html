@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Welcome to Orbit</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700&amp;family=Inter:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {"inverse-primary": "#c3c0ff", "on-primary": "#ffffff", "surface-dim": "#d8dadc", "inverse-surface": "#2d3133", error: "#ba1a1a", "tertiary-fixed-dim": "#ffb695", "on-primary-fixed": "#0f0069", "secondary-container": "#d0e1fb", tertiary: "#7e3000", "error-container": "#ffdad6", primary: "#3525cd", "on-tertiary": "#ffffff", "surface-container-high": "#e6e8ea", "surface-container-lowest": "#ffffff", "surface-variant": "#e0e3e5", outline: "#777587", "on-secondary-fixed-variant": "#38485d", "tertiary-fixed": "#ffdbcc", "inverse-on-surface": "#eff1f3", "on-surface": "#191c1e", "outline-variant": "#c7c4d8", "secondary-fixed": "#d3e4fe", "primary-container": "#4f46e5", "surface-container-low": "#f2f4f6", "primary-fixed": "#e2dfff", "on-secondary-fixed": "#0b1c30", "on-primary-container": "#dad7ff", "surface-tint": "#4d44e3", "on-tertiary-container": "#ffd2be", "on-error-container": "#93000a", "primary-fixed-dim": "#c3c0ff", secondary: "#505f76", "surface-container-highest": "#e0e3e5", "secondary-fixed-dim": "#b7c8e1", "surface-container": "#eceef0", "on-surface-variant": "#464555", "on-tertiary-fixed": "#351000", "on-error": "#ffffff", background: "#f7f9fb", surface: "#f7f9fb", "surface-bright": "#f7f9fb", "on-secondary": "#ffffff", "on-secondary-container": "#54647a", "on-tertiary-fixed-variant": "#7b2f00", "tertiary-container": "#a44100", "on-primary-fixed-variant": "#3323cc", "on-background": "#191c1e"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}, spacing: {unit: "4px", md: "16px", "2xl": "48px", sm: "8px", gutter: "20px", xs: "4px", lg: "24px", "container-margin": "32px", xl: "32px"}, fontFamily: {h1: ["manrope"], "body-md": ["inter"], button: ["inter"], h2: ["manrope"], "label-sm": ["inter"], "body-lg": ["inter"], h3: ["manrope"], headline: ["Manrope"], display: ["Manrope"], body: ["Inter"], label: ["Inter"]}, fontSize: {h1: ["32px", {lineHeight: "1.2", letterSpacing: "-0.02em", fontWeight: "700"}], "body-md": ["14px", {lineHeight: "1.5", letterSpacing: "0", fontWeight: "400"}], button: ["14px", {lineHeight: "1", letterSpacing: "0", fontWeight: "600"}], h2: ["24px", {lineHeight: "1.3", letterSpacing: "-0.01em", fontWeight: "600"}], "label-sm": ["12px", {lineHeight: "1", letterSpacing: "0.02em", fontWeight: "500"}], "body-lg": ["16px", {lineHeight: "1.6", letterSpacing: "0", fontWeight: "400"}], h3: ["20px", {lineHeight: "1.4", letterSpacing: "-0.01em", fontWeight: "600"}]}}}};</script>
+<style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col selection:bg-primary-fixed selection:text-primary">
+<!-- Top Navigation Bar (Shared Component Logic) -->
+<header class="bg-white/70 backdrop-blur-xl border-b border-slate-200/50 shadow-sm flex justify-between items-center px-6 h-16 w-full fixed top-0 z-50">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-indigo-600 text-2xl" data-icon="rocket_launch">rocket_launch</span>
+<span class="font-manrope font-semibold tracking-tight text-2xl font-black text-indigo-600 tracking-tighter">Orbit</span>
+</div>
+<div class="hidden md:flex gap-8">
+<a class="text-indigo-600 font-bold font-manrope text-sm" href="#">Product</a>
+<a class="text-slate-500 font-manrope text-sm hover:text-indigo-500 transition-colors" href="#">Pricing</a>
+<a class="text-slate-500 font-manrope text-sm hover:text-indigo-500 transition-colors" href="#">Enterprise</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-sm font-button px-4 py-2 text-primary font-semibold hover:bg-slate-100/50 rounded-lg transition-all active:scale-95">Sign In</button>
+</div>
+</header>
+<main class="flex-grow pt-24 pb-20 px-6 container-margin max-w-7xl mx-auto w-full">
+<!-- Hero Section -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-20">
+<div class="lg:col-span-5 flex flex-col gap-6">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-primary-fixed text-on-primary-fixed-variant rounded-full text-label-sm w-fit">
+<span class="material-symbols-outlined text-[16px]" data-icon="auto_awesome">auto_awesome</span>
+                    New: Enterprise AI Workspaces
+                </div>
+<h1 class="font-h1 text-[48px] leading-[1.1] text-on-surface tracking-tighter">
+                    Collaborate with <span class="text-primary">Precision.</span>
+</h1>
+<p class="font-body-lg text-secondary max-w-md">
+                    The next-generation productivity engine designed for high-focus teams. Organize, track, and scale your vision without the noise.
+                </p>
+<div class="flex flex-wrap gap-4 mt-4">
+<button class="bg-primary text-on-primary font-button px-8 py-4 rounded-[24px] shadow-lg shadow-primary/20 hover:bg-primary-container transition-all active:scale-95 text-lg">
+                        Get Started
+                    </button>
+<button class="border border-outline-variant text-on-surface-variant font-button px-8 py-4 rounded-[24px] hover:bg-surface-container-low transition-all active:scale-95 flex items-center gap-2">
+<span class="material-symbols-outlined" data-icon="play_circle">play_circle</span>
+                        Watch Demo
+                    </button>
+</div>
+</div>
+<div class="lg:col-span-7 relative">
+<!-- Main Illustration Area -->
+<div class="aspect-[4/3] rounded-[32px] overflow-hidden bg-slate-200 relative group">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Modern minimalist office space with diverse team collaborating around a white table with clean laptops in bright airy setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAV7ccB6_vBRsCNJ_g0mEwhY1BdBPIYBCpbnFZ810LL5qfLwWQF8eCEQZdK3s0Z8jO_fNZT48En1Erl7rTWrxhiJRX73lAfsdWbTKUTzKmP31fqOx_GjLxbe0McAaxmxCvf3RBGBFVDW6qgEyO7ZtIkNQMkz2zswzD9h3GPQoj_lsjh3DCEQNkDjInqk_eW8tz-mZr88KXSDqgwOlx1Wr_p2p0WOjHPCz83w_YOF3KYeOiGQyflBDYKLfzdvxwauP37cGrdULoUfg"/>
+<div class="absolute inset-0 bg-gradient-to-tr from-indigo-500/20 to-transparent"></div>
+<!-- Floating Feature Cards (Glassmorphism) -->
+<div class="absolute top-12 -left-8 w-64 glass-card p-4 rounded-xl hidden md:block animate-bounce-subtle">
+<div class="flex items-center gap-3 mb-2">
+<div class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="account_tree">account_tree</span>
+</div>
+<span class="font-manrope font-semibold text-sm text-on-surface">Workspace hierarchy</span>
+</div>
+<div class="h-2 w-full bg-slate-200/50 rounded-full overflow-hidden">
+<div class="h-full w-2/3 bg-primary"></div>
+</div>
+</div>
+<div class="absolute bottom-12 -right-12 w-72 glass-card p-4 rounded-xl hidden md:block">
+<div class="flex items-center gap-3 mb-3">
+<div class="w-8 h-8 rounded-lg bg-tertiary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-tertiary text-xl" data-icon="flag">flag</span>
+</div>
+<span class="font-manrope font-semibold text-sm text-on-surface">Milestone tracking</span>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-center text-[10px] text-secondary">
+<span>Q3 Product Launch</span>
+<span class="font-bold text-primary">85%</span>
+</div>
+<div class="flex gap-1">
+<div class="h-1 flex-1 bg-primary rounded-full"></div>
+<div class="h-1 flex-1 bg-primary rounded-full"></div>
+<div class="h-1 flex-1 bg-primary rounded-full"></div>
+<div class="h-1 flex-1 bg-slate-200 rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Feature Bento Grid -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20">
+<!-- Feature 1: Workspace Hierarchy -->
+<div class="bg-white p-8 rounded-3xl border border-slate-200/50 shadow-sm hover:shadow-md transition-shadow">
+<div class="w-12 h-12 rounded-2xl bg-indigo-50 flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-indigo-600 text-3xl" data-icon="dashboard_customize">dashboard_customize</span>
+</div>
+<h3 class="font-h3 text-on-surface mb-3">Workspace hierarchy</h3>
+<p class="font-body-md text-secondary">
+                    Architect your environment with infinite nesting. From global organizations to niche project channels, maintain absolute structure.
+                </p>
+<div class="mt-6 flex flex-col gap-2">
+<div class="flex items-center gap-2 p-2 bg-slate-50 rounded-lg text-xs font-medium text-slate-500">
+<span class="material-symbols-outlined text-sm" data-icon="folder">folder</span> Global Ops
+                    </div>
+<div class="flex items-center gap-2 p-2 bg-slate-50 rounded-lg text-xs font-medium text-slate-500 ml-4 border-l-2 border-indigo-200">
+<span class="material-symbols-outlined text-sm" data-icon="folder_open">folder_open</span> Marketing
+                    </div>
+<div class="flex items-center gap-2 p-2 bg-slate-50 rounded-lg text-xs font-medium text-slate-500 ml-8 border-l-2 border-indigo-200">
+<span class="material-symbols-outlined text-sm text-indigo-500" data-icon="assignment">assignment</span> Campaign Launch
+                    </div>
+</div>
+</div>
+<!-- Feature 2: Milestone Tracking -->
+<div class="bg-white p-8 rounded-3xl border border-slate-200/50 shadow-sm hover:shadow-md transition-shadow">
+<div class="w-12 h-12 rounded-2xl bg-primary-fixed flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="track_changes">track_changes</span>
+</div>
+<h3 class="font-h3 text-on-surface mb-3">Milestone tracking</h3>
+<p class="font-body-md text-secondary">
+                    Visualize the critical path. Identify bottlenecks before they happen and celebrate velocity with automated milestone updates.
+                </p>
+<div class="mt-6 bg-slate-50 rounded-xl p-4">
+<div class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span class="text-[11px] font-bold text-slate-700">Sprint Finalized</span>
+</div>
+<span class="text-[10px] text-slate-400">Mar 24</span>
+</div>
+<div class="flex -space-x-2">
+<div class="w-6 h-6 rounded-full border-2 border-white bg-slate-300"></div>
+<div class="w-6 h-6 rounded-full border-2 border-white bg-slate-400"></div>
+<div class="w-6 h-6 rounded-full border-2 border-white bg-indigo-200 flex items-center justify-center text-[8px] font-bold">+4</div>
+</div>
+</div>
+</div>
+<!-- Feature 3: Subtask Trees -->
+<div class="bg-white p-8 rounded-3xl border border-slate-200/50 shadow-sm hover:shadow-md transition-shadow">
+<div class="w-12 h-12 rounded-2xl bg-tertiary-fixed flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-tertiary text-3xl" data-icon="format_indent_increase">format_indent_increase</span>
+</div>
+<h3 class="font-h3 text-on-surface mb-3">Subtask trees</h3>
+<p class="font-body-md text-secondary">
+                    Break down complex initiatives into actionable atoms. Track dependencies and progress inherited from granular subtasks.
+                </p>
+<div class="mt-6 space-y-3">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-300 text-lg" data-icon="radio_button_checked">radio_button_checked</span>
+<div class="h-[1px] flex-grow bg-slate-100"></div>
+<span class="material-symbols-outlined text-slate-300 text-lg" data-icon="check_circle">check_circle</span>
+</div>
+<div class="flex flex-col gap-2 pl-4 border-l-2 border-slate-100">
+<div class="flex items-center gap-2 text-xs text-slate-400 italic">
+<span class="material-symbols-outlined text-[14px]" data-icon="subdirectory_arrow_right">subdirectory_arrow_right</span>
+                            Inherited status: Complete
+                        </div>
+</div>
+</div>
+</div>
+</section>
+<!-- Social Proof / Logos -->
+<section class="text-center">
+<p class="text-label-sm text-slate-400 uppercase tracking-widest mb-8">Trusted by teams at</p>
+<div class="flex flex-wrap justify-center items-center gap-12 opacity-50 grayscale hover:grayscale-0 transition-all">
+<span class="font-manrope font-bold text-xl text-slate-600">LUMINA</span>
+<span class="font-manrope font-bold text-xl text-slate-600">VERTEX</span>
+<span class="font-manrope font-bold text-xl text-slate-600">QUANTUM</span>
+<span class="font-manrope font-bold text-xl text-slate-600">NEBULA</span>
+<span class="font-manrope font-bold text-xl text-slate-600">ZENITH</span>
+</div>
+</section>
+</main>
+<!-- Simple Footer for Onboarding -->
+<footer class="py-12 border-t border-slate-200/50 bg-white/50 backdrop-blur-sm">
+<div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-indigo-600 text-xl" data-icon="rocket_launch">rocket_launch</span>
+<span class="font-manrope font-bold text-on-surface">Orbit</span>
+</div>
+<div class="flex gap-8 text-sm text-secondary">
+<a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<a class="hover:text-primary transition-colors" href="#">Terms of Service</a>
+<a class="hover:text-primary transition-colors" href="#">Security</a>
+<a class="hover:text-primary transition-colors" href="#">Contact</a>
+</div>
+<p class="text-xs text-slate-400">© 2024 Orbit Technologies Inc.</p>
+</div>
+</footer>
+<!-- Bottom Navigation Bar (Hidden on Desktop, following Platform Rule) -->
+<nav class="md:hidden bg-white/80 backdrop-blur-xl border-t border-slate-200/50 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] fixed bottom-0 w-full z-50 rounded-t-2xl flex justify-around items-center pt-2 pb-6 px-4">
+<div class="flex flex-col items-center justify-center text-indigo-600 bg-indigo-50 rounded-2xl px-3 py-1 active:scale-90 transition-transform">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-manrope text-[11px] font-medium">Workspace</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 hover:text-indigo-500 active:scale-90 transition-transform">
+<span class="material-symbols-outlined" data-icon="folder_open">folder_open</span>
+<span class="font-manrope text-[11px] font-medium">Projects</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 hover:text-indigo-500 active:scale-90 transition-transform">
+<span class="material-symbols-outlined" data-icon="check_circle">check_circle</span>
+<span class="font-manrope text-[11px] font-medium">Tasks</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 hover:text-indigo-500 active:scale-90 transition-transform">
+<span class="material-symbols-outlined" data-icon="insights">insights</span>
+<span class="font-manrope text-[11px] font-medium">Activity</span>
+</div>
+</nav>
+</body></html>

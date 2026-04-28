@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Manrope:wght@500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary-fixed-variant": "#3323cc",
+                      "surface-variant": "#e0e3e5",
+                      "secondary-fixed": "#d3e4fe",
+                      "on-background": "#191c1e",
+                      "surface": "#f7f9fb",
+                      "secondary-container": "#d0e1fb",
+                      "on-secondary-fixed": "#0b1c30",
+                      "on-tertiary-fixed": "#351000",
+                      "surface-tint": "#4d44e3",
+                      "primary-fixed-dim": "#c3c0ff",
+                      "surface-container-lowest": "#ffffff",
+                      "primary-container": "#4f46e5",
+                      "outline-variant": "#c7c4d8",
+                      "primary-fixed": "#e2dfff",
+                      "tertiary-container": "#a44100",
+                      "on-tertiary-fixed-variant": "#7b2f00",
+                      "on-tertiary": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "surface-dim": "#d8dadc",
+                      "surface-container": "#eceef0",
+                      "secondary-fixed-dim": "#b7c8e1",
+                      "secondary": "#505f76",
+                      "background": "#f7f9fb",
+                      "error-container": "#ffdad6",
+                      "inverse-on-surface": "#eff1f3",
+                      "inverse-primary": "#c3c0ff",
+                      "tertiary-fixed-dim": "#ffb695",
+                      "inverse-surface": "#2d3133",
+                      "on-surface": "#191c1e",
+                      "primary": "#3525cd",
+                      "surface-container-high": "#e6e8ea",
+                      "on-error-container": "#93000a",
+                      "tertiary-fixed": "#ffdbcc",
+                      "surface-container-low": "#f2f4f6",
+                      "outline": "#777587",
+                      "on-surface-variant": "#464555",
+                      "on-primary-container": "#dad7ff",
+                      "on-primary-fixed": "#0f0069",
+                      "surface-container-highest": "#e0e3e5",
+                      "error": "#ba1a1a",
+                      "tertiary": "#7e3000",
+                      "on-secondary-fixed-variant": "#38485d",
+                      "on-secondary-container": "#54647a",
+                      "on-tertiary-container": "#ffd2be",
+                      "on-secondary": "#ffffff",
+                      "surface-bright": "#f7f9fb",
+                      "on-error": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px",
+                      "2xl": "24px"
+              },
+              "spacing": {
+                      "2xl": "48px",
+                      "xs": "4px",
+                      "gutter": "20px",
+                      "md": "16px",
+                      "unit": "4px",
+                      "lg": "24px",
+                      "sm": "8px",
+                      "container-margin": "32px",
+                      "xl": "32px"
+              },
+              "fontFamily": {
+                      "button": ["inter"],
+                      "h3": ["manrope"],
+                      "h2": ["manrope"],
+                      "body-lg": ["inter"],
+                      "body-md": ["inter"],
+                      "label-sm": ["inter"],
+                      "h1": ["manrope"]
+              },
+              "fontSize": {
+                      "button": ["14px", {"lineHeight": "1", "letterSpacing": "0", "fontWeight": "600"}],
+                      "h3": ["20px", {"lineHeight": "1.4", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "h2": ["24px", {"lineHeight": "1.3", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "body-lg": ["16px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                      "body-md": ["14px", {"lineHeight": "1.5", "letterSpacing": "0", "fontWeight": "400"}],
+                      "label-sm": ["12px", {"lineHeight": "1", "letterSpacing": "0.02em", "fontWeight": "500"}],
+                      "h1": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-white/70 backdrop-blur-xl border-b border-white/20 shadow-sm flex justify-between items-center px-6 h-16">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-indigo-600" data-icon="rocket_launch">rocket_launch</span>
+<h1 class="text-xl font-bold tracking-tighter text-indigo-600 font-h1">Orbit</h1>
+</div>
+<div class="flex items-center gap-md">
+<div class="hidden md:flex items-center gap-lg mr-lg">
+<span class="font-manrope text-sm font-medium tracking-tight text-indigo-600">Home</span>
+<span class="font-manrope text-sm font-medium tracking-tight text-slate-500 hover:opacity-80 transition-opacity">Projects</span>
+<span class="font-manrope text-sm font-medium tracking-tight text-slate-500 hover:opacity-80 transition-opacity">Deadlines</span>
+<span class="font-manrope text-sm font-medium tracking-tight text-slate-500 hover:opacity-80 transition-opacity">Settings</span>
+</div>
+<img alt="User Profile" class="w-8 h-8 rounded-full border border-outline-variant object-cover" data-alt="Close-up portrait of a young professional woman with a soft smile in a bright airy studio environment" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFGOf9m5LgKvS2oe2Uxx0yITPgBlulJFv2RFFWIhY6SpSL9dPuAd-XuRAAbfyzxNRyTJFPWMv5Oe1HclBHf-JbC-lym-HvzYAybJezUtsmvynPYaYxf7eRejQh26zGpCfepc_O60KunUtaBzE94RAZhEQlyKj8zTaxDDNNdKce9hHJzyEUIwyPTen8kp6E0yE74j7ZbKAYeSbdMZqs30IJ9SXD9-z5V7op-ZJa5JOOJECm5COyWD5zkNSpJfNZ7FQtnedDzkXBUQ"/>
+</div>
+</header>
+<main class="mt-24 px-6 max-w-7xl mx-auto space-y-xl">
+<!-- Welcome Greeting -->
+<section class="mb-xl">
+<h2 class="font-h1 text-h1 text-on-surface">Hello, Alex</h2>
+<div class="flex items-center gap-2 mt-xs text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px]" data-icon="calendar_today">calendar_today</span>
+<p class="font-body-md text-body-md">Tuesday, October 24 • You have 4 tasks due today</p>
+</div>
+</section>
+<!-- Quick Stats Row -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-md">
+<div class="glass-card p-lg rounded-2xl shadow-sm border border-white/20 flex items-center justify-between">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Active Tasks</p>
+<p class="font-h2 text-h2 text-on-surface mt-xs">12</p>
+</div>
+<div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="assignment">assignment</span>
+</div>
+</div>
+<div class="glass-card p-lg rounded-2xl shadow-sm border border-white/20 flex items-center justify-between">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Due Today</p>
+<p class="font-h2 text-h2 text-error mt-xs">4</p>
+</div>
+<div class="w-12 h-12 rounded-full bg-error-container flex items-center justify-center text-error">
+<span class="material-symbols-outlined" data-icon="priority_high">priority_high</span>
+</div>
+</div>
+<div class="glass-card p-lg rounded-2xl shadow-sm border border-white/20 flex items-center justify-between sm:col-span-2 lg:col-span-1">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase">Completed</p>
+<p class="font-h2 text-h2 text-on-tertiary-fixed-variant mt-xs">28</p>
+</div>
+<div class="w-12 h-12 rounded-full bg-tertiary-fixed flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined" data-icon="check_circle">check_circle</span>
+</div>
+</div>
+</section>
+<!-- Recent Workspaces (Horizontal Scroll) -->
+<section>
+<div class="flex justify-between items-end mb-md">
+<h3 class="font-h3 text-h3">Recent Workspaces</h3>
+<button class="text-primary font-button text-button hover:underline">View All</button>
+</div>
+<div class="flex overflow-x-auto gap-md pb-md no-scrollbar -mx-6 px-6">
+<div class="flex-none w-64 glass-card rounded-2xl p-md border border-white/20 hover:scale-[1.02] transition-transform cursor-pointer">
+<div class="w-full h-32 rounded-xl mb-md bg-slate-200 overflow-hidden relative">
+<img class="w-full h-full object-cover" data-alt="Modern minimalist office interior with white desks and floor to ceiling windows showing a city skyline" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQbhLrYatFuYhsfAJAb_VOLJJxXUhAv74aEfAuSIPFZFyJjAaxUNFgJveTFGJRbki5Y7zoVAcm6ojnh5WuA4bkLB17JUqeFvWimzZzOCfdCpTxecELFN3dc5BCEK6jog-Lw-2knRBsAWoSf-jTTRwHHLs3h52rPbLLlXXSWu5ysFua7wQDwgps9N00ikCprapvUb3G_G9g450-mmCd5dJYwQaShTzqM5blm5hKKuDuszl8DfCx1-5i_vYFb8FdxmX-Svv4rBggKw"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+</div>
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" data-icon="design_services">design_services</span>
+<p class="font-h3 text-body-lg font-bold">Brand Design</p>
+</div>
+</div>
+<div class="flex-none w-64 glass-card rounded-2xl p-md border border-white/20 hover:scale-[1.02] transition-transform cursor-pointer">
+<div class="w-full h-32 rounded-xl mb-md bg-slate-200 overflow-hidden relative">
+<img class="w-full h-full object-cover" data-alt="Close up of a computer screen showing complex lines of code in a dark mode editor with colored syntax highlighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCW98G2FQjyblFGEUj8CgLYGhQixlJwDtMPJLzmII8kcvL2qOsra1zJJw4A-y0mkCWOtH32uow3en23lCLDX5EzcSruBIH-jY3gtSVe5DPowRkpH_3-2wiNZrXmsRMN6K5Ep90ymcZvCKrCCRludPpfUQxEm53i2d58QAXNAABvtdoByBsAzxvVCArQ2Ygj9HIbTXc0-KqWS5mKUxNrBpxe6r1hQn1mmZYIh1AFVGsZJZKc-W0d9gWyPZoKlCep-8RNdaFQAYBUAw"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+</div>
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" data-icon="code">code</span>
+<p class="font-h3 text-body-lg font-bold">App Development</p>
+</div>
+</div>
+<div class="flex-none w-64 glass-card rounded-2xl p-md border border-white/20 hover:scale-[1.02] transition-transform cursor-pointer">
+<div class="w-full h-32 rounded-xl mb-md bg-slate-200 overflow-hidden relative">
+<img class="w-full h-full object-cover" data-alt="Clean desk with a laptop, notebook, and a small succulent plant in soft natural morning light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDH58Ut_axN_D02Zyze0FtG7QJzf4voCWPeRKeSpAi0GIy2Vkd2ZNmrTwOU7fB31mHrFq1zJHWcJISXQUhCr9UjdhaXbayHXtFIjH1x6CsjQUyGUckMXUklfDllvy5DwBwBlmYweQ0G7mM52TsJ0TGrVnCyxRmtYiVtiDRafdbsrrN97giX0s92tIRIdLFeiBnM860Q2e6MCdObwv5k7GereXa493jdENSovlvO3kcXZHwNPNqK3iksoa152biKTY7iJcr9_-RL4A"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+</div>
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary" data-icon="campaign">campaign</span>
+<p class="font-h3 text-body-lg font-bold">Marketing Strategy</p>
+</div>
+</div>
+</div>
+</section>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-xl">
+<!-- Active Projects -->
+<section>
+<h3 class="font-h3 text-h3 mb-md">Active Projects</h3>
+<div class="space-y-md">
+<div class="glass-card p-lg rounded-2xl border border-white/20 shadow-sm">
+<div class="flex justify-between items-start mb-md">
+<div>
+<h4 class="font-h3 text-body-lg font-bold">Orbit Design System</h4>
+<p class="text-label-sm text-on-surface-variant">Due Oct 30, 2023</p>
+</div>
+<span class="text-primary font-bold">75%</span>
+</div>
+<div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary w-3/4 rounded-full"></div>
+</div>
+<div class="mt-md flex -space-x-2">
+<img class="w-8 h-8 rounded-full border-2 border-white object-cover" data-alt="Portrait of a male designer" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqYYgk2J33BAKRKUwhNz4CRYNG0UvTsSYXBz_1LYLtc1kpL2aYphktOPfvx297ktFtIWVTw6hnkTd3M7VUQsSH39JUJkWWif0EBdszZ-5KJ_IA7gfJk0LI2Uo3kycb21OSzEfaSnx2fnV3P2sSK1x4GNHHrz8MXkRUnglWhUc5MSMMq9NSjy3bdmaQcQ_ytqqaE87uiU1rPoob1s2B3iFvNyTToIHLoK6DtUYdX1eB_ezsxdkHCrVUNJdw8kntMjSyllXZF3J0dA"/>
+<img class="w-8 h-8 rounded-full border-2 border-white object-cover" data-alt="Portrait of a female developer" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNaZTPXDNmuh1gGTqqFjbBE8ExanF4e2zQKPWeyLFWSjf4s8CDNlVODAXQBpa4LvaCqNZ9jc0EH7dgdgd1oU2ZIUlj1HN-9Hs3tuWrwGo2CGL5YGantOK-fvAABLUedQxfXBuwYS0akDqFTBhsALwGqgyE9Uv1sV1kbQSRjodpzdeXwmcuaMazXdnoTKnX5_R376jJQZbcxkeuEnkJPHioHB0tJB7sND1MnJGqJryKSC2aRDLvo4iUsoUOY6XVDn4zCpnKpL8piQ"/>
+<div class="w-8 h-8 rounded-full bg-primary-fixed text-primary text-[10px] flex items-center justify-center border-2 border-white font-bold">+2</div>
+</div>
+</div>
+<div class="glass-card p-lg rounded-2xl border border-white/20 shadow-sm">
+<div class="flex justify-between items-start mb-md">
+<div>
+<h4 class="font-h3 text-body-lg font-bold">Mobile App Onboarding</h4>
+<p class="text-label-sm text-on-surface-variant">Due Nov 05, 2023</p>
+</div>
+<span class="text-primary font-bold">32%</span>
+</div>
+<div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-primary w-1/3 rounded-full"></div>
+</div>
+<div class="mt-md flex -space-x-2">
+<img class="w-8 h-8 rounded-full border-2 border-white object-cover" data-alt="Portrait of a young man" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXJEuyIAK_WWLXpdjXnprx78cG4U4KWCZdNxAS0WK6_0did5OMTs83KcB7wCWYPsw1UMYk_DL7rlmwWrX_IKNaq69gUH1duOxNnEgUFI9K-fa6VI97LwLiBdA-eDeQ9lfzaLMBuePJkZAyFES_HcywPmWF9tfA8RTlYzNGtQxZ8VL8l3IlTVqJhHOIZNAkWONPrSBhRWenvF7pbPyiSNwhBdKW2FgakPazJ-SiTsB5wHweHG2xCNg7GmFFmu3LUqV9bJiaWSYwkQ"/>
+<img class="w-8 h-8 rounded-full border-2 border-white object-cover" data-alt="Portrait of a professional woman" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDdJqgwUiONye8abxmTlHHyp3rHY_eZPYBShNS94_pfrDQqFWbQNFlBdYkH9sBVQxv3JCdkmEOQHEK6FbgsCD_XZTew0uHOtqAzSU6Qr87Hy7jWXnU1L9fgiz4WUWYrQu5iUq-CDl6rAx3J13hPXDpHL-mIU5jWiTn3YJVCUvdSimgmFTfKtzGcB46rIA4sphRX-2Q7-7YL4xX2px8ufTkcrpmoeLaiuXDFg19JE-CootY0vmZvEM-28kBEYpOLu6nRu3NSCibpMA"/>
+</div>
+</div>
+</div>
+</section>
+<!-- Upcoming Deadlines -->
+<section>
+<h3 class="font-h3 text-h3 mb-md">Upcoming Deadlines</h3>
+<div class="space-y-xs">
+<div class="flex items-center gap-md p-md hover:bg-white/40 rounded-xl transition-colors cursor-pointer group">
+<div class="flex-none w-10 h-10 rounded-full border border-primary flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all">
+<span class="material-symbols-outlined" data-icon="radio_button_unchecked">radio_button_unchecked</span>
+</div>
+<div class="flex-grow">
+<h4 class="font-body-md font-semibold text-on-surface">Final UI Review</h4>
+<p class="text-label-sm text-on-surface-variant">Today, 5:00 PM</p>
+</div>
+<span class="px-3 py-1 rounded-full bg-error-container text-error text-[10px] font-bold uppercase tracking-wider">High</span>
+</div>
+<div class="flex items-center gap-md p-md hover:bg-white/40 rounded-xl transition-colors cursor-pointer group">
+<div class="flex-none w-10 h-10 rounded-full border border-outline flex items-center justify-center text-outline group-hover:border-primary group-hover:text-primary transition-all">
+<span class="material-symbols-outlined" data-icon="radio_button_unchecked">radio_button_unchecked</span>
+</div>
+<div class="flex-grow">
+<h4 class="font-body-md font-semibold text-on-surface">Client Feedback Sync</h4>
+<p class="text-label-sm text-on-surface-variant">Tomorrow, 10:00 AM</p>
+</div>
+<span class="px-3 py-1 rounded-full bg-secondary-container text-secondary text-[10px] font-bold uppercase tracking-wider">Medium</span>
+</div>
+<div class="flex items-center gap-md p-md hover:bg-white/40 rounded-xl transition-colors cursor-pointer group">
+<div class="flex-none w-10 h-10 rounded-full border border-outline flex items-center justify-center text-outline group-hover:border-primary group-hover:text-primary transition-all">
+<span class="material-symbols-outlined" data-icon="radio_button_unchecked">radio_button_unchecked</span>
+</div>
+<div class="flex-grow">
+<h4 class="font-body-md font-semibold text-on-surface">Update Documentation</h4>
+<p class="text-label-sm text-on-surface-variant">Oct 26, 2023</p>
+</div>
+<span class="px-3 py-1 rounded-full bg-surface-container text-on-surface-variant text-[10px] font-bold uppercase tracking-wider">Low</span>
+</div>
+<div class="flex items-center gap-md p-md hover:bg-white/40 rounded-xl transition-colors cursor-pointer group">
+<div class="flex-none w-10 h-10 rounded-full border border-outline flex items-center justify-center text-outline group-hover:border-primary group-hover:text-primary transition-all">
+<span class="material-symbols-outlined" data-icon="radio_button_unchecked">radio_button_unchecked</span>
+</div>
+<div class="flex-grow">
+<h4 class="font-body-md font-semibold text-on-surface">Weekly Team Standup</h4>
+<p class="text-label-sm text-on-surface-variant">Oct 27, 2023</p>
+</div>
+<span class="px-3 py-1 rounded-full bg-secondary-container text-secondary text-[10px] font-bold uppercase tracking-wider">Medium</span>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full h-20 px-8 flex justify-between items-center pb-safe bg-white/80 backdrop-blur-2xl border-t border-white/20 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] rounded-t-3xl z-50 md:hidden">
+<div class="flex flex-col items-center justify-center text-indigo-600 relative after:content-[''] after:absolute after:-bottom-1 after:w-1 after:h-1 after:bg-indigo-600 after:rounded-full active:scale-90 duration-200">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-manrope text-[10px] font-semibold uppercase tracking-widest mt-1">Home</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 hover:text-indigo-500 transition-colors active:scale-90 duration-200">
+<span class="material-symbols-outlined" data-icon="folder_open">folder_open</span>
+<span class="font-manrope text-[10px] font-semibold uppercase tracking-widest mt-1">Projects</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 hover:text-indigo-500 transition-colors active:scale-90 duration-200">
+<span class="material-symbols-outlined" data-icon="event_upcoming">event_upcoming</span>
+<span class="font-manrope text-[10px] font-semibold uppercase tracking-widest mt-1">Deadlines</span>
+</div>
+<div class="flex flex-col items-center justify-center text-slate-400 hover:text-indigo-500 transition-colors active:scale-90 duration-200">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-manrope text-[10px] font-semibold uppercase tracking-widest mt-1">Settings</span>
+</div>
+</nav>
+<!-- Contextual FAB - Only for Home Dashboard -->
+<button class="fixed bottom-24 right-6 w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center hover:opacity-90 active:scale-95 transition-all md:bottom-10">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+</body></html>
