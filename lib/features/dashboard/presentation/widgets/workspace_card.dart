@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_constants.dart';
-import '../../../../shared/models/workspace.dart';
+import 'package:provider/provider.dart';
+import 'package:orbit/core/constants/app_constants.dart';
+import 'package:orbit/shared/models/workspace.dart';
+import 'package:orbit/features/dashboard/presentation/view_models/dashboard_view_model.dart';
+import 'package:orbit/features/workspace/presentation/widgets/workspace_dialog.dart';
+
+import 'package:orbit/shared/widgets/smart_image.dart';
 
 class WorkspaceCard extends StatelessWidget {
   final Workspace ws;
@@ -13,6 +18,65 @@ class WorkspaceCard extends StatelessWidget {
     required this.isDark,
     this.width,
   });
+
+  void _showWorkspaceMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (_) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: const Icon(Icons.edit_rounded),
+            title: const Text('Edit Workspace'),
+            onTap: () {
+              Navigator.pop(context);
+              showDialog(
+                context: context,
+                builder: (_) => WorkspaceDialog(
+                  workspace: ws,
+                  onSave: (name, desc, imageUrl, memberIds) => context.read<DashboardViewModel>().updateWorkspace(
+                    Workspace(
+                      id: ws.id,
+                      name: name,
+                      description: desc,
+                      imageUrl: imageUrl,
+                      createdAt: ws.createdAt,
+                      updatedAt: DateTime.now(),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.delete_outline_rounded, color: Colors.red),
+            title: const Text('Delete Workspace', style: TextStyle(color: Colors.red)),
+            onTap: () {
+              Navigator.pop(context);
+              showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Delete Workspace'),
+                  content: const Text('Are you sure you want to delete this workspace? This action is reversible but will hide it from your dashboard.'),
+                  actions: [
+                    TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+                    TextButton(
+                      onPressed: () {
+                        context.read<DashboardViewModel>().deleteWorkspace(ws.id);
+                        Navigator.pop(context);
+                      }, 
+                      child: const Text('Delete', style: TextStyle(color: Colors.red))
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: AppSpacing.lg),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,9 +100,8 @@ class WorkspaceCard extends StatelessWidget {
           children: [
             if (ws.imageUrl != null)
               Positioned.fill(
-                child: Image.network(
-                  ws.imageUrl!,
-                  fit: BoxFit.cover,
+                child: SmartImage(
+                  imageUrl: ws.imageUrl!,
                 ),
               ),
             Positioned.fill(
@@ -75,10 +138,13 @@ class WorkspaceCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.15), shape: BoxShape.circle),
-                          child: const Icon(Icons.more_horiz, size: 18, color: Colors.white),
+                        GestureDetector(
+                          onTap: () => _showWorkspaceMenu(context),
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.15), shape: BoxShape.circle),
+                            child: const Icon(Icons.more_horiz, size: 18, color: Colors.white),
+                          ),
                         ),
                       ],
                     ),
@@ -102,7 +168,7 @@ class WorkspaceCard extends StatelessWidget {
                             boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 4, offset: const Offset(0, 2))],
                           ),
                           child: const Text(
-                            '8 PROJECTS', 
+                            'VIEW DETAILS',
                             style: TextStyle(fontWeight: FontWeight.w900, fontSize: 9, color: Colors.white, letterSpacing: 0.5)
                           ),
                         ),

@@ -17,6 +17,8 @@ class DashboardStats extends StatelessWidget {
           
           return GlassCard(
             padding: const EdgeInsets.all(AppSpacing.lg),
+            blur: 5,
+            frosted: true,
             borderRadius: AppRadius.xxl,
             child: Flex(
               direction: isWide ? Axis.horizontal : Axis.vertical,

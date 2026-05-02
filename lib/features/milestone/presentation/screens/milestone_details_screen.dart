@@ -1,52 +1,106 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../../core/constants/app_constants.dart';
-import '../../../../shared/models/milestone.dart';
-import '../../../../shared/models/task.dart';
+import '../../../../shared/models/milestone.dart' as model;
 import '../../../../shared/widgets/glass_card.dart';
+import '../../../dashboard/presentation/widgets/task_card.dart';
+import '../view_models/milestone_view_model.dart';
 
-class MilestoneDetailsScreen extends StatelessWidget {
-  final Milestone milestone;
+import '../widgets/milestone_dialog.dart';
+import '../../../dashboard/presentation/widgets/task_dialog.dart';
+import '../../../dashboard/presentation/view_models/task_view_model.dart';
+
+class MilestoneDetailsScreen extends StatefulWidget {
+  final model.Milestone milestone;
 
   const MilestoneDetailsScreen({super.key, required this.milestone});
 
   @override
+  State<MilestoneDetailsScreen> createState() => _MilestoneDetailsScreenState();
+}
+
+class _MilestoneDetailsScreenState extends State<MilestoneDetailsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<MilestoneViewModel>().loadMilestoneData(widget.milestone.id);
+    });
+  }
+
+  void _showMilestoneMenu() {
+    final viewModel = context.read<MilestoneViewModel>();
+    showModalBottomSheet(
+      context: context,
+      builder: (_) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: const Icon(Icons.edit_rounded),
+            title: const Text('Edit Milestone'),
+            onTap: () {
+              Navigator.pop(context);
+              showDialog(
+                context: context,
+                builder: (_) => MilestoneDialog(
+                  milestone: widget.milestone,
+                  onSave: (name, desc, dueDate) {
+                    viewModel.updateMilestone(model.Milestone(
+                      id: widget.milestone.id,
+                      projectId: widget.milestone.projectId,
+                      name: name,
+                      description: desc,
+                      dueDate: dueDate,
+                      createdAt: widget.milestone.createdAt,
+                      updatedAt: DateTime.now(),
+                    ));
+                  },
+                ),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.delete_outline_rounded, color: Colors.red),
+            title: const Text('Delete Milestone', style: TextStyle(color: Colors.red)),
+            onTap: () {
+              Navigator.pop(context);
+              viewModel.deleteMilestone(widget.milestone.id);
+              Navigator.pop(context);
+            },
+          ),
+          const SizedBox(height: AppSpacing.lg),
+        ],
+      ),
+    );
+  }
+
+  void _showAddTaskDialog() {
+    final viewModel = context.read<MilestoneViewModel>();
+    showDialog(
+      context: context,
+      builder: (_) => TaskDialog(
+        milestoneId: widget.milestone.id,
+        workspaceMembers: viewModel.workspaceMembers,
+        onSave: ({required description, required priority, required status, required title, assigneeId, dueDate}) {
+          context.read<TaskViewModel>().createTask(
+            milestoneId: widget.milestone.id,
+            title: title,
+            description: description,
+            status: status,
+            priority: priority,
+            assigneeId: assigneeId,
+            dueDate: dueDate,
+          );
+        },
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
-    // Mock Data for Recursive Subtasks
-    final tasks = [
-      Task(
-        id: 't1',
-        milestoneId: milestone.id,
-        title: 'Design System Implementation',
-        description: 'Complete all UI components based on the new glassmorphic design language.',
-        status: TaskStatus.done,
-        priority: TaskPriority.high,
-        subtasks: [
-          Task(id: 'st1', milestoneId: milestone.id, title: 'Refactor GlassCard', description: 'Remove grain and optimize blur performance.'),
-          Task(id: 'st2', milestoneId: milestone.id, title: 'Typography Mapping', description: 'Ensure Manrope and Inter are applied globally.'),
-        ],
-      ),
-      Task(
-        id: 't2',
-        milestoneId: milestone.id,
-        title: 'Workflow Orchestration',
-        description: 'Establish the core project hierarchy logic and state management flows.',
-        status: TaskStatus.inProgress,
-        priority: TaskPriority.medium,
-        subtasks: [
-          Task(
-            id: 'st3', 
-            milestoneId: milestone.id, 
-            title: 'Recursive Subtasks', 
-            description: 'Implement a clean tree view for unlimited subtask nesting.',
-            subtasks: [
-              Task(id: 'sst1', milestoneId: milestone.id, title: 'Depth Indentation', description: 'Visual clarity for nested levels.'),
-            ],
-          ),
-        ],
-      ),
-    ];
+    final viewModel = context.watch<MilestoneViewModel>();
+    final tasks = viewModel.tasks;
 
     return Scaffold(
       body: Container(
@@ -54,12 +108,13 @@ class MilestoneDetailsScreen extends StatelessWidget {
         height: double.infinity,
         decoration: BoxDecoration(
           color: theme.scaffoldBackgroundColor,
-          gradient: RadialGradient(
-            center: const Alignment(-0.8, -0.8),
-            radius: 1.2,
+          gradient: LinearGradient(
+            begin: Alignment.topRight,
+            end: Alignment.bottomLeft,
             colors: [
-              theme.colorScheme.primary.withValues(alpha: 0.03),
+              theme.colorScheme.primary.withValues(alpha: 0.05),
               Colors.transparent,
+              theme.colorScheme.secondary.withValues(alpha: 0.02),
             ],
           ),
         ),
@@ -68,8 +123,9 @@ class MilestoneDetailsScreen extends StatelessWidget {
             physics: const BouncingScrollPhysics(),
             slivers: [
               SliverAppBar(
-                expandedHeight: 100,
-                floating: true,
+                expandedHeight: 180,
+                floating: false,
+                pinned: true,
                 backgroundColor: Colors.transparent,
                 elevation: 0,
                 leadingWidth: 70,
@@ -85,37 +141,78 @@ class MilestoneDetailsScreen extends StatelessWidget {
                     ),
                   ),
                 ),
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.more_vert_rounded),
+                    onPressed: _showMilestoneMenu,
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                ],
                 flexibleSpace: FlexibleSpaceBar(
-                  centerTitle: true,
-                  title: Text(
-                    'Milestone Details', 
-                    style: theme.textTheme.headlineSmall?.copyWith(fontSize: 18, fontWeight: FontWeight.w800)
+                  background: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 40),
+                        Hero(
+                          tag: 'milestone_${widget.milestone.id}',
+                          child: Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(Icons.flag_rounded, color: theme.colorScheme.primary, size: 32),
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Text(
+                          widget.milestone.name,
+                          style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
               SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                padding: const EdgeInsets.all(AppSpacing.md),
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
-                    const SizedBox(height: AppSpacing.md),
-                    _buildMilestoneHeader(theme),
+                    Text(
+                      widget.milestone.description,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                        height: 1.6,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: AppSpacing.xl),
+                    _buildStatsRow(theme),
                     const SizedBox(height: AppSpacing.xl),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Container(
-                          width: 4,
-                          height: 16,
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.primary,
-                            borderRadius: BorderRadius.circular(2),
-                          ),
+                        Text('Tasks', style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
+                        TextButton.icon(
+                          onPressed: _showAddTaskDialog,
+                          icon: const Icon(Icons.add_rounded, size: 18),
+                          label: const Text('Add Task'),
                         ),
-                        const SizedBox(width: AppSpacing.sm),
-                        Text('Task Hierarchy', style: theme.textTheme.headlineSmall?.copyWith(fontSize: 16, fontWeight: FontWeight.w900)),
                       ],
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    ...tasks.map((task) => _TaskItem(task: task)),
+                    if (tasks.isEmpty)
+                       const Center(child: Padding(
+                         padding: EdgeInsets.all(20.0),
+                         child: Text('No tasks found for this milestone.'),
+                       ))
+                    else
+                      ...tasks.map((task) => Padding(
+                        padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                        child: TaskCard(task: task),
+                      )),
                     const SizedBox(height: AppSpacing.xxl),
                   ]),
                 ),
@@ -127,192 +224,43 @@ class MilestoneDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMilestoneHeader(ThemeData theme) {
-    return GlassCard(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      borderRadius: AppRadius.xxl,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(AppSpacing.sm),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary,
-                  borderRadius: BorderRadius.circular(AppRadius.md),
-                ),
-                child: const Icon(Icons.flag_rounded, color: Colors.white, size: 24),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(milestone.name, style: theme.textTheme.headlineSmall?.copyWith(fontSize: 20, fontWeight: FontWeight.w800)),
-                    Text('Active Phase', style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.primary, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          Text(
-            milestone.description,
-            style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant, height: 1.5),
-          ),
-          const SizedBox(height: AppSpacing.xl),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text('Overall Progress', style: theme.textTheme.labelSmall?.copyWith(fontWeight: FontWeight.bold)),
-              Text('${(milestone.progress * 100).toInt()}%', style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.primary, fontWeight: FontWeight.w900)),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.sm),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(AppRadius.full),
-            child: LinearProgressIndicator(
-              value: milestone.progress,
-              minHeight: 8,
-              backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.05),
-              valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
-            ),
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Text(
-            '${milestone.completedTasks} of ${milestone.totalTasks} tasks completed',
-            style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _TaskItem extends StatefulWidget {
-  final Task task;
-  final int depth;
-
-  const _TaskItem({required this.task, this.depth = 0});
-
-  @override
-  State<_TaskItem> createState() => _TaskItemState();
-}
-
-class _TaskItemState extends State<_TaskItem> {
-  bool _isExpanded = true; // Default expanded for better visibility in mock
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final hasSubtasks = widget.task.subtasks.isNotEmpty;
-    final isDone = widget.task.status == TaskStatus.done;
-
-    return Column(
+  Widget _buildStatsRow(ThemeData theme) {
+    return Row(
       children: [
-        GestureDetector(
-          onTap: hasSubtasks ? () => setState(() => _isExpanded = !_isExpanded) : null,
-          child: Container(
-            margin: const EdgeInsets.only(bottom: 2),
-            padding: EdgeInsets.only(
-              left: widget.depth * 20.0 + AppSpacing.sm,
-              right: AppSpacing.sm,
-              top: AppSpacing.md,
-              bottom: AppSpacing.md,
-            ),
-            decoration: BoxDecoration(
-              color: widget.depth == 0 ? theme.colorScheme.surface : Colors.transparent,
-              borderRadius: widget.depth == 0 ? BorderRadius.circular(AppRadius.lg) : null,
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (hasSubtasks)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 2, right: 8),
-                    child: Icon(
-                      _isExpanded ? Icons.keyboard_arrow_down_rounded : Icons.keyboard_arrow_right_rounded,
-                      size: 18,
-                      color: theme.colorScheme.primary,
-                    ),
-                  )
-                else
-                  const SizedBox(width: 26),
-                
-                GestureDetector(
-                  onTap: () {}, // Toggle completion logic later
-                  child: Icon(
-                    isDone ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
-                    size: 22,
-                    color: isDone ? Colors.green : theme.colorScheme.outline.withValues(alpha: 0.5),
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.task.title,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          fontWeight: widget.depth == 0 ? FontWeight.w800 : FontWeight.w600,
-                          decoration: isDone ? TextDecoration.lineThrough : null,
-                          color: isDone ? theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5) : null,
-                        ),
-                      ),
-                      if (widget.task.description.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 4),
-                          child: Text(
-                            widget.task.description,
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              fontSize: 11,
-                              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                if (widget.depth == 0)
-                  _buildPriorityBadge(theme, widget.task.priority),
-              ],
-            ),
+        Expanded(
+          child: _buildStatItem(
+            theme, 
+            'Progress', 
+            '${(widget.milestone.progress * 100).toInt()}%', 
+            Icons.donut_large_rounded
           ),
         ),
-        if (_isExpanded && hasSubtasks)
-          ...widget.task.subtasks.map((st) => _TaskItem(task: st, depth: widget.depth + 1)),
-        if (widget.depth == 0) const SizedBox(height: AppSpacing.sm),
+        const SizedBox(width: AppSpacing.md),
+        Expanded(
+          child: _buildStatItem(
+            theme, 
+            'Tasks', 
+            '${widget.milestone.completedTasks}/${widget.milestone.totalTasks}', 
+            Icons.check_circle_outline_rounded
+          ),
+        ),
       ],
     );
   }
 
-  Widget _buildPriorityBadge(ThemeData theme, TaskPriority priority) {
-    final color = _getPriorityColor(priority);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppRadius.full),
-      ),
-      child: Text(
-        priority.name.toUpperCase(),
-        style: theme.textTheme.labelSmall?.copyWith(
-          color: color,
-          fontSize: 9,
-          fontWeight: FontWeight.w900,
-          letterSpacing: 0.5,
-        ),
+  Widget _buildStatItem(ThemeData theme, String label, String value, IconData icon) {
+    return GlassCard(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      borderRadius: AppRadius.xl,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 18, color: theme.colorScheme.primary),
+          const SizedBox(height: AppSpacing.sm),
+          Text(value, style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
+          Text(label, style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+        ],
       ),
     );
-  }
-
-  Color _getPriorityColor(TaskPriority priority) {
-    switch (priority) {
-      case TaskPriority.high: return Colors.redAccent;
-      case TaskPriority.medium: return Colors.orangeAccent;
-      case TaskPriority.low: return Colors.blueAccent;
-    }
   }
 }

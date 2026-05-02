@@ -7,8 +7,13 @@ class Task {
   final String? parentTaskId;
   final String title;
   final String description;
+  final String? assigneeId;
   final TaskStatus status;
   final TaskPriority priority;
+  final DateTime? startDate;
+  final DateTime? dueDate;
+  final DateTime createdAt;
+  final DateTime updatedAt;
   final List<Task> subtasks;
 
   Task({
@@ -17,8 +22,13 @@ class Task {
     this.parentTaskId,
     required this.title,
     required this.description,
+    this.assigneeId,
     this.status = TaskStatus.todo,
     this.priority = TaskPriority.medium,
+    this.startDate,
+    this.dueDate,
+    required this.createdAt,
+    required this.updatedAt,
     this.subtasks = const [],
   });
 }
