@@ -1,0 +1,13 @@
+{
+  "@@locale": "en",
+  "appTitle": "Orbit",
+  "dashboard": "My Dashboard",
+  "createWorkspace": "Create Workspace",
+  "editWorkspace": "Edit Workspace",
+  "activeWorkspaces": "Active Workspaces",
+  "members": "Members",
+  "activeProjects": "Active Projects",
+  "projectMilestones": "Project Milestones",
+  "tasks": "Tasks",
+  "subtasks": "Subtasks"
+}

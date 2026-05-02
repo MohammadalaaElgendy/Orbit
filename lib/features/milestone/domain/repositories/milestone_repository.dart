@@ -21,15 +21,17 @@ class MilestoneRepository {
   }
 
   Stream<List<model.Milestone>> watchMilestonesByProject(String projectId) {
-    return _milestoneDao.watchByProject(projectId).map((rows) => rows
+    return _milestoneDao.watchByProjectWithCounts(projectId).map((rows) => rows
         .map((row) => model.Milestone(
-              id: row.id,
-              projectId: row.projectId,
-              name: row.name,
-              description: row.description,
-              dueDate: row.dueDate,
-              createdAt: row.createdAt,
-              updatedAt: row.updatedAt,
+              id: row.milestone.id,
+              projectId: row.milestone.projectId,
+              name: row.milestone.name,
+              description: row.milestone.description,
+              dueDate: row.milestone.dueDate,
+              createdAt: row.milestone.createdAt,
+              updatedAt: row.milestone.updatedAt,
+              totalTasks: row.totalTasks,
+              completedTasks: row.completedTasks,
             ))
         .toList());
   }

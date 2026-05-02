@@ -26,14 +26,44 @@ class TaskRepository {
   }
 
   Stream<List<model.Task>> watchRootTasksByMilestone(String milestoneId) {
-    return _taskDao.watchRootTasksByMilestone(milestoneId).map((rows) => rows
-        .map((row) => _mapToDomain(row))
+    return _taskDao.watchRootTasksByMilestoneWithCounts(milestoneId).map((rows) => rows
+        .map((row) => model.Task(
+              id: row.task.id,
+              milestoneId: row.task.milestoneId,
+              parentTaskId: row.task.parentTaskId,
+              title: row.task.title,
+              description: row.task.description,
+              assigneeId: row.task.assigneeId,
+              status: model.TaskStatus.values.byName(row.task.status),
+              priority: model.TaskPriority.values.byName(row.task.priority),
+              startDate: row.task.startDate,
+              dueDate: row.task.dueDate,
+              createdAt: row.task.createdAt,
+              updatedAt: row.task.updatedAt,
+              subtaskCount: row.subtaskCount,
+              completedSubtasks: row.completedSubtasks,
+            ))
         .toList());
   }
 
   Stream<List<model.Task>> watchSubtasks(String parentId) {
-    return _taskDao.watchSubtasks(parentId).map((rows) => rows
-        .map((row) => _mapToDomain(row))
+    return _taskDao.watchSubtasksWithCounts(parentId).map((rows) => rows
+        .map((row) => model.Task(
+              id: row.task.id,
+              milestoneId: row.task.milestoneId,
+              parentTaskId: row.task.parentTaskId,
+              title: row.task.title,
+              description: row.task.description,
+              assigneeId: row.task.assigneeId,
+              status: model.TaskStatus.values.byName(row.task.status),
+              priority: model.TaskPriority.values.byName(row.task.priority),
+              startDate: row.task.startDate,
+              dueDate: row.task.dueDate,
+              createdAt: row.task.createdAt,
+              updatedAt: row.task.updatedAt,
+              subtaskCount: row.subtaskCount,
+              completedSubtasks: row.completedSubtasks,
+            ))
         .toList());
   }
 
@@ -107,6 +137,8 @@ class TaskRepository {
               createdAt: t.createdAt,
               updatedAt: t.updatedAt,
               subtasks: _buildTree(allTasks, t.id),
+              subtaskCount: allTasks.where((st) => st.parentTaskId == t.id).length,
+              completedSubtasks: allTasks.where((st) => st.parentTaskId == t.id && st.status == model.TaskStatus.done).length,
             ))
         .toList();
   }

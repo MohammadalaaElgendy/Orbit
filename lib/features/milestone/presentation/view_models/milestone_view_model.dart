@@ -8,6 +8,7 @@ import '../../../workspace/domain/repositories/workspace_repository.dart';
 import '../../../dashboard/domain/repositories/task_repository.dart';
 import 'dart:async';
 import 'package:uuid/uuid.dart';
+import '../../../../core/services/notification_service.dart';
 
 class MilestoneViewModel extends ChangeNotifier {
   final MilestoneRepository _milestoneRepository;
@@ -69,10 +70,30 @@ class MilestoneViewModel extends ChangeNotifier {
       updatedAt: DateTime.now(),
     );
     await _milestoneRepository.createMilestone(milestone);
+
+    if (dueDate != null) {
+      await NotificationService().scheduleDeadlineNotification(
+        id: milestone.id.hashCode,
+        title: 'Milestone Reminder: $name',
+        body: 'The deadline for this milestone is in 1 hour.',
+        deadline: dueDate,
+      );
+    }
   }
 
   Future<void> updateMilestone(Milestone milestone) async {
     await _milestoneRepository.updateMilestone(milestone);
+
+    if (milestone.dueDate != null) {
+      await NotificationService().scheduleDeadlineNotification(
+        id: milestone.id.hashCode,
+        title: 'Milestone Reminder: ${milestone.name}',
+        body: 'The deadline for this milestone is in 1 hour.',
+        deadline: milestone.dueDate!,
+      );
+    } else {
+      await NotificationService().cancelNotification(milestone.id.hashCode);
+    }
   }
 
   Future<void> deleteMilestone(String id) async {

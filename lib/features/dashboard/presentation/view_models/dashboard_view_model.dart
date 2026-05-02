@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../shared/models/workspace.dart';
 import '../../../../shared/models/milestone.dart';
 import '../../../../shared/models/task.dart';
+import '../../../../shared/models/user.dart';
 import '../../domain/repositories/task_repository.dart';
 import '../../../workspace/domain/repositories/workspace_repository.dart';
 import '../../../milestone/domain/repositories/milestone_repository.dart';
@@ -13,6 +14,9 @@ class DashboardViewModel extends ChangeNotifier {
 
   List<Workspace> _workspaces = [];
   List<Workspace> get workspaces => _workspaces;
+
+  final Map<String, List<User>> _workspaceMembersMap = {};
+  Map<String, List<User>> get workspaceMembersMap => _workspaceMembersMap;
 
   final List<Milestone> _recentMilestones = [];
   List<Milestone> get recentMilestones => _recentMilestones;
@@ -31,12 +35,17 @@ class DashboardViewModel extends ChangeNotifier {
   }
 
   void _init() {
-    _workspaceSub = _workspaceRepository.watchWorkspaces().listen((data) {
+    _workspaceSub = _workspaceRepository.watchWorkspaces().listen((data) async {
       _workspaces = data;
+      
+      // Fetch members for each workspace to show real avatars on cards
+      for (var ws in data) {
+        final members = await _workspaceRepository.watchWorkspaceMembers(ws.id).first;
+        _workspaceMembersMap[ws.id] = members;
+      }
+      
       notifyListeners();
     });
-    
-    // In a more advanced version, we could watch for "recent" items here using the other repos
   }
 
   Future<void> createWorkspace(String name, String description, String? imageUrl, List<String> memberIds) async {
@@ -56,8 +65,38 @@ class DashboardViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> updateWorkspace(Workspace workspace) async {
-    await _workspaceRepository.updateWorkspace(workspace);
+  Future<void> updateWorkspace(String id, String name, String description, String? imageUrl, List<String> memberIds) async {
+    final ws = await _workspaceRepository.getWorkspaceById(id);
+    if (ws == null) return;
+    
+    final updated = Workspace(
+      id: id,
+      name: name,
+      description: description,
+      imageUrl: imageUrl ?? ws.imageUrl,
+      createdAt: ws.createdAt,
+      updatedAt: DateTime.now(),
+    );
+    await _workspaceRepository.updateWorkspace(updated);
+
+    // Sync Members
+    final currentMembers = await _workspaceRepository.watchWorkspaceMembers(id).first;
+    final currentMemberIds = currentMembers.map((m) => m.id).toSet();
+    final newMemberIds = memberIds.toSet();
+
+    for (final mId in currentMemberIds) {
+      if (!newMemberIds.contains(mId)) {
+        await _workspaceRepository.removeMemberFromWorkspace(id, mId);
+      }
+    }
+
+    for (final mId in newMemberIds) {
+      if (!currentMemberIds.contains(mId)) {
+        await _workspaceRepository.addMemberToWorkspace(id, mId, 'member');
+      }
+    }
+
+    notifyListeners();
   }
 
   Future<void> deleteWorkspace(String id) async {

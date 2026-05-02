@@ -80,9 +80,10 @@ class WorkspaceViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> updateWorkspace(String id, String name, String description, String? imageUrl) async {
+  Future<void> updateWorkspace(String id, String name, String description, String? imageUrl, List<String> memberIds) async {
     final ws = await _workspaceRepository.getWorkspaceById(id);
     if (ws == null) return;
+    
     final updated = Workspace(
       id: id,
       name: name,
@@ -92,6 +93,25 @@ class WorkspaceViewModel extends ChangeNotifier {
       updatedAt: DateTime.now(),
     );
     await _workspaceRepository.updateWorkspace(updated);
+
+    // Sync Members
+    final currentMemberIds = _members.map((m) => m.id).toSet();
+    final newMemberIds = memberIds.toSet();
+
+    // Remove users no longer in the list
+    for (final mId in currentMemberIds) {
+      if (!newMemberIds.contains(mId)) {
+        await _workspaceRepository.removeMemberFromWorkspace(id, mId);
+      }
+    }
+
+    // Add new users
+    for (final mId in newMemberIds) {
+      if (!currentMemberIds.contains(mId)) {
+        await _workspaceRepository.addMemberToWorkspace(id, mId, 'member');
+      }
+    }
+
     if (_currentWorkspace?.id == id) {
       _currentWorkspace = updated;
     }
@@ -125,6 +145,14 @@ class WorkspaceViewModel extends ChangeNotifier {
 
   Future<void> addMember(String workspaceId, String userId) async {
     await _workspaceRepository.addMemberToWorkspace(workspaceId, userId, 'member');
+  }
+
+  Future<List<User>> getWorkspaceMembers(String workspaceId) async {
+    return _workspaceRepository.watchWorkspaceMembers(workspaceId).first;
+  }
+
+  Future<User?> searchUserByEmail(String email) async {
+    return _userRepository.getUserByEmail(email);
   }
 
   Future<void> removeMember(String workspaceId, String userId) async {

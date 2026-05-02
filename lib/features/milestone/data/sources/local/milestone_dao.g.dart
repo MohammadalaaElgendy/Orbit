@@ -7,6 +7,8 @@ mixin _$MilestoneDaoMixin on DatabaseAccessor<AppDatabase> {
   $WorkspacesTable get workspaces => attachedDatabase.workspaces;
   $ProjectsTable get projects => attachedDatabase.projects;
   $MilestonesTable get milestones => attachedDatabase.milestones;
+  $UsersTable get users => attachedDatabase.users;
+  $TasksTable get tasks => attachedDatabase.tasks;
   MilestoneDaoManager get managers => MilestoneDaoManager(this);
 }
 
@@ -19,4 +21,8 @@ class MilestoneDaoManager {
       $$ProjectsTableTableManager(_db.attachedDatabase, _db.projects);
   $$MilestonesTableTableManager get milestones =>
       $$MilestonesTableTableManager(_db.attachedDatabase, _db.milestones);
+  $$UsersTableTableManager get users =>
+      $$UsersTableTableManager(_db.attachedDatabase, _db.users);
+  $$TasksTableTableManager get tasks =>
+      $$TasksTableTableManager(_db.attachedDatabase, _db.tasks);
 }

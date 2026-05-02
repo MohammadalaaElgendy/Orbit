@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/services/notification_service.dart';
 import '../../../../shared/models/task.dart';
 import '../../../../shared/models/user.dart';
 import '../../domain/repositories/task_repository.dart';
@@ -82,10 +83,31 @@ class TaskViewModel extends ChangeNotifier {
       updatedAt: DateTime.now(),
     );
     await _taskRepository.createTask(task);
+
+    if (dueDate != null) {
+      await NotificationService().scheduleDeadlineNotification(
+        id: task.id.hashCode,
+        title: 'Task Reminder: $title',
+        body: 'The deadline for this task is in 1 hour.',
+        deadline: dueDate,
+      );
+    }
   }
 
   Future<void> updateTask(Task task) async {
     await _taskRepository.updateTask(task);
+
+    if (task.dueDate != null) {
+      await NotificationService().scheduleDeadlineNotification(
+        id: task.id.hashCode,
+        title: 'Task Reminder: ${task.title}',
+        body: 'The deadline for this task is in 1 hour.',
+        deadline: task.dueDate!,
+      );
+    } else {
+      await NotificationService().cancelNotification(task.id.hashCode);
+    }
+
     if (_currentTask?.id == task.id) {
       _currentTask = task;
     }

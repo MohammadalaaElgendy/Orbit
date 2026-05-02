@@ -47,15 +47,5 @@ class AppPresetImages {
     'assets/images/workspaces/ws_23.webp',
     'assets/images/workspaces/ws_24.webp',
     'assets/images/workspaces/ws_25.webp',
-    'assets/images/workspaces/ws_26.webp',
-    'assets/images/workspaces/ws_27.webp',
-    'assets/images/workspaces/ws_28.webp',
-    'assets/images/workspaces/ws_29.webp',
-    'assets/images/workspaces/ws_30.webp',
-    'assets/images/workspaces/ws_31.webp',
-    'assets/images/workspaces/ws_32.webp',
-    'assets/images/workspaces/ws_33.webp',
-    'assets/images/workspaces/ws_34.webp',
-    'assets/images/workspaces/ws_35.webp',
   ];
 }

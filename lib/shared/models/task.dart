@@ -15,6 +15,8 @@ class Task {
   final DateTime createdAt;
   final DateTime updatedAt;
   final List<Task> subtasks;
+  final int subtaskCount;
+  final int completedSubtasks;
 
   Task({
     required this.id,
@@ -30,5 +32,7 @@ class Task {
     required this.createdAt,
     required this.updatedAt,
     this.subtasks = const [],
+    this.subtaskCount = 0,
+    this.completedSubtasks = 0,
   });
 }

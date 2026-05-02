@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_constants.dart';
@@ -9,10 +10,12 @@ import '../../../../shared/widgets/glass_card.dart';
 import '../view_models/workspace_view_model.dart';
 import '../widgets/project_dialog.dart';
 import '../widgets/workspace_dialog.dart';
+import '../widgets/member_search_dialog.dart';
 import '../../../milestone/presentation/view_models/milestone_view_model.dart';
 import '../../../milestone/presentation/widgets/milestone_dialog.dart';
 import 'dart:async';
 
+import 'package:intl/intl.dart';
 import '../../../../shared/widgets/smart_image.dart';
 
 class WorkspaceDetailsScreen extends StatefulWidget {
@@ -103,13 +106,17 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
           ListTile(
             leading: const Icon(Icons.edit_rounded),
             title: const Text('Edit Workspace'),
-            onTap: () {
+            onTap: () async {
               Navigator.pop(context);
+              final members = await viewModel.getWorkspaceMembers(widget.workspace.id);
+              if (!mounted) return;
+              
               showDialog(
                 context: context,
                 builder: (_) => WorkspaceDialog(
                   workspace: widget.workspace,
-                  onSave: (name, desc, imageUrl, memberIds) => viewModel.updateWorkspace(widget.workspace.id, name, desc, imageUrl),
+                  currentMembers: members,
+                  onSave: (name, desc, imageUrl, memberIds) => viewModel.updateWorkspace(widget.workspace.id, name, desc, imageUrl, memberIds),
                 ),
               );
             },
@@ -126,6 +133,13 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
           const SizedBox(height: AppSpacing.lg),
         ],
       ),
+    );
+  }
+
+  void _showMemberSearchDialog() {
+    showDialog(
+      context: context,
+      builder: (_) => MemberSearchDialog(workspaceId: widget.workspace.id),
     );
   }
 
@@ -196,6 +210,7 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                   title: LayoutBuilder(
                     builder: (context, constraints) {
                       final top = constraints.biggest.height;
+                      final isMobile = MediaQuery.of(context).size.width < 600;
                       
                       // Calculate interpolation ratio (0.0 = expanded, 1.0 = collapsed)
                       final expandedHeight = 200.0 + MediaQuery.of(context).padding.top;
@@ -206,40 +221,118 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                           ? Colors.white 
                           : Color.lerp(Colors.white, Colors.black, ratio)!;
 
-                      return Text(
-                        currentWorkspace.name, 
-                        style: theme.textTheme.headlineSmall?.copyWith(
-                          fontSize: 18, 
-                          fontWeight: FontWeight.w800,
-                          color: titleColor,
-                          shadows: ratio > 0.5 && !isDark ? [] : [
-                            const Shadow(color: Colors.black54, blurRadius: 10, offset: Offset(0, 2)),
-                          ],
-                        )
+                      // Vertical centering adjustment for collapsed state (Toolbar vs entire AppBar height)
+                      final double verticalOffset = (MediaQuery.of(context).padding.top / 2) * ratio;
+
+                      return Align(
+                        alignment: isMobile 
+                            ? Alignment.center 
+                            : AlignmentDirectional.lerp(
+                                AlignmentDirectional.bottomStart, 
+                                AlignmentDirectional.center, 
+                                ratio
+                              )!.resolve(Directionality.of(context)),
+                        child: Transform.translate(
+                          offset: Offset(0, verticalOffset + 10),
+                          child: Padding(
+                            padding: EdgeInsetsDirectional.only(
+                              start: isMobile ? 0 : (440.0 * (1.0 - ratio)), // Increased displacement
+                              bottom: isMobile ? 0 : (AppSpacing.lg * (1.0 - ratio)),
+                            ),
+                            child: Text(
+                              currentWorkspace.name, 
+                              style: theme.textTheme.headlineSmall?.copyWith(
+                                fontSize: 18, 
+                                fontWeight: FontWeight.w900,
+                                color: titleColor,
+                                shadows: ratio < 0.5 || isDark ? [
+                                  const Shadow(color: Colors.black54, blurRadius: 10, offset: Offset(0, 2)),
+                                ] : [],
+                              )
+                            ),
+                          ),
+                        ),
                       );
                     },
                   ),
-                  background: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      if (currentWorkspace.imageUrl != null)
-                        SmartImage(
-                          imageUrl: currentWorkspace.imageUrl!,
-                        ),
-                      DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Colors.black.withValues(alpha: 0.3),
-                              Colors.transparent,
-                              Colors.black.withValues(alpha: 0.7),
-                            ],
+                  expandedTitleScale: 1.0,
+                  background: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final top = constraints.biggest.height;
+                      final isMobile = MediaQuery.of(context).size.width < 600;
+                      final expandedHeight = 200.0 + MediaQuery.of(context).padding.top;
+                      final collapsedHeight = kToolbarHeight + MediaQuery.of(context).padding.top;
+                      final ratio = ((expandedHeight - top) / (expandedHeight - collapsedHeight)).clamp(0.0, 1.0);
+
+                      return Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          if (currentWorkspace.imageUrl != null)
+                            SmartImage(
+                              imageUrl: currentWorkspace.imageUrl!,
+                            ),
+                          // Always blur background on large screens to hide pixelation
+                          if (!isMobile)
+                            ClipRect(
+                              child: BackdropFilter(
+                                filter: ColorFilter.mode(Colors.black.withValues(alpha: 0.1), BlendMode.darken),
+                                child: Container(
+                                  color: Colors.black.withValues(alpha: 0.2),
+                                ),
+                              ),
+                            ),
+                          
+                          // Blur effect layer
+                          if (!isMobile)
+                            ClipRect(
+                              child: BackdropFilter(
+                                filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+                                child: Container(color: Colors.transparent),
+                              ),
+                            ),
+
+                          DecoratedBox(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.black.withValues(alpha: 0.3),
+                                  Colors.transparent,
+                                  Colors.black.withValues(alpha: isMobile ? 0.7 : 0.4),
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    ],
+
+                          // Clear Image Card for Large Screens
+                          if (!isMobile && currentWorkspace.imageUrl != null)
+                            PositionedDirectional(
+                              start: 100,
+                              bottom: AppSpacing.lg,
+                              child: Opacity(
+                                opacity: (1.0 - (ratio * 1.5)).clamp(0.0, 1.0),
+                                child: Container(
+                                  width: 240,
+                                  height: 140,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(AppRadius.lg),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withValues(alpha: 0.4),
+                                        blurRadius: 20,
+                                        offset: const Offset(0, 10),
+                                      )
+                                    ],
+                                  ),
+                                  clipBehavior: Clip.antiAlias,
+                                  child: SmartImage(imageUrl: currentWorkspace.imageUrl!),
+                                ),
+                              ),
+                            ),
+                        ],
+                      );
+                    }
                   ),
                 ),
               ),
@@ -257,7 +350,7 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: AppSpacing.xl),
-                    _buildSectionHeader(theme, 'Members', onAdd: () {}),
+                    _buildSectionHeader(theme, 'Members', onAdd: _showMemberSearchDialog),
                     const SizedBox(height: AppSpacing.md),
                     _buildMembersList(members, theme),
                     const SizedBox(height: AppSpacing.xl),
@@ -321,9 +414,32 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
         itemCount: members.length,
         separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.sm),
         itemBuilder: (context, index) {
-          return CircleAvatar(
-            radius: 20,
-            backgroundImage: NetworkImage('https://i.pravatar.cc/150?u=${members[index].id}'),
+          final member = members[index];
+          return GestureDetector(
+            onLongPress: () {
+               showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Remove Member'),
+                  content: Text('Are you sure you want to remove ${member.name} from this workspace?'),
+                  actions: [
+                    TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+                    TextButton(
+                      onPressed: () {
+                        context.read<WorkspaceViewModel>().removeMember(widget.workspace.id, member.id);
+                        Navigator.pop(context);
+                      }, 
+                      child: const Text('Remove', style: TextStyle(color: Colors.red))
+                    ),
+                  ],
+                ),
+              );
+            },
+            child: CircleAvatar(
+              radius: 20,
+              backgroundImage: member.avatarUrl != null ? NetworkImage(member.avatarUrl!) : null,
+              child: member.avatarUrl == null ? const Icon(Icons.person, size: 20) : null,
+            ),
           );
         },
       ),
@@ -333,20 +449,24 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
   Widget _buildProjectsGrid(List<Project> projects, ThemeData theme) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        int crossAxisCount = constraints.maxWidth > 1600 ? 7 : (constraints.maxWidth > 1200 ? 6 : (constraints.maxWidth > 800 ? 4 : 2));
+        // Define constraints for project cards
+        const double minWidth = 180.0;
+        const double maxWidth = 280.0;
+        const double spacing = AppSpacing.md;
         
-        return GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: crossAxisCount,
-            crossAxisSpacing: AppSpacing.md,
-            mainAxisSpacing: AppSpacing.md,
-            childAspectRatio: 1.4,
-          ),
-          itemCount: projects.length,
-          itemBuilder: (context, index) {
-            final project = projects[index];
+        // Calculate number of items per row based on available width
+        int crossAxisCount = (constraints.maxWidth / (minWidth + spacing)).floor();
+        crossAxisCount = crossAxisCount.clamp(1, projects.isNotEmpty ? projects.length : 1);
+        
+        // Calculate actual width of each item to fill space between min and max
+        double itemWidth = (constraints.maxWidth - (spacing * (crossAxisCount - 1))) / crossAxisCount;
+        itemWidth = itemWidth.clamp(minWidth, maxWidth);
+
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
+          alignment: WrapAlignment.start,
+          children: projects.map((project) {
             final isSelected = selectedProjectId == project.id;
             final isDark = theme.brightness == Brightness.dark;
             final projectColor = project.color != null 
@@ -390,6 +510,8 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 400),
                 curve: Curves.easeOutCubic,
+                width: itemWidth,
+                height: 140, // Fixed height for consistency
                 decoration: BoxDecoration(
                   color: isDark ? Colors.white.withValues(alpha: 0.03) : Colors.white,
                   borderRadius: BorderRadius.circular(AppRadius.xl),
@@ -477,7 +599,7 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                 ),
               ),
             );
-          },
+          }).toList(),
         );
       },
     );
@@ -516,26 +638,31 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
   Widget _buildMilestonesGrid(List<model.Milestone> milestones, ThemeData theme) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        int crossAxisCount = constraints.maxWidth > 1600 ? 5 : (constraints.maxWidth > 1000 ? 4 : (constraints.maxWidth > 600 ? 2 : 1));
+        // Define constraints for milestone cards (typically wider than projects)
+        const double minWidth = 280.0;
+        const double maxWidth = 400.0;
+        const double spacing = AppSpacing.md;
         
-        return GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: crossAxisCount,
-            crossAxisSpacing: AppSpacing.md,
-            mainAxisSpacing: AppSpacing.md,
-            childAspectRatio: crossAxisCount == 1 ? 2.5 : 1.5,
-          ),
-          itemCount: milestones.length,
-          itemBuilder: (context, index) {
-            final milestone = milestones[index];
+        // Calculate distribution
+        int crossAxisCount = (constraints.maxWidth / (minWidth + spacing)).floor();
+        crossAxisCount = crossAxisCount.clamp(1, milestones.isNotEmpty ? milestones.length : 1);
+        
+        double itemWidth = (constraints.maxWidth - (spacing * (crossAxisCount - 1))) / crossAxisCount;
+        itemWidth = itemWidth.clamp(minWidth, maxWidth);
+
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
+          alignment: WrapAlignment.start,
+          children: milestones.map((milestone) {
             final isDark = theme.brightness == Brightness.dark;
 
             return GestureDetector(
               onTap: () => Navigator.pushNamed(context, '/milestone-details', arguments: milestone),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 300),
+                width: itemWidth,
+                height: 180, // Slightly increased for deadline text
                 decoration: BoxDecoration(
                   color: isDark ? Colors.white.withValues(alpha: 0.03) : Colors.white,
                   borderRadius: BorderRadius.circular(AppRadius.xl),
@@ -588,6 +715,8 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 8),
+                    _buildDeadlineInfo(milestone.dueDate, theme),
                     const Spacer(),
                     Text(
                       milestone.description, 
@@ -598,7 +727,7 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                       maxLines: 1, 
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 12),
                     Stack(
                       children: [
                         Container(
@@ -626,7 +755,7 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 8),
                     Text(
                       '${milestone.completedTasks}/${milestone.totalTasks} Tasks',
                       style: theme.textTheme.labelSmall?.copyWith(
@@ -639,9 +768,55 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                 ),
               ),
             );
-          },
+          }).toList(),
         );
       },
+    );
+  }
+
+  Widget _buildDeadlineInfo(DateTime? deadline, ThemeData theme) {
+    if (deadline == null) return const SizedBox.shrink();
+    
+    final now = DateTime.now();
+    final difference = deadline.difference(now);
+    final isOverdue = difference.isNegative;
+    final isUrgent = !isOverdue && difference.inDays < 3;
+    
+    final color = isOverdue ? Colors.red : (isUrgent ? Colors.orange : Colors.green);
+    final icon = isOverdue ? Icons.error_outline_rounded : Icons.access_time_rounded;
+    
+    String text;
+    if (isOverdue) {
+      text = 'Overdue';
+    } else if (difference.inDays > 0) {
+      text = '${difference.inDays} days left';
+    } else if (difference.inHours > 0) {
+      text = '${difference.inHours} hours left';
+    } else {
+      text = 'Due soon';
+    }
+
+    return Row(
+      children: [
+        Icon(icon, size: 12, color: color),
+        const SizedBox(width: 4),
+        Text(
+          text,
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: color,
+            fontWeight: FontWeight.bold,
+            fontSize: 11,
+          ),
+        ),
+        const Spacer(),
+        Text(
+          DateFormat('MMM dd').format(deadline),
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+            fontSize: 11,
+          ),
+        ),
+      ],
     );
   }
 }

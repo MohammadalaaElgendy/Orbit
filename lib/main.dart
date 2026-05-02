@@ -26,12 +26,18 @@ import 'features/workspace/presentation/view_models/workspace_view_model.dart';
 import 'features/milestone/presentation/view_models/milestone_view_model.dart';
 import 'features/dashboard/presentation/view_models/task_view_model.dart';
 
+import 'l10n/app_localizations.dart';
 import 'shared/models/task.dart' as model;
 import 'shared/models/workspace.dart' as model;
 import 'shared/models/milestone.dart' as model;
 
+import 'core/services/notification_service.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Notification Service
+  await NotificationService().init();
   
   final database = AppDatabase();
   
@@ -133,6 +139,8 @@ class OrbitApp extends StatelessWidget {
             theme: AppTheme.light,
             darkTheme: AppTheme.dark,
             themeMode: themeModel.mode,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
             initialRoute: '/',
             onGenerateRoute: (settings) {
               switch (settings.name) {
@@ -156,7 +164,9 @@ class OrbitApp extends StatelessWidget {
                   return MaterialPageRoute(builder: (_) => MilestoneDetailsScreen(milestone: milestone));
                 case '/task-details':
                   final task = settings.arguments as model.Task;
-                  return MaterialPageRoute(builder: (_) => TaskDetailsScreen(task: task));
+                  return MaterialPageRoute(
+                    builder: (_) => TaskDetailsScreen(task: task)
+                  );
                 default:
                   return MaterialPageRoute(builder: (_) => const SplashScreen());
               }

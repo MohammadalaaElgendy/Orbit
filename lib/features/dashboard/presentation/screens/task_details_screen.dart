@@ -123,7 +123,12 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             blur: 10,
             child: IconButton(
               icon: const Icon(Icons.arrow_back_ios_new, size: 18),
-              onPressed: () => Navigator.pop(context),
+              onPressed: () {
+                // Ensure we pop the current screen
+                if (Navigator.of(context).canPop()) {
+                  Navigator.of(context).pop();
+                }
+              },
             ),
           ),
         ),
@@ -177,7 +182,17 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             else
               ...subtasks.map((st) => Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                child: TaskCard(task: st),
+                child: TaskCard(
+                  task: st,
+                  onTap: () {
+                    // USE EXPLICIT PUSH TO ENSURE DISTINCT BACK-STACK ENTRY
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => TaskDetailsScreen(task: st),
+                      ),
+                    );
+                  },
+                ),
               )),
           ],
         ),

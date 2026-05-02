@@ -85,7 +85,13 @@ class DashboardScreen extends StatelessWidget {
                       itemCount: workspaces.length,
                       separatorBuilder: (context, index) => const SizedBox(width: AppSpacing.md),
                       itemBuilder: (context, index) {
-                        return WorkspaceCard(ws: workspaces[index], isDark: isDark);
+                        final ws = workspaces[index];
+                        final members = viewModel.workspaceMembersMap[ws.id] ?? [];
+                        return WorkspaceCard(
+                          ws: ws, 
+                          isDark: isDark,
+                          members: members,
+                        );
                       },
                     ),
                   )
@@ -101,11 +107,15 @@ class DashboardScreen extends StatelessWidget {
                         return Wrap(
                           spacing: spacing,
                           runSpacing: spacing,
-                          children: workspaces.map((ws) => WorkspaceCard(
-                            ws: ws, 
-                            isDark: isDark, 
-                            width: itemWidth,
-                          )).toList(),
+                          children: workspaces.map((ws) {
+                            final members = viewModel.workspaceMembersMap[ws.id] ?? [];
+                            return WorkspaceCard(
+                              ws: ws, 
+                              isDark: isDark, 
+                              width: itemWidth,
+                              members: members,
+                            );
+                          }).toList(),
                         );
                       },
                     ),

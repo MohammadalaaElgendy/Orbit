@@ -1,0 +1,13 @@
+{
+  "@@locale": "ar",
+  "appTitle": "أوربت",
+  "dashboard": "لوحة التحكم",
+  "createWorkspace": "إنشاء مساحة عمل",
+  "editWorkspace": "تعديل مساحة العمل",
+  "activeWorkspaces": "مساحات العمل النشطة",
+  "members": "الأعضاء",
+  "activeProjects": "المشاريع الحالية",
+  "projectMilestones": "مراحل المشروع",
+  "tasks": "المهام",
+  "subtasks": "المهام الفرعية"
+}

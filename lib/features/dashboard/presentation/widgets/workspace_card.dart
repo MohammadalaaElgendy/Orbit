@@ -2,21 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:orbit/core/constants/app_constants.dart';
 import 'package:orbit/shared/models/workspace.dart';
+import 'package:orbit/shared/models/user.dart';
 import 'package:orbit/features/dashboard/presentation/view_models/dashboard_view_model.dart';
+import 'package:orbit/features/workspace/presentation/view_models/workspace_view_model.dart';
 import 'package:orbit/features/workspace/presentation/widgets/workspace_dialog.dart';
-
 import 'package:orbit/shared/widgets/smart_image.dart';
 
 class WorkspaceCard extends StatelessWidget {
   final Workspace ws;
   final bool isDark;
   final double? width;
+  final List<User> members;
 
   const WorkspaceCard({
     super.key,
     required this.ws,
     required this.isDark,
     this.width,
+    this.members = const [],
   });
 
   void _showWorkspaceMenu(BuildContext context) {
@@ -28,21 +31,18 @@ class WorkspaceCard extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.edit_rounded),
             title: const Text('Edit Workspace'),
-            onTap: () {
+            onTap: () async {
               Navigator.pop(context);
+              final members = await context.read<WorkspaceViewModel>().getWorkspaceMembers(ws.id);
+              if (!context.mounted) return;
+              
               showDialog(
                 context: context,
                 builder: (_) => WorkspaceDialog(
                   workspace: ws,
+                  currentMembers: members,
                   onSave: (name, desc, imageUrl, memberIds) => context.read<DashboardViewModel>().updateWorkspace(
-                    Workspace(
-                      id: ws.id,
-                      name: name,
-                      description: desc,
-                      imageUrl: imageUrl,
-                      createdAt: ws.createdAt,
-                      updatedAt: DateTime.now(),
-                    ),
+                    ws.id, name, desc, imageUrl, memberIds,
                   ),
                 ),
               );
@@ -158,7 +158,7 @@ class WorkspaceCard extends StatelessWidget {
                     const SizedBox(height: AppSpacing.md),
                     Row(
                       children: [
-                        _buildMiniAvatarStack(),
+                        _buildMiniAvatarStack(members),
                         const Spacer(),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -184,12 +184,15 @@ class WorkspaceCard extends StatelessWidget {
     );
   }
 
-  Widget _buildMiniAvatarStack() {
+  Widget _buildMiniAvatarStack(List<User> members) {
+    if (members.isEmpty) return const SizedBox.shrink();
+    
+    final displayMembers = members.take(3).toList();
     return SizedBox(
       width: 60,
       height: 24,
       child: Stack(
-        children: List.generate(3, (i) => Positioned(
+        children: List.generate(displayMembers.length, (i) => Positioned(
           left: i * 14.0,
           child: Container(
             decoration: BoxDecoration(
@@ -198,7 +201,8 @@ class WorkspaceCard extends StatelessWidget {
             ),
             child: CircleAvatar(
               radius: 10,
-              backgroundImage: NetworkImage('https://i.pravatar.cc/150?u=user$i'),
+              backgroundImage: displayMembers[i].avatarUrl != null ? NetworkImage(displayMembers[i].avatarUrl!) : null,
+              child: displayMembers[i].avatarUrl == null ? const Icon(Icons.person, size: 10) : null,
             ),
           ),
         )),

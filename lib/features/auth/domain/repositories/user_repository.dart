@@ -40,4 +40,15 @@ class UserRepository {
       avatarUrl: row.avatarUrl,
     );
   }
+
+  Future<model.User?> getUserByEmail(String email) async {
+    final row = await _userDao.getByEmail(email);
+    if (row == null) return null;
+    return model.User(
+      id: row.id,
+      name: row.name,
+      email: row.email,
+      avatarUrl: row.avatarUrl,
+    );
+  }
 }
