@@ -10,7 +10,7 @@ import 'features/auth/presentation/screens/welcome_screen.dart';
 import 'features/auth/presentation/screens/login_screen.dart';
 import 'features/auth/presentation/screens/register_screen.dart';
 import 'features/auth/presentation/screens/forgot_password_screen.dart';
-import 'features/dashboard/presentation/screens/dashboard_screen.dart';
+import 'features/dashboard/presentation/screens/main_screen.dart';
 import 'features/workspace/presentation/screens/workspace_details_screen.dart';
 import 'features/milestone/presentation/screens/milestone_details_screen.dart';
 import 'features/dashboard/presentation/screens/task_details_screen.dart';
@@ -33,11 +33,23 @@ import 'shared/models/milestone.dart' as model;
 
 import 'core/services/notification_service.dart';
 
+/// Configuration flag for Mock Data seeding.
+/// Set this to [true] to populate the database with example data on first launch.
+/// Set this to [false] to start with a completely empty database.
+const bool kEnableAutoSeed = false; 
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Initialize Notification Service
-  await NotificationService().init();
+  try {
+    // Initialize Notification Service (Don't let it block startup if it fails)
+    await NotificationService().init().timeout(
+      const Duration(seconds: 5),
+      onTimeout: () => debugPrint('Notification initialization timed out'),
+    );
+  } catch (e) {
+    debugPrint('Error initializing notification service: $e');
+  }
   
   final database = AppDatabase();
   
@@ -48,15 +60,17 @@ void main() async {
   final milestoneRepo = MilestoneRepository(database.milestoneDao);
   final taskRepo = TaskRepository(database.taskDao);
 
-  // Seed Data
-  await DatabaseSeeder.seed(
-    database,
-    userRepo,
-    workspaceRepo,
-    projectRepo,
-    milestoneRepo,
-    taskRepo,
-  );
+  // Seed Data (Mock)
+  if (kEnableAutoSeed) {
+    await DatabaseSeeder.seed(
+      database,
+      userRepo,
+      workspaceRepo,
+      projectRepo,
+      milestoneRepo,
+      taskRepo,
+    );
+  }
 
   runApp(OrbitApp(
     database: database,
@@ -155,17 +169,44 @@ class OrbitApp extends StatelessWidget {
                 case '/forgot-password':
                   return MaterialPageRoute(builder: (_) => const ForgotPasswordScreen());
                 case '/dashboard':
-                  return MaterialPageRoute(builder: (_) => const DashboardScreen());
+                  return MaterialPageRoute(builder: (_) => const MainScreen());
                 case '/workspace-details':
                   final workspace = settings.arguments as model.Workspace;
-                  return MaterialPageRoute(builder: (_) => WorkspaceDetailsScreen(workspace: workspace));
+                  return MaterialPageRoute(
+                    builder: (context) => ChangeNotifierProvider(
+                      create: (context) => WorkspaceViewModel(
+                        workspaceRepository: context.read<WorkspaceRepository>(),
+                        projectRepository: context.read<ProjectRepository>(),
+                        userRepository: context.read<UserRepository>(),
+                      )..loadWorkspace(workspace.id),
+                      child: WorkspaceDetailsScreen(workspace: workspace),
+                    ),
+                  );
                 case '/milestone-details':
                   final milestone = settings.arguments as model.Milestone;
-                  return MaterialPageRoute(builder: (_) => MilestoneDetailsScreen(milestone: milestone));
+                  return MaterialPageRoute(
+                    builder: (context) => ChangeNotifierProvider(
+                      create: (context) => MilestoneViewModel(
+                        milestoneRepository: context.read<MilestoneRepository>(),
+                        projectRepository: context.read<ProjectRepository>(),
+                        workspaceRepository: context.read<WorkspaceRepository>(),
+                        taskRepository: context.read<TaskRepository>(),
+                      )..loadMilestoneData(milestone.id),
+                      child: MilestoneDetailsScreen(milestone: milestone),
+                    ),
+                  );
                 case '/task-details':
                   final task = settings.arguments as model.Task;
                   return MaterialPageRoute(
-                    builder: (_) => TaskDetailsScreen(task: task)
+                    builder: (context) => ChangeNotifierProvider(
+                      create: (context) => TaskViewModel(
+                        taskRepository: context.read<TaskRepository>(),
+                        milestoneRepository: context.read<MilestoneRepository>(),
+                        projectRepository: context.read<ProjectRepository>(),
+                        workspaceRepository: context.read<WorkspaceRepository>(),
+                      )..loadTaskDetails(task),
+                      child: TaskDetailsScreen(task: task),
+                    ),
                   );
                 default:
                   return MaterialPageRoute(builder: (_) => const SplashScreen());

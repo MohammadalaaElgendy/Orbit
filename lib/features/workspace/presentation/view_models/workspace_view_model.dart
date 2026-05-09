@@ -155,6 +155,11 @@ class WorkspaceViewModel extends ChangeNotifier {
     return _userRepository.getUserByEmail(email);
   }
 
+  Future<List<User>> searchUsers(String query) async {
+    if (query.isEmpty) return [];
+    return _userRepository.searchUsers(query);
+  }
+
   Future<void> removeMember(String workspaceId, String userId) async {
     await _workspaceRepository.removeMemberFromWorkspace(workspaceId, userId);
   }

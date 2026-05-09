@@ -27,9 +27,12 @@ class WorkspaceDialog extends StatefulWidget {
 class _WorkspaceDialogState extends State<WorkspaceDialog> {
   late TextEditingController _nameController;
   late TextEditingController _descController;
+  late TextEditingController _searchController;
   late ScrollController _imageScrollController;
   String? _selectedImageUrl;
-  final List<String> _selectedMemberIds = [];
+  final List<User> _selectedMembers = [];
+  List<User> _searchResults = [];
+  bool _isSearching = false;
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -37,11 +40,12 @@ class _WorkspaceDialogState extends State<WorkspaceDialog> {
     super.initState();
     _nameController = TextEditingController(text: widget.workspace?.name ?? '');
     _descController = TextEditingController(text: widget.workspace?.description ?? '');
+    _searchController = TextEditingController();
     _imageScrollController = ScrollController();
     _selectedImageUrl = widget.workspace?.imageUrl ?? AppPresetImages.images[0];
     
     if (widget.currentMembers != null) {
-      _selectedMemberIds.addAll(widget.currentMembers!.map((m) => m.id));
+      _selectedMembers.addAll(widget.currentMembers!);
     }
   }
 
@@ -49,23 +53,33 @@ class _WorkspaceDialogState extends State<WorkspaceDialog> {
   void dispose() {
     _nameController.dispose();
     _descController.dispose();
+    _searchController.dispose();
     _imageScrollController.dispose();
     super.dispose();
+  }
+
+  void _onSearch(String query) async {
+    if (query.isEmpty) {
+      setState(() {
+        _searchResults = [];
+        _isSearching = false;
+      });
+      return;
+    }
+
+    setState(() => _isSearching = true);
+    final results = await context.read<WorkspaceViewModel>().searchUsers(query);
+    setState(() {
+      _searchResults = results;
+      _isSearching = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isEdit = widget.workspace != null;
-    final viewModel = context.watch<WorkspaceViewModel>();
     
-    // Remove duplicates from allUsers by ID
-    final uniqueUsers = <String, User>{};
-    for (var u in viewModel.allUsers) {
-      uniqueUsers[u.id] = u;
-    }
-    final allUsers = uniqueUsers.values.toList();
-
     return Dialog(
       backgroundColor: Colors.transparent,
       insetPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.xl),
@@ -92,7 +106,7 @@ class _WorkspaceDialogState extends State<WorkspaceDialog> {
                       controller: _nameController,
                       decoration: InputDecoration(
                         labelText: 'Name',
-                        hintText: 'e.g. Orbit Development',
+                        hintText: 'Enter workspace name',
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                       ),
                       validator: (v) => v == null || v.isEmpty ? 'Name is required' : null,
@@ -103,7 +117,7 @@ class _WorkspaceDialogState extends State<WorkspaceDialog> {
                       maxLines: 2,
                       decoration: InputDecoration(
                         labelText: 'Description',
-                        hintText: 'What is this workspace about?',
+                        hintText: 'Enter workspace description',
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                       ),
                     ),
@@ -180,38 +194,108 @@ class _WorkspaceDialogState extends State<WorkspaceDialog> {
                     const SizedBox(height: AppSpacing.lg),
                     Text('Manage Members', style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
                     const SizedBox(height: AppSpacing.sm),
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(AppRadius.md),
-                        border: Border.all(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
-                      ),
-                      child: Column(
-                        children: allUsers.map((user) {
-                          final isSelected = _selectedMemberIds.contains(user.id);
-                          return CheckboxListTile(
-                            value: isSelected,
-                            onChanged: (val) {
-                              setState(() {
-                                if (val == true) {
-                                  _selectedMemberIds.add(user.id);
-                                } else {
-                                  _selectedMemberIds.remove(user.id);
-                                }
-                              });
-                            },
-                            secondary: CircleAvatar(
-                              radius: 16,
-                              backgroundImage: user.avatarUrl != null ? NetworkImage(user.avatarUrl!) : null,
-                              child: user.avatarUrl == null ? const Icon(Icons.person, size: 16) : null,
-                            ),
-                            title: Text(user.name, style: theme.textTheme.bodyMedium),
-                            subtitle: Text(user.email, style: theme.textTheme.labelSmall),
-                            activeColor: theme.colorScheme.primary,
-                            checkboxShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-                          );
-                        }).toList(),
+                    
+                    // Search Field
+                    TextFormField(
+                      controller: _searchController,
+                      onChanged: _onSearch,
+                      decoration: InputDecoration(
+                        hintText: 'Search members by email...',
+                        prefixIcon: const Icon(Icons.search, size: 20),
+                        suffixIcon: _searchController.text.isNotEmpty 
+                          ? IconButton(
+                              icon: const Icon(Icons.close, size: 20),
+                              onPressed: () {
+                                _searchController.clear();
+                                _onSearch('');
+                              },
+                            )
+                          : null,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                       ),
                     ),
+
+                    if (_searchResults.isNotEmpty || _isSearching) ...[
+                      const SizedBox(height: AppSpacing.sm),
+                      Container(
+                        constraints: const BoxConstraints(maxHeight: 200),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                          borderRadius: BorderRadius.circular(AppRadius.md),
+                          border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.5)),
+                        ),
+                        child: _isSearching 
+                          ? const Center(child: Padding(padding: EdgeInsets.all(AppSpacing.md), child: CircularProgressIndicator(strokeWidth: 2)))
+                          : ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: _searchResults.length,
+                              itemBuilder: (context, index) {
+                                final user = _searchResults[index];
+                                final isAdded = _selectedMembers.any((m) => m.id == user.id);
+                                return ListTile(
+                                  leading: CircleAvatar(
+                                    radius: 14,
+                                    backgroundImage: user.avatarUrl != null ? NetworkImage(user.avatarUrl!) : null,
+                                    child: user.avatarUrl == null ? const Icon(Icons.person, size: 14) : null,
+                                  ),
+                                  title: Text(user.name, style: theme.textTheme.bodyMedium),
+                                  subtitle: Text(user.email, style: theme.textTheme.labelSmall),
+                                  trailing: IconButton(
+                                    icon: Icon(isAdded ? Icons.check_circle : Icons.add_circle_outline, 
+                                      color: isAdded ? Colors.green : theme.colorScheme.primary),
+                                    onPressed: isAdded ? null : () {
+                                      setState(() {
+                                        _selectedMembers.add(user);
+                                        _searchController.clear();
+                                        _searchResults = [];
+                                      });
+                                    },
+                                  ),
+                                );
+                              },
+                            ),
+                      ),
+                    ],
+
+                    const SizedBox(height: AppSpacing.md),
+                    if (_selectedMembers.isNotEmpty) ...[
+                      const SizedBox(height: AppSpacing.md),
+                      Text('Workspace Members', style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.primary, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: AppSpacing.xs),
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(AppRadius.md),
+                          border: Border.all(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
+                        ),
+                        child: Column(
+                          children: _selectedMembers.map((user) {
+                            return CheckboxListTile(
+                              value: true,
+                              onChanged: (val) {
+                                if (val == false) {
+                                  setState(() => _selectedMembers.removeWhere((m) => m.id == user.id));
+                                }
+                              },
+                              secondary: CircleAvatar(
+                                radius: 16,
+                                backgroundImage: user.avatarUrl != null ? NetworkImage(user.avatarUrl!) : null,
+                                child: user.avatarUrl == null ? const Icon(Icons.person, size: 16) : null,
+                              ),
+                              title: Text(user.name, style: theme.textTheme.bodyMedium),
+                              subtitle: Text(user.email, style: theme.textTheme.labelSmall),
+                              activeColor: theme.colorScheme.primary,
+                              checkboxShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                            );
+                          }).toList(),
+                        ),
+                      ),
+                    ]
+else if (!isEdit)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+                        child: Text('No members added yet.', style: theme.textTheme.labelSmall?.copyWith(fontStyle: FontStyle.italic)),
+                      ),
 
                     const SizedBox(height: AppSpacing.xl),
                     Row(
@@ -225,7 +309,12 @@ class _WorkspaceDialogState extends State<WorkspaceDialog> {
                         ElevatedButton(
                           onPressed: () {
                             if (_formKey.currentState?.validate() ?? false) {
-                              widget.onSave(_nameController.text, _descController.text, _selectedImageUrl, _selectedMemberIds);
+                              widget.onSave(
+                                _nameController.text, 
+                                _descController.text, 
+                                _selectedImageUrl, 
+                                _selectedMembers.map((m) => m.id).toList()
+                              );
                               Navigator.pop(context);
                             }
                           },

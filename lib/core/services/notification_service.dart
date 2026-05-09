@@ -12,7 +12,7 @@ class NotificationService {
   Future<void> init() async {
     tz.initializeTimeZones();
     
-    const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidInit = AndroidInitializationSettings('@mipmap/launcher_icon');
     const iosInit = DarwinInitializationSettings();
     const linuxInit = LinuxInitializationSettings(defaultActionName: 'Open Orbit');
     const initSettings = InitializationSettings(

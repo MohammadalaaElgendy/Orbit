@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../shared/models/task.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../shared/widgets/glass_card.dart';
+import '../../../../shared/widgets/smart_image.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../shared/models/user.dart';
@@ -100,13 +101,32 @@ class _TaskDialogState extends State<TaskDialog> {
                     if (widget.workspaceMembers.isNotEmpty) ...[
                       DropdownButtonFormField<String?>(
                         initialValue: _assigneeId,
+                        isExpanded: true,
                         decoration: InputDecoration(
                           labelText: 'Assignee',
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                         ),
                         items: [
                           const DropdownMenuItem(value: null, child: Text('Unassigned')),
-                          ...widget.workspaceMembers.map((u) => DropdownMenuItem(value: u.id, child: Text(u.name))),
+                          ...widget.workspaceMembers.map((u) => DropdownMenuItem(
+                            value: u.id, 
+                            child: Row(
+                              children: [
+                                if (u.avatarUrl != null)
+                                  ClipOval(
+                                    child: SmartImage(
+                                      imageUrl: u.avatarUrl!,
+                                      width: 20,
+                                      height: 20,
+                                    ),
+                                  )
+                                else
+                                  const Icon(Icons.person_outline_rounded, size: 16),
+                                const SizedBox(width: AppSpacing.sm),
+                                Text(u.name),
+                              ],
+                            )
+                          )),
                         ],
                         onChanged: (v) => setState(() => _assigneeId = v),
                       ),
@@ -154,14 +174,14 @@ class _TaskDialogState extends State<TaskDialog> {
                         decoration: InputDecoration(
                           labelText: 'Due Date',
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+                          suffixIcon: _dueDate != null 
+                            ? IconButton(
+                                icon: const Icon(Icons.close_rounded, size: 20),
+                                onPressed: () => setState(() => _dueDate = null),
+                              )
+                            : const Icon(Icons.calendar_today_rounded, size: 18),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(_dueDate == null ? 'Not set' : DateFormat('MMM dd, yyyy').format(_dueDate!)),
-                            const Icon(Icons.calendar_today_rounded, size: 18),
-                          ],
-                        ),
+                        child: Text(_dueDate == null ? 'Not set' : DateFormat('MMM dd, yyyy').format(_dueDate!)),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.xl),

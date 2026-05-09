@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import '../constants/app_constants.dart';
 import 'app_colors.dart';
 
@@ -62,41 +61,48 @@ class AppTheme {
         : AppColors.onSurfaceDark;
     
     return TextTheme(
-      displayLarge: GoogleFonts.manrope(
+      displayLarge: TextStyle(
+        fontFamily: 'Manrope',
         fontSize: 48,
         fontWeight: FontWeight.w800,
         letterSpacing: -0.02,
         color: color,
       ),
-      headlineLarge: GoogleFonts.manrope(
+      headlineLarge: TextStyle(
+        fontFamily: 'Manrope',
         fontSize: 32,
         fontWeight: FontWeight.w700,
         letterSpacing: -0.02,
         color: color,
       ),
-      headlineMedium: GoogleFonts.manrope(
+      headlineMedium: TextStyle(
+        fontFamily: 'Manrope',
         fontSize: 24,
         fontWeight: FontWeight.w600,
         letterSpacing: -0.01,
         color: color,
       ),
-      headlineSmall: GoogleFonts.manrope(
+      headlineSmall: TextStyle(
+        fontFamily: 'Manrope',
         fontSize: 20,
         fontWeight: FontWeight.w600,
         letterSpacing: -0.01,
         color: color,
       ),
-      bodyLarge: GoogleFonts.inter(
+      bodyLarge: TextStyle(
+        fontFamily: 'Inter',
         fontSize: 16,
         fontWeight: FontWeight.w400,
         color: color,
       ),
-      bodyMedium: GoogleFonts.inter(
+      bodyMedium: TextStyle(
+        fontFamily: 'Inter',
         fontSize: 14,
         fontWeight: FontWeight.w400,
         color: color,
       ),
-      labelSmall: GoogleFonts.inter(
+      labelSmall: TextStyle(
+        fontFamily: 'Inter',
         fontSize: 12,
         fontWeight: FontWeight.w500,
         letterSpacing: 0.02,
@@ -114,7 +120,8 @@ class AppTheme {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.lg),
         ),
-        textStyle: GoogleFonts.inter(
+        textStyle: const TextStyle(
+          fontFamily: 'Inter',
           fontSize: 14,
           fontWeight: FontWeight.w600,
         ),
@@ -147,7 +154,8 @@ class AppTheme {
           width: 2,
         ),
       ),
-      hintStyle: GoogleFonts.inter(
+      hintStyle: TextStyle(
+        fontFamily: 'Inter',
         fontSize: 14,
         color: isLight ? AppColors.outlineLight : AppColors.outlineDark,
       ),

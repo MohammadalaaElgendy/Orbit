@@ -19,11 +19,15 @@ class MilestoneViewModel extends ChangeNotifier {
   List<Task> _tasks = [];
   List<Task> get tasks => _tasks;
 
+  Milestone? _currentMilestone;
+  Milestone? get currentMilestone => _currentMilestone;
+
   List<User> _workspaceMembers = [];
   List<User> get workspaceMembers => _workspaceMembers;
 
   StreamSubscription? _taskSub;
   StreamSubscription? _memberSub;
+  StreamSubscription? _milestoneSub;
 
   MilestoneViewModel({
     required MilestoneRepository milestoneRepository,
@@ -39,6 +43,12 @@ class MilestoneViewModel extends ChangeNotifier {
     _taskSub?.cancel();
     _taskSub = _taskRepository.watchRootTasksByMilestone(milestoneId).listen((data) {
       _tasks = data;
+      notifyListeners();
+    });
+
+    _milestoneSub?.cancel();
+    _milestoneSub = _milestoneRepository.watchMilestoneById(milestoneId).listen((data) {
+      _currentMilestone = data;
       notifyListeners();
     });
 
@@ -104,6 +114,7 @@ class MilestoneViewModel extends ChangeNotifier {
   void dispose() {
     _taskSub?.cancel();
     _memberSub?.cancel();
+    _milestoneSub?.cancel();
     super.dispose();
   }
 }

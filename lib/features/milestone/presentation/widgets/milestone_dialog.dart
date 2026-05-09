@@ -87,14 +87,14 @@ class _MilestoneDialogState extends State<MilestoneDialog> {
                         decoration: InputDecoration(
                           labelText: 'Due Date',
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+                          suffixIcon: _selectedDate != null 
+                            ? IconButton(
+                                icon: const Icon(Icons.close_rounded, size: 20),
+                                onPressed: () => setState(() => _selectedDate = null),
+                              )
+                            : const Icon(Icons.calendar_today_rounded, size: 18),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(_selectedDate == null ? 'Not set' : DateFormat('MMM dd, yyyy').format(_selectedDate!)),
-                            const Icon(Icons.calendar_today_rounded, size: 18),
-                          ],
-                        ),
+                        child: Text(_selectedDate == null ? 'Not set' : DateFormat('MMM dd, yyyy').format(_selectedDate!)),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.xl),

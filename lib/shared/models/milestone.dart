@@ -1,6 +1,8 @@
 class Milestone {
   final String id;
   final String projectId;
+  final String? projectName;
+  final String? workspaceName;
   final String name;
   final String description;
   final DateTime? dueDate;
@@ -13,6 +15,8 @@ class Milestone {
   Milestone({
     required this.id,
     required this.projectId,
+    this.projectName,
+    this.workspaceName,
     required this.name,
     required this.description,
     this.dueDate,

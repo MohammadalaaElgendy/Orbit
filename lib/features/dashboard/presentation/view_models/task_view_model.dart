@@ -24,6 +24,7 @@ class TaskViewModel extends ChangeNotifier {
   List<User> _workspaceMembers = [];
   List<User> get workspaceMembers => _workspaceMembers;
 
+  StreamSubscription? _taskSub;
   StreamSubscription? _subtaskSub;
   StreamSubscription? _memberSub;
 
@@ -39,6 +40,15 @@ class TaskViewModel extends ChangeNotifier {
 
   void loadTaskDetails(Task task) async {
     _currentTask = task;
+    
+    _taskSub?.cancel();
+    _taskSub = _taskRepository.watchTaskById(task.id).listen((data) {
+      if (data != null) {
+        _currentTask = data;
+        notifyListeners();
+      }
+    });
+
     _subtaskSub?.cancel();
     _subtaskSub = _taskRepository.watchSubtasks(task.id).listen((data) {
       _subtasks = data;
@@ -120,6 +130,7 @@ class TaskViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
+    _taskSub?.cancel();
     _subtaskSub?.cancel();
     _memberSub?.cancel();
     super.dispose();

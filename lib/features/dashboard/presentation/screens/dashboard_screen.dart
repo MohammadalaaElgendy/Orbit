@@ -9,9 +9,11 @@ import 'package:orbit/features/dashboard/presentation/widgets/milestone_card.dar
 import 'package:orbit/features/dashboard/presentation/widgets/task_card.dart';
 import 'package:orbit/features/dashboard/presentation/view_models/dashboard_view_model.dart';
 import 'package:orbit/features/workspace/presentation/widgets/workspace_dialog.dart';
+import 'package:orbit/shared/widgets/top_padding.dart';
 
 class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({super.key});
+  final bool isTab;
+  const DashboardScreen({super.key, this.isTab = false});
 
   void _showCreateWorkspace(BuildContext context) {
     showDialog(
@@ -32,120 +34,159 @@ class DashboardScreen extends StatelessWidget {
     final milestones = viewModel.recentMilestones;
     final tasks = viewModel.recentTasks;
 
-    final size = MediaQuery.of(context).size;
-    final isMobile = size.width < 600;
+    final body = SingleChildScrollView(
+      physics: const BouncingScrollPhysics(),
+      padding: EdgeInsets.zero,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const TopPadding(),
+          const DashboardStats(),
+          
+          const SizedBox(height: AppSpacing.xl),
+          _buildSectionHeader(theme, 'Active Workspaces', '${workspaces.length} total'),
+          const SizedBox(height: AppSpacing.md),
+
+          workspaces.isEmpty
+              ? const Center(
+            child: Padding(
+              padding: EdgeInsets.all(AppSpacing.xl),
+              child: Text('No workspaces found'),
+            ),
+          )
+              : LayoutBuilder(
+            builder: (context, constraints) {
+              final isMobile = constraints.maxWidth < 600;
+
+              // Mobile Layout
+              if (isMobile) {
+                return ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxHeight: 200,
+                  ),
+                  child: ListView.separated(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                    ),
+                    scrollDirection: Axis.horizontal,
+                    itemCount: workspaces.length,
+                    separatorBuilder: (context, index) =>
+                    const SizedBox(width: AppSpacing.md),
+                    itemBuilder: (context, index) {
+                      final ws = workspaces[index];
+                      final members =
+                          viewModel.workspaceMembersMap[ws.id] ?? [];
+
+                      return WorkspaceCard(
+                        ws: ws,
+                        isDark: isDark,
+                        members: members,
+                      );
+                    },
+                  ),
+                );
+              }
+
+              // Desktop / Tablet Layout
+              return Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                ),
+                child: GridView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: workspaces.length,
+                  gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                    maxCrossAxisExtent: 350, // العرض ديناميك
+                    mainAxisExtent: 180, // ارتفاع ثابت
+                    crossAxisSpacing: AppSpacing.md,
+                    mainAxisSpacing: AppSpacing.md,
+                  ),
+                  itemBuilder: (context, index) {
+                    final ws = workspaces[index];
+                    final members =
+                        viewModel.workspaceMembersMap[ws.id] ?? [];
+
+                    return WorkspaceCard(
+                      ws: ws,
+                      isDark: isDark,
+                      members: members,
+                    );
+                  },
+                ),
+              );
+            },
+          ),
+
+          if (milestones.isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.xl),
+            _buildSectionHeader(theme, 'Priority Milestones', 'Recent'),
+            const SizedBox(height: AppSpacing.md),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+              child: Column(
+                children: milestones.map((m) => Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                  child: MilestoneCard(milestone: m),
+                )).toList(),
+              ),
+            ),
+          ],
+
+          if (tasks.isNotEmpty) ...[
+            const SizedBox(height: AppSpacing.xl),
+            _buildSectionHeader(theme, 'Recent Activity', 'View all'),
+            const SizedBox(height: AppSpacing.md),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+              child: Column(
+                children: tasks.map((t) => Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                  child: TaskCard(task: t),
+                )).toList(),
+              ),
+            ),
+          ],
+          const BottomPadding(),
+        ],
+      ),
+    );
+
+    if (isTab) return body;
 
     return ResponsiveScaffold(
       title: 'My Dashboard',
       actions: [
-        GlassCard(
-          padding: const EdgeInsets.all(AppSpacing.xs),
-          borderRadius: AppRadius.md,
-          blur: 10,
-          child: IconButton(
-            icon: const Icon(Icons.add_rounded, size: 20),
-            onPressed: () => _showCreateWorkspace(context),
-            tooltip: 'Create Workspace',
-          ),
+        // No manual SizedBox needed anymore, Scaffold handles it via Directional Padding
+        _buildActionButton(
+          context, 
+          icon: Icons.add_rounded, 
+          onTap: () => _showCreateWorkspace(context),
         ),
-        const SizedBox(width: AppSpacing.sm),
-        GlassCard(
-          padding: const EdgeInsets.all(AppSpacing.xs),
-          borderRadius: AppRadius.md,
-          blur: 10,
-          child: IconButton(
-            icon: const Icon(Icons.search, size: 20),
-            onPressed: () {},
-          ),
+        _buildActionButton(
+          context, 
+          icon: Icons.search, 
+          onTap: () {},
         ),
       ],
-      body: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        padding: EdgeInsets.only(
-          top: isMobile ? kToolbarHeight + 40 : AppSpacing.md,
-          bottom: 120, // Increased to clear floating FAB/BottomNav
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const DashboardStats(),
-            
-            const SizedBox(height: AppSpacing.xl),
-            _buildSectionHeader(theme, 'Active Workspaces', '${workspaces.length} total'),
-            const SizedBox(height: AppSpacing.md),
-            
-            workspaces.isEmpty
-              ? const Center(child: Text('No workspaces found'))
-              : isMobile 
-                ? ConstrainedBox(
-                    constraints: const BoxConstraints(maxHeight: 200),
-                    child: ListView.separated(
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                      scrollDirection: Axis.horizontal,
-                      itemCount: workspaces.length,
-                      separatorBuilder: (context, index) => const SizedBox(width: AppSpacing.md),
-                      itemBuilder: (context, index) {
-                        final ws = workspaces[index];
-                        final members = viewModel.workspaceMembersMap[ws.id] ?? [];
-                        return WorkspaceCard(
-                          ws: ws, 
-                          isDark: isDark,
-                          members: members,
-                        );
-                      },
-                    ),
-                  )
-                : Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        // Dynamically calculate columns based on width
-                        int crossAxisCount = constraints.maxWidth > 1200 ? 3 : 2;
-                        final spacing = AppSpacing.md;
-                        final itemWidth = (constraints.maxWidth - (spacing * (crossAxisCount - 1))) / crossAxisCount;
-                        
-                        return Wrap(
-                          spacing: spacing,
-                          runSpacing: spacing,
-                          children: workspaces.map((ws) {
-                            final members = viewModel.workspaceMembersMap[ws.id] ?? [];
-                            return WorkspaceCard(
-                              ws: ws, 
-                              isDark: isDark, 
-                              width: itemWidth,
-                              members: members,
-                            );
-                          }).toList(),
-                        );
-                      },
-                    ),
-                  ),
+      body: body,
+    );
+  }
 
-            if (milestones.isNotEmpty) ...[
-              const SizedBox(height: AppSpacing.xl),
-              _buildSectionHeader(theme, 'Priority Milestones', 'Coming soon'),
-              const SizedBox(height: AppSpacing.md),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                child: Column(
-                  children: milestones.map((m) => MilestoneCard(milestone: m)).toList(),
-                ),
-              ),
-            ],
-
-            if (tasks.isNotEmpty) ...[
-              const SizedBox(height: AppSpacing.xl),
-              _buildSectionHeader(theme, 'Recent Activity', 'View all'),
-              const SizedBox(height: AppSpacing.md),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                child: Column(
-                  children: tasks.map((t) => TaskCard(task: t)).toList(),
-                ),
-              ),
-            ],
-            const SizedBox(height: AppSpacing.xxl),
-          ],
+  Widget _buildActionButton(BuildContext context, {required IconData icon, required VoidCallback onTap}) {
+    return GlassCard(
+      padding: EdgeInsets.zero,
+      borderRadius: AppRadius.md,
+      blur: 10,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.sm),
+            child: Icon(icon, size: 20),
+          ),
         ),
       ),
     );

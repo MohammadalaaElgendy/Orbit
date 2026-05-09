@@ -51,4 +51,16 @@ class UserRepository {
       avatarUrl: row.avatarUrl,
     );
   }
+
+  Future<List<model.User>> searchUsers(String query) async {
+    final rows = await _userDao.searchUsers(query);
+    return rows
+        .map((row) => model.User(
+              id: row.id,
+              name: row.name,
+              email: row.email,
+              avatarUrl: row.avatarUrl,
+            ))
+        .toList();
+  }
 }

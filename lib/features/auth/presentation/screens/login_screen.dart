@@ -7,8 +7,15 @@ import '../../../../shared/widgets/orbit_text_field.dart';
 
 import '../../../../shared/widgets/auth_background.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  bool _obscurePassword = true;
 
   @override
   Widget build(BuildContext context) {
@@ -17,24 +24,26 @@ class LoginScreen extends StatelessWidget {
     return AuthBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
+        extendBodyBehindAppBar: true,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
             icon: Icon(Icons.arrow_back_ios_new, color: theme.colorScheme.onSurface),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ),
-        body: SafeArea(
+        body: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 500),
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
+              child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.containerMargin),
                 child: Column(
                   children: [
-                    const SizedBox(height: AppSpacing.md),
+                    SizedBox(height: MediaQuery.of(context).padding.top + AppSpacing.xl),
                     // Brand Section
                     _buildAnimatedItem(
                       delay: 0,
@@ -50,101 +59,112 @@ class LoginScreen extends StatelessWidget {
                               letterSpacing: -1.5,
                             ),
                           ),
-                          Text(
-                            'SIGN IN TO WORKSPACE',
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              letterSpacing: 2.0,
-                              color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.xl),
-                    
-                    // Login Form Card
-                    _buildAnimatedItem(
-                      delay: 300,
-                      child: GlassCard(
-                        padding: const EdgeInsets.all(AppSpacing.lg),
-                        borderRadius: AppRadius.xxl,
-                        opacity: 0.1,
-                        borderColor: Colors.white.withValues(alpha: 0.1),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
                             Text(
-                              'Welcome back', 
-                              style: theme.textTheme.headlineMedium?.copyWith(color: theme.colorScheme.onSurface),
-                            ),
-                            const SizedBox(height: AppSpacing.xs),
-                            Text(
-                              'Please enter your details to sign in.',
-                              style: theme.textTheme.bodyMedium?.copyWith(
+                              'SIGN IN TO WORKSPACE',
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                letterSpacing: 2.0,
                                 color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                fontWeight: FontWeight.bold,
                               ),
-                            ),
-                            const SizedBox(height: AppSpacing.xl),
-                            const OrbitTextField(
-                              label: 'Email address',
-                              hint: 'name@company.com',
-                              keyboardType: TextInputType.emailAddress,
-                            ),
-                            const SizedBox(height: AppSpacing.lg),
-                            OrbitTextField(
-                              label: 'Password',
-                              hint: '••••••••',
-                              obscureText: true,
-                              suffixIcon: IconButton(
-                                icon: const Icon(Icons.visibility_off_outlined, color: Colors.white70, size: 20),
-                                onPressed: () {},
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.xl),
-                            OrbitButton(
-                              text: 'Sign in to Workspace',
-                              onPressed: () {
-                                Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (route) => false);
-                              },
                             ),
                           ],
                         ),
                       ),
-                    ),
-                    
-                    const SizedBox(height: AppSpacing.xl),
-                    // Footer Section
+                      const SizedBox(height: AppSpacing.xl),
+                      
+                      // Login Form Card
                       _buildAnimatedItem(
-                        delay: 600,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "Don't have an account? ",
-                              style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
-                            ),
-                            GestureDetector(
-                              onTap: () => Navigator.pushNamed(context, '/register'),
-                              child: Text(
-                                'Create account',
+                        delay: 300,
+                        child: GlassCard(
+                          padding: const EdgeInsets.all(AppSpacing.lg),
+                          borderRadius: AppRadius.xxl,
+                          opacity: 0.1,
+                          borderColor: Colors.white.withValues(alpha: 0.1),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Welcome back', 
+                                style: theme.textTheme.headlineMedium?.copyWith(color: theme.colorScheme.onSurface),
+                              ),
+                              const SizedBox(height: AppSpacing.xs),
+                              Text(
+                                'Please enter your details to sign in.',
                                 style: theme.textTheme.bodyMedium?.copyWith(
-                                  color: theme.colorScheme.onSurface,
-                                  fontWeight: FontWeight.bold,
+                                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                                 ),
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: AppSpacing.xl),
+                              const OrbitTextField(
+                                label: 'Email address',
+                                hint: 'Enter your email',
+                                keyboardType: TextInputType.emailAddress,
+                              ),
+                              const SizedBox(height: AppSpacing.lg),
+                              OrbitTextField(
+                                label: 'Password',
+                                hint: '••••••••',
+                                obscureText: _obscurePassword,
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscurePassword 
+                                        ? Icons.visibility_off_outlined 
+                                        : Icons.visibility_outlined,
+                                    color: theme.colorScheme.onSurfaceVariant,
+                                    size: 20,
+                                  ),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscurePassword = !_obscurePassword;
+                                    });
+                                  },
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.xl),
+                              OrbitButton(
+                                text: 'Sign in to Workspace',
+                                onPressed: () {
+                                  Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (route) => false);
+                                },
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    const SizedBox(height: AppSpacing.xxl),
-                  ],
+                      
+                      const SizedBox(height: AppSpacing.xl),
+                      // Footer Section
+                        _buildAnimatedItem(
+                          delay: 600,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Don't have an account? ",
+                                style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
+                              ),
+                              GestureDetector(
+                                onTap: () => Navigator.pushNamed(context, '/register'),
+                                child: Text(
+                                  'Create account',
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: theme.colorScheme.onSurface,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      const SizedBox(height: AppSpacing.xxl),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
         ),
-      ),
+
     );
   }
 

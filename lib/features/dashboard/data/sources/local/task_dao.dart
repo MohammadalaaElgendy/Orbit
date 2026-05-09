@@ -98,4 +98,8 @@ class TaskDao extends DatabaseAccessor<AppDatabase> with _$TaskDaoMixin {
   Future<Task?> getById(String id) {
     return (select(tasks)..where((t) => t.id.equals(id))).getSingleOrNull();
   }
+
+  Stream<Task?> watchById(String id) {
+    return (select(tasks)..where((t) => t.id.equals(id) & t.deletedAt.isNull())).watchSingleOrNull();
+  }
 }

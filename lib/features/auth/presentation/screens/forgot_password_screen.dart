@@ -54,7 +54,7 @@ class ForgotPasswordScreen extends StatelessWidget {
                   children: [
                     const OrbitTextField(
                       label: 'Email address',
-                      hint: 'name@company.com',
+                      hint: 'Enter your email',
                       keyboardType: TextInputType.emailAddress,
                     ),
                     const SizedBox(height: AppSpacing.lg),

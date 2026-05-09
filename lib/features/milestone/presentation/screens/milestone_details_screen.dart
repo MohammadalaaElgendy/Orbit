@@ -32,6 +32,7 @@ class _MilestoneDetailsScreenState extends State<MilestoneDetailsScreen> {
 
   void _showMilestoneMenu() {
     final viewModel = context.read<MilestoneViewModel>();
+    final currentMilestone = viewModel.currentMilestone ?? widget.milestone;
     showModalBottomSheet(
       context: context,
       builder: (_) => Column(
@@ -45,15 +46,15 @@ class _MilestoneDetailsScreenState extends State<MilestoneDetailsScreen> {
               showDialog(
                 context: context,
                 builder: (_) => MilestoneDialog(
-                  milestone: widget.milestone,
+                  milestone: currentMilestone,
                   onSave: (name, desc, dueDate) {
                     viewModel.updateMilestone(model.Milestone(
-                      id: widget.milestone.id,
-                      projectId: widget.milestone.projectId,
+                      id: currentMilestone.id,
+                      projectId: currentMilestone.projectId,
                       name: name,
                       description: desc,
                       dueDate: dueDate,
-                      createdAt: widget.milestone.createdAt,
+                      createdAt: currentMilestone.createdAt,
                       updatedAt: DateTime.now(),
                     ));
                   },
@@ -66,7 +67,7 @@ class _MilestoneDetailsScreenState extends State<MilestoneDetailsScreen> {
             title: const Text('Delete Milestone', style: TextStyle(color: Colors.red)),
             onTap: () {
               Navigator.pop(context);
-              viewModel.deleteMilestone(widget.milestone.id);
+              viewModel.deleteMilestone(currentMilestone.id);
               Navigator.pop(context);
             },
           ),
@@ -102,6 +103,7 @@ class _MilestoneDetailsScreenState extends State<MilestoneDetailsScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final viewModel = context.watch<MilestoneViewModel>();
+    final currentMilestone = viewModel.currentMilestone ?? widget.milestone;
     final tasks = viewModel.tasks;
 
     return Scaffold(
@@ -158,7 +160,7 @@ class _MilestoneDetailsScreenState extends State<MilestoneDetailsScreen> {
                       children: [
                         const SizedBox(height: 40),
                         Hero(
-                          tag: 'milestone_${widget.milestone.id}',
+                          tag: 'milestone_${currentMilestone.id}',
                           child: Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
@@ -170,7 +172,7 @@ class _MilestoneDetailsScreenState extends State<MilestoneDetailsScreen> {
                         ),
                         const SizedBox(height: AppSpacing.sm),
                         Text(
-                          widget.milestone.name,
+                          currentMilestone.name,
                           style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900),
                         ),
                       ],
@@ -183,7 +185,7 @@ class _MilestoneDetailsScreenState extends State<MilestoneDetailsScreen> {
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
                     Text(
-                      widget.milestone.description,
+                      currentMilestone.description,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                         height: 1.6,
@@ -191,7 +193,7 @@ class _MilestoneDetailsScreenState extends State<MilestoneDetailsScreen> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: AppSpacing.xl),
-                    _buildStatsRow(theme),
+                    _buildStatsRow(theme, currentMilestone),
                     const SizedBox(height: AppSpacing.xl),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -226,16 +228,16 @@ class _MilestoneDetailsScreenState extends State<MilestoneDetailsScreen> {
     );
   }
 
-  Widget _buildStatsRow(ThemeData theme) {
+  Widget _buildStatsRow(ThemeData theme, model.Milestone milestone) {
     return Column(
       children: [
         _buildStatItem(
           theme, 
           'Deadline', 
-          widget.milestone.dueDate != null ? DateFormat('MMMM dd, yyyy').format(widget.milestone.dueDate!) : 'No deadline', 
+          milestone.dueDate != null ? DateFormat('MMMM dd, yyyy').format(milestone.dueDate!) : 'No deadline', 
           Icons.calendar_today_rounded,
-          subtitle: _getDeadlineSubtitle(widget.milestone.dueDate),
-          subtitleColor: _getDeadlineColor(widget.milestone.dueDate),
+          subtitle: _getDeadlineSubtitle(milestone.dueDate),
+          subtitleColor: _getDeadlineColor(milestone.dueDate),
         ),
         const SizedBox(height: AppSpacing.md),
         Row(
@@ -244,7 +246,7 @@ class _MilestoneDetailsScreenState extends State<MilestoneDetailsScreen> {
               child: _buildStatItem(
                 theme, 
                 'Progress', 
-                '${(widget.milestone.progress * 100).toInt()}%', 
+                '${(milestone.progress * 100).toInt()}%', 
                 Icons.donut_large_rounded
               ),
             ),
@@ -253,7 +255,7 @@ class _MilestoneDetailsScreenState extends State<MilestoneDetailsScreen> {
               child: _buildStatItem(
                 theme, 
                 'Tasks', 
-                '${widget.milestone.completedTasks}/${widget.milestone.totalTasks}', 
+                '${milestone.completedTasks}/${milestone.totalTasks}',
                 Icons.check_circle_outline_rounded
               ),
             ),

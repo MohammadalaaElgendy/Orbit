@@ -11,6 +11,8 @@ import 'package:uuid/uuid.dart';
 
 class DashboardViewModel extends ChangeNotifier {
   final WorkspaceRepository _workspaceRepository;
+  final MilestoneRepository _milestoneRepository;
+  final TaskRepository _taskRepository;
 
   List<Workspace> _workspaces = [];
   List<Workspace> get workspaces => _workspaces;
@@ -18,30 +20,75 @@ class DashboardViewModel extends ChangeNotifier {
   final Map<String, List<User>> _workspaceMembersMap = {};
   Map<String, List<User>> get workspaceMembersMap => _workspaceMembersMap;
 
-  final List<Milestone> _recentMilestones = [];
+  List<Milestone> _recentMilestones = [];
   List<Milestone> get recentMilestones => _recentMilestones;
 
-  final List<Task> _recentTasks = [];
+  List<Milestone> _allMilestones = [];
+  List<Milestone> get allMilestones => _allMilestones;
+
+  List<Task> _recentTasks = [];
   List<Task> get recentTasks => _recentTasks;
 
+  // Stats
+  double _overallProgress = 0.0;
+  double get overallProgress => _overallProgress;
+
+  int _totalMilestones = 0;
+  int get totalMilestones => _totalMilestones;
+
+  int _completedMilestones = 0;
+  int get completedMilestones => _completedMilestones;
+
+  List<Milestone> _topMilestones = [];
+  List<Milestone> get topMilestones => _topMilestones;
+
   StreamSubscription? _workspaceSub;
+  StreamSubscription? _milestoneSub;
+  StreamSubscription? _taskSub;
   
   DashboardViewModel({
     required WorkspaceRepository workspaceRepository,
     required MilestoneRepository milestoneRepository,
     required TaskRepository taskRepository,
-  })  : _workspaceRepository = workspaceRepository {
+  })  : _workspaceRepository = workspaceRepository,
+        _milestoneRepository = milestoneRepository,
+        _taskRepository = taskRepository {
     _init();
   }
 
   void _init() {
+    // Watch Workspaces
     _workspaceSub = _workspaceRepository.watchWorkspaces().listen((data) async {
       _workspaces = data;
-      
-      // Fetch members for each workspace to show real avatars on cards
       for (var ws in data) {
         final members = await _workspaceRepository.watchWorkspaceMembers(ws.id).first;
         _workspaceMembersMap[ws.id] = members;
+      }
+      notifyListeners();
+    });
+
+    // Watch ALL Milestones - Ensure this is robust
+    _milestoneSub = _milestoneRepository.watchAllMilestones().listen((data) {
+      _allMilestones = data;
+      _recentMilestones = data.take(5).toList();
+      _totalMilestones = data.length;
+      _completedMilestones = data.where((m) => m.progress >= 1.0).length;
+      
+      final active = data.where((m) => m.progress < 1.0).toList();
+      active.sort((a, b) => b.progress.compareTo(a.progress));
+      _topMilestones = active.take(3).toList();
+      
+      notifyListeners();
+    });
+
+    _taskSub = _taskRepository.watchAllTasks().listen((data) {
+      _recentTasks = data.take(10).toList();
+      
+      if (data.isEmpty) {
+        _overallProgress = 0.0;
+      } else {
+        final completed = data.where((t) => t.status == TaskStatus.done).length;
+        _overallProgress = completed / data.length;
       }
       
       notifyListeners();
@@ -106,6 +153,8 @@ class DashboardViewModel extends ChangeNotifier {
   @override
   void dispose() {
     _workspaceSub?.cancel();
+    _milestoneSub?.cancel();
+    _taskSub?.cancel();
     super.dispose();
   }
 }

@@ -20,20 +20,40 @@ class MilestoneRepository {
     ));
   }
 
+  Stream<List<model.Milestone>> watchAllMilestones() {
+    return _milestoneDao.watchAllWithCounts().map((rows) => rows
+        .map(_mapWithCountsToDomain)
+        .toList());
+  }
+
   Stream<List<model.Milestone>> watchMilestonesByProject(String projectId) {
     return _milestoneDao.watchByProjectWithCounts(projectId).map((rows) => rows
-        .map((row) => model.Milestone(
-              id: row.milestone.id,
-              projectId: row.milestone.projectId,
-              name: row.milestone.name,
-              description: row.milestone.description,
-              dueDate: row.milestone.dueDate,
-              createdAt: row.milestone.createdAt,
-              updatedAt: row.milestone.updatedAt,
-              totalTasks: row.totalTasks,
-              completedTasks: row.completedTasks,
-            ))
+        .map(_mapWithCountsToDomain)
         .toList());
+  }
+
+  Stream<model.Milestone?> watchMilestoneById(String id) {
+    return _milestoneDao.watchByIdWithCounts(id).map((row) {
+      if (row == null) return null;
+      return _mapWithCountsToDomain(row);
+    });
+  }
+
+  model.Milestone _mapWithCountsToDomain(MilestoneWithTaskCounts row) {
+    return model.Milestone(
+      id: row.milestone.id,
+      projectId: row.milestone.projectId,
+      projectName: row.projectName,
+      workspaceName: row.workspaceName,
+      name: row.milestone.name,
+      description: row.milestone.description,
+      dueDate: row.milestone.dueDate,
+      createdAt: row.milestone.createdAt,
+      updatedAt: row.milestone.updatedAt,
+      totalTasks: row.totalTasks,
+      completedTasks: row.completedTasks,
+      progress: row.totalTasks > 0 ? row.completedTasks / row.totalTasks : 0.0,
+    );
   }
 
   Future<void> updateMilestone(model.Milestone milestone) async {

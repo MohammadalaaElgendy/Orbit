@@ -17,9 +17,13 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _navigateToWelcome() async {
-    await Future.delayed(const Duration(milliseconds: 1500));
-    if (mounted) {
-      Navigator.pushReplacementNamed(context, '/welcome');
+    try {
+      await Future.delayed(const Duration(milliseconds: 1500));
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/welcome');
+      }
+    } catch (e) {
+      debugPrint('Error during splash navigation: $e');
     }
   }
 

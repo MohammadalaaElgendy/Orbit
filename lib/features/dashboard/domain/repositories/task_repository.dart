@@ -25,6 +25,10 @@ class TaskRepository {
     ));
   }
 
+  Stream<List<model.Task>> watchAllTasks() {
+    return _taskDao.watchAll().map((rows) => rows.map(_mapToDomain).toList());
+  }
+
   Stream<List<model.Task>> watchRootTasksByMilestone(String milestoneId) {
     return _taskDao.watchRootTasksByMilestoneWithCounts(milestoneId).map((rows) => rows
         .map((row) => model.Task(
@@ -92,6 +96,10 @@ class TaskRepository {
     final row = await _taskDao.getById(id);
     if (row == null) return null;
     return _mapToDomain(row);
+  }
+
+  Stream<model.Task?> watchTaskById(String id) {
+    return _taskDao.watchById(id).map((row) => row != null ? _mapToDomain(row) : null);
   }
 
   model.Task _mapToDomain(db.Task row) {

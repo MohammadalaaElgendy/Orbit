@@ -13,10 +13,10 @@ import '../widgets/workspace_dialog.dart';
 import '../widgets/member_search_dialog.dart';
 import '../../../milestone/presentation/view_models/milestone_view_model.dart';
 import '../../../milestone/presentation/widgets/milestone_dialog.dart';
+import '../../../dashboard/presentation/widgets/milestone_card.dart';
 import 'dart:async';
-
-import 'package:intl/intl.dart';
 import '../../../../shared/widgets/smart_image.dart';
+import '../../../../shared/widgets/top_padding.dart';
 
 class WorkspaceDetailsScreen extends StatefulWidget {
   final Workspace workspace;
@@ -35,9 +35,6 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<WorkspaceViewModel>().loadWorkspace(widget.workspace.id);
-    });
   }
 
   @override
@@ -146,7 +143,6 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
     final viewModel = context.watch<WorkspaceViewModel>();
     final currentWorkspace = viewModel.currentWorkspace ?? widget.workspace;
     final projects = viewModel.projects;
@@ -167,8 +163,7 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
             ],
           ),
         ),
-        child: SafeArea(
-          child: CustomScrollView(
+        child: CustomScrollView(
             physics: const BouncingScrollPhysics(),
             slivers: [
               SliverAppBar(
@@ -184,9 +179,15 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                     padding: EdgeInsets.zero,
                     borderRadius: AppRadius.lg,
                     blur: 10,
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new, size: 18),
-                      onPressed: () => Navigator.pop(context),
+                    child: Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        onTap: () => Navigator.pop(context),
+                        borderRadius: BorderRadius.circular(AppRadius.lg),
+                        child: const Center(
+                          child: Icon(Icons.arrow_back_ios_new, size: 18),
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -197,9 +198,17 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                       padding: EdgeInsets.zero,
                       borderRadius: AppRadius.lg,
                       blur: 10,
-                      child: IconButton(
-                        icon: const Icon(Icons.more_vert_rounded, size: 20),
-                        onPressed: _showWorkspaceMenu,
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: _showWorkspaceMenu,
+                          borderRadius: BorderRadius.circular(AppRadius.lg),
+                          child: const SizedBox(
+                            width: 40,
+                            height: 40,
+                            child: Icon(Icons.more_vert_rounded, size: 20),
+                          ),
+                        ),
                       ),
                     ),
                   ),
@@ -217,9 +226,10 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                       final collapsedHeight = kToolbarHeight + MediaQuery.of(context).padding.top;
                       final ratio = ((expandedHeight - top) / (expandedHeight - collapsedHeight)).clamp(0.0, 1.0);
 
-                      final Color titleColor = isDark 
-                          ? Colors.white 
-                          : Color.lerp(Colors.white, Colors.black, ratio)!;
+                      // Fix: Stay white longer, then transition to theme color when almost collapsed
+                      final Color titleColor = ratio > 0.8 
+                          ? Color.lerp(Colors.white, theme.colorScheme.onSurface, (ratio - 0.8) * 5)!
+                          : Colors.white;
 
                       // Vertical centering adjustment for collapsed state (Toolbar vs entire AppBar height)
                       final double verticalOffset = (MediaQuery.of(context).padding.top / 2) * ratio;
@@ -245,9 +255,13 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                                 fontSize: 18, 
                                 fontWeight: FontWeight.w900,
                                 color: titleColor,
-                                shadows: ratio < 0.5 || isDark ? [
-                                  const Shadow(color: Colors.black54, blurRadius: 10, offset: Offset(0, 2)),
-                                ] : [],
+                                shadows: [
+                                  Shadow(
+                                    color: Colors.black.withValues(alpha: ratio > 0.8 ? (1.0 - ratio) * 0.5 : 0.5), 
+                                    blurRadius: 4, 
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
                               )
                             ),
                           ),
@@ -264,8 +278,13 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                       final collapsedHeight = kToolbarHeight + MediaQuery.of(context).padding.top;
                       final ratio = ((expandedHeight - top) / (expandedHeight - collapsedHeight)).clamp(0.0, 1.0);
 
-                      return Stack(
-                        fit: StackFit.expand,
+                      final radius = AppRadius.xxl * (1.0 - ratio);
+                      return ClipRRect(
+                        borderRadius: BorderRadius.vertical(
+                          bottom: Radius.circular(radius),
+                        ),
+                        child: Stack(
+                          fit: StackFit.expand,
                         children: [
                           if (currentWorkspace.imageUrl != null)
                             SmartImage(
@@ -331,14 +350,17 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                               ),
                             ),
                         ],
-                      );
+                      ),
+                    );
                     }
                   ),
                 ),
               ),
-              SliverPadding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                sliver: SliverList(
+              SliverSafeArea(
+                top: false,
+                sliver: SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                  sliver: SliverList(
                   delegate: SliverChildListDelegate([
                     const SizedBox(height: AppSpacing.md),
                     Text(
@@ -366,13 +388,13 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                       _buildEmptyMilestones(theme)
                     else
                       _buildMilestonesGrid(_milestones, theme),
-                    const SizedBox(height: AppSpacing.xxl),
+                    const BottomPadding(),
                   ]),
                 ),
               ),
+              ),
             ],
           ),
-        ),
       ),
     );
   }
@@ -638,12 +660,10 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
   Widget _buildMilestonesGrid(List<model.Milestone> milestones, ThemeData theme) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        // Define constraints for milestone cards (typically wider than projects)
         const double minWidth = 280.0;
         const double maxWidth = 400.0;
         const double spacing = AppSpacing.md;
         
-        // Calculate distribution
         int crossAxisCount = (constraints.maxWidth / (minWidth + spacing)).floor();
         crossAxisCount = crossAxisCount.clamp(1, milestones.isNotEmpty ? milestones.length : 1);
         
@@ -655,168 +675,13 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
           runSpacing: spacing,
           alignment: WrapAlignment.start,
           children: milestones.map((milestone) {
-            final isDark = theme.brightness == Brightness.dark;
-
-            return GestureDetector(
-              onTap: () => Navigator.pushNamed(context, '/milestone-details', arguments: milestone),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                width: itemWidth,
-                height: 180, // Slightly increased for deadline text
-                decoration: BoxDecoration(
-                  color: isDark ? Colors.white.withValues(alpha: 0.03) : Colors.white,
-                  borderRadius: BorderRadius.circular(AppRadius.xl),
-                  border: Border.all(
-                    color: isDark ? Colors.white.withValues(alpha: 0.05) : theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.03),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                padding: const EdgeInsets.all(AppSpacing.md),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(Icons.flag_rounded, color: theme.colorScheme.primary, size: 14),
-                        ),
-                        const SizedBox(width: AppSpacing.sm),
-                        Expanded(
-                          child: Text(
-                            milestone.name, 
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              fontWeight: FontWeight.w900,
-                              fontSize: 16,
-                              letterSpacing: -0.3,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        Text(
-                          '${(milestone.progress * 100).toInt()}%', 
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w900, 
-                            color: theme.colorScheme.primary,
-                            letterSpacing: -0.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    _buildDeadlineInfo(milestone.dueDate, theme),
-                    const Spacer(),
-                    Text(
-                      milestone.description, 
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-                        fontSize: 12,
-                      ), 
-                      maxLines: 1, 
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 12),
-                    Stack(
-                      children: [
-                        Container(
-                          height: 6,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.primary.withValues(alpha: 0.05),
-                            borderRadius: BorderRadius.circular(AppRadius.full),
-                          ),
-                        ),
-                        FractionallySizedBox(
-                          widthFactor: milestone.progress,
-                          child: Container(
-                            height: 6,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  theme.colorScheme.primary,
-                                  theme.colorScheme.primary.withValues(alpha: 0.6),
-                                ],
-                              ),
-                              borderRadius: BorderRadius.circular(AppRadius.full),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '${milestone.completedTasks}/${milestone.totalTasks} Tasks',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w800,
-                        color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            return SizedBox(
+              width: itemWidth,
+              child: MilestoneCard(milestone: milestone),
             );
           }).toList(),
         );
       },
-    );
-  }
-
-  Widget _buildDeadlineInfo(DateTime? deadline, ThemeData theme) {
-    if (deadline == null) return const SizedBox.shrink();
-    
-    final now = DateTime.now();
-    final difference = deadline.difference(now);
-    final isOverdue = difference.isNegative;
-    final isUrgent = !isOverdue && difference.inDays < 3;
-    
-    final color = isOverdue ? Colors.red : (isUrgent ? Colors.orange : Colors.green);
-    final icon = isOverdue ? Icons.error_outline_rounded : Icons.access_time_rounded;
-    
-    String text;
-    if (isOverdue) {
-      text = 'Overdue';
-    } else if (difference.inDays > 0) {
-      text = '${difference.inDays} days left';
-    } else if (difference.inHours > 0) {
-      text = '${difference.inHours} hours left';
-    } else {
-      text = 'Due soon';
-    }
-
-    return Row(
-      children: [
-        Icon(icon, size: 12, color: color),
-        const SizedBox(width: 4),
-        Text(
-          text,
-          style: theme.textTheme.labelSmall?.copyWith(
-            color: color,
-            fontWeight: FontWeight.bold,
-            fontSize: 11,
-          ),
-        ),
-        const Spacer(),
-        Text(
-          DateFormat('MMM dd').format(deadline),
-          style: theme.textTheme.labelSmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
-            fontSize: 11,
-          ),
-        ),
-      ],
     );
   }
 }
