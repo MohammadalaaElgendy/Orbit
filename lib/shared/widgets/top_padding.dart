@@ -30,6 +30,6 @@ class BottomPadding extends StatelessWidget {
     if (!isMobile) return const SizedBox(height: 40);
 
     // Matches the height and safe area of the floating bottom nav
-    return SizedBox(height: 80 + safeAreaBottom);
+    return SizedBox(height: 86 + safeAreaBottom);
   }
 }

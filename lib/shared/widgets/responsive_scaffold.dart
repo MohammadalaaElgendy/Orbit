@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'orbit_logo.dart';
 import 'glass_card.dart';
 import '../../core/constants/app_constants.dart';
@@ -66,15 +67,20 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
 
     // Mobile View
     final appBarHeight = kToolbarHeight + topPadding;
-    return Scaffold(
-      extendBody: true,
-      extendBodyBehindAppBar: true,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(appBarHeight),
-        child: _buildCustomGlassAppBar(theme, topPadding),
+    final isDark = theme.brightness == Brightness.dark;
+    
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+      child: Scaffold(
+        extendBody: true,
+        extendBodyBehindAppBar: true,
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(appBarHeight),
+          child: _buildCustomGlassAppBar(theme, topPadding),
+        ),
+        body: widget.body,
+        bottomNavigationBar: _buildFloatingGlassBottomNav(theme),
       ),
-      body: widget.body,
-      bottomNavigationBar: _buildFloatingGlassBottomNav(theme),
     );
   }
 
@@ -165,7 +171,7 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
     return Container(
       padding: EdgeInsets.fromLTRB(AppSpacing.md, 0, AppSpacing.md, bottomPadding > 0 ? bottomPadding : AppSpacing.md),
       child: Container(
-        height: 65,
+        height: 64,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(AppRadius.xxl),
           boxShadow: [
@@ -189,21 +195,27 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
                   width: 1.0,
                 ),
               ),
-              child: BottomNavigationBar(
-                currentIndex: widget.currentIndex,
-                onTap: widget.onTabSelected,
-                type: BottomNavigationBarType.fixed,
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                selectedItemColor: theme.colorScheme.primary,
-                unselectedItemColor: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                showSelectedLabels: false,
-                showUnselectedLabels: false,
-                items: const [
+              child: MediaQuery.removePadding(
+                context: context,
+                removeBottom: true,
+                child: BottomNavigationBar(
+                  currentIndex: widget.currentIndex,
+                  onTap: widget.onTabSelected,
+                  type: BottomNavigationBarType.fixed,
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                  selectedItemColor: theme.colorScheme.primary,
+                  unselectedItemColor: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                  showSelectedLabels: false,
+                  showUnselectedLabels: false,
+                  selectedFontSize: 0,
+                  unselectedFontSize: 0,
+                  items: const [
                   BottomNavigationBarItem(icon: Icon(Icons.dashboard_rounded, size: 26), label: 'Home'),
                   BottomNavigationBarItem(icon: Icon(Icons.work_rounded, size: 26), label: 'Work'),
                   BottomNavigationBarItem(icon: Icon(Icons.flag_rounded, size: 26), label: 'Goals'),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
