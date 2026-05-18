@@ -13,18 +13,26 @@ class AuthRepository {
     _authService.authStateChanges.listen((data) async {
       final sUser = data.session?.user;
       if (sUser != null) {
+        final userName = sUser.userMetadata?['full_name']?.toString().isNotEmpty == true 
+            ? sUser.userMetadata!['full_name'] 
+            : sUser.email?.split('@').first ?? 'User';
+            
         final user = User(
           id: sUser.id,
-          name: sUser.userMetadata?['full_name'] ?? sUser.email?.split('@').first ?? 'User',
+          name: userName,
           email: sUser.email ?? '',
           avatarUrl: sUser.userMetadata?['avatar_url'],
-          isVerified: sUser.emailConfirmedAt != null,
+          isVerified: true, // If we have a session, the user is verified.
           authProvider: sUser.appMetadata['provider'] ?? 'email',
         );
         
-        final existingUser = await _userRepository.getUserById(user.id);
-        if (existingUser == null) {
-          await _userRepository.createUser(user);
+        try {
+          final existingUser = await _userRepository.getUserById(user.id);
+          if (existingUser == null) {
+            await _userRepository.createUser(user);
+          }
+        } catch (e) {
+          debugPrint('Error syncing user to local database: $e');
         }
       }
     });
@@ -36,17 +44,21 @@ class AuthRepository {
     final sUser = _authService.currentUser;
     if (sUser == null) return null;
     
+    final userName = sUser.userMetadata?['full_name']?.toString().isNotEmpty == true 
+        ? sUser.userMetadata!['full_name'] 
+        : sUser.email?.split('@').first ?? 'User';
+
     return User(
       id: sUser.id,
-      name: sUser.userMetadata?['full_name'] ?? '',
+      name: userName,
       email: sUser.email ?? '',
       avatarUrl: sUser.userMetadata?['avatar_url'],
-      isVerified: sUser.emailConfirmedAt != null,
+      isVerified: true, // Valid session implies verified
     );
   }
 
-  Future<void> signInWithOtp(String email, {String? name, String? avatarUrl}) async {
-    await _authService.signInWithOtp(email: email, name: name, avatarUrl: avatarUrl);
+  Future<void> signInWithOtp(String email, {String? name, String? avatarUrl, bool shouldCreateUser = true}) async {
+    await _authService.signInWithOtp(email: email, name: name, avatarUrl: avatarUrl, shouldCreateUser: shouldCreateUser);
   }
 
   Future<String?> uploadAvatar(Uint8List bytes, String fileName) async {

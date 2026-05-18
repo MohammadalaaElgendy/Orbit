@@ -1,3 +1,4 @@
+// ignore_for_file: avoid_print
 import 'dart:io';
 
 /// This script registers the custom URL scheme for Windows deep linking.

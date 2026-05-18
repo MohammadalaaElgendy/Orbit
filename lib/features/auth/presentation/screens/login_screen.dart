@@ -121,56 +121,58 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                             const SizedBox(height: AppSpacing.xl),
-                            Center(
-                              child: GestureDetector(
-                                onTap: () => authViewModel.pickAvatar(),
-                                child: Stack(
-                                  children: [
-                                    Container(
-                                      width: 80,
-                                      height: 80,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        border: Border.all(
-                                          color: theme.colorScheme.primary.withValues(alpha: 0.2),
-                                          width: 2,
-                                        ),
-                                      ),
-                                      child: CircleAvatar(
-                                        radius: 38,
-                                        backgroundColor: theme.colorScheme.surface,
-                                        backgroundImage: authViewModel.pickedAvatarBytes != null
-                                            ? MemoryImage(authViewModel.pickedAvatarBytes!)
-                                            : null,
-                                        child: authViewModel.pickedAvatarBytes == null
-                                            ? Icon(Icons.add_a_photo_outlined, color: theme.colorScheme.primary)
-                                            : null,
-                                      ),
-                                    ),
-                                    if (authViewModel.pickedAvatarBytes != null)
-                                      Positioned(
-                                        right: 0,
-                                        bottom: 0,
-                                        child: Container(
-                                          padding: const EdgeInsets.all(4),
-                                          decoration: BoxDecoration(
-                                            color: theme.colorScheme.primary,
-                                            shape: BoxShape.circle,
+                            if (authViewModel.userExists == false) ...[
+                              Center(
+                                child: GestureDetector(
+                                  onTap: () => authViewModel.pickAvatar(),
+                                  child: Stack(
+                                    children: [
+                                      Container(
+                                        width: 80,
+                                        height: 80,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: theme.colorScheme.primary.withValues(alpha: 0.2),
+                                            width: 2,
                                           ),
-                                          child: const Icon(Icons.edit, size: 12, color: Colors.white),
+                                        ),
+                                        child: CircleAvatar(
+                                          radius: 38,
+                                          backgroundColor: theme.colorScheme.surface,
+                                          backgroundImage: authViewModel.pickedAvatarBytes != null
+                                              ? MemoryImage(authViewModel.pickedAvatarBytes!)
+                                              : null,
+                                          child: authViewModel.pickedAvatarBytes == null
+                                              ? Icon(Icons.add_a_photo_outlined, color: theme.colorScheme.primary)
+                                              : null,
                                         ),
                                       ),
-                                  ],
+                                      if (authViewModel.pickedAvatarBytes != null)
+                                        Positioned(
+                                          right: 0,
+                                          bottom: 0,
+                                          child: Container(
+                                            padding: const EdgeInsets.all(4),
+                                            decoration: BoxDecoration(
+                                              color: theme.colorScheme.primary,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: const Icon(Icons.edit, size: 12, color: Colors.white),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(height: AppSpacing.xl),
-                            OrbitTextField(
-                              label: 'Full Name (First time only)',
-                              hint: 'Enter your name',
-                              controller: authViewModel.nameController,
-                            ),
-                            const SizedBox(height: AppSpacing.md),
+                              const SizedBox(height: AppSpacing.xl),
+                              OrbitTextField(
+                                label: 'Full Name (First time only)',
+                                hint: 'Enter your name',
+                                controller: authViewModel.nameController,
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                            ],
                             OrbitTextField(
                               label: 'Email address',
                               hint: 'Enter your email',
@@ -187,12 +189,19 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               ),
                             OrbitButton(
-                              text: 'Send Sign-in Code',
+                              text: authViewModel.userExists == null ? 'Continue' : (authViewModel.userExists! ? 'Send Sign-in Code' : 'Register & Send Code'),
                               isLoading: authViewModel.isLoading,
                               onPressed: () async {
-                                await authViewModel.sendOtp();
-                                if (authViewModel.errorMessage == null && context.mounted) {
-                                  Navigator.pushNamed(context, '/otp');
+                                if (authViewModel.userExists == null) {
+                                  await authViewModel.checkUserExistence();
+                                  if (authViewModel.userExists == true && context.mounted) {
+                                    Navigator.pushNamed(context, '/otp');
+                                  }
+                                } else {
+                                  await authViewModel.sendOtp();
+                                  if (authViewModel.errorMessage == null && context.mounted) {
+                                    Navigator.pushNamed(context, '/otp');
+                                  }
                                 }
                               },
                             ),

@@ -11,6 +11,7 @@ class AuthViewModel extends ChangeNotifier {
   User? user;
   bool isLoading = false;
   String? errorMessage;
+  bool? userExists;
   
   // Stream to notify UI about successful login for navigation
   final _loginSuccessController = StreamController<bool>.broadcast();
@@ -55,6 +56,30 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> checkUserExistence() async {
+    final email = emailController.text.trim();
+    if (email.isEmpty) return;
+
+    isLoading = true;
+    errorMessage = null;
+    notifyListeners();
+
+    try {
+      await authRepository.signInWithOtp(email, shouldCreateUser: false);
+      userExists = true;
+    } catch (e) {
+      final msg = e.toString().toLowerCase();
+      if (msg.contains('user not found') || msg.contains('signups not allowed') || msg.contains('not allowed')) {
+        userExists = false;
+      } else {
+        errorMessage = e.toString();
+      }
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
+  }
+
   Future<void> sendOtp() async {
     final email = emailController.text.trim();
     final name = nameController.text.trim();
@@ -74,6 +99,7 @@ class AuthViewModel extends ChangeNotifier {
         email, 
         name: name.isNotEmpty ? name : null,
         avatarUrl: avatarUrl,
+        shouldCreateUser: true,
       );
     } catch (e) {
       errorMessage = e.toString();
@@ -111,6 +137,8 @@ class AuthViewModel extends ChangeNotifier {
 
     try {
       await authRepository.signInWithGoogle();
+      // Ensure we navigate directly on success if stream misses it
+      _loginSuccessController.add(true);
     } catch (e) {
       errorMessage = e.toString();
     } finally {

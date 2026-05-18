@@ -50,8 +50,10 @@ void main() async {
   await Supabase.initialize(
     url: supabaseUrl,
     anonKey: supabaseAnonKey,
-    authOptions: const FlutterAuthClientOptions(
-      authFlowType: AuthFlowType.pkce,
+    authOptions: FlutterAuthClientOptions(
+      authFlowType: (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS))
+          ? AuthFlowType.implicit
+          : AuthFlowType.pkce,
     ),
   );
 

@@ -16,6 +16,7 @@ class SupabaseAuthService {
     required String email,
     String? name,
     String? avatarUrl,
+    bool shouldCreateUser = true,
   }) async {
     await _supabase.auth.signInWithOtp(
       email: email,
@@ -23,7 +24,7 @@ class SupabaseAuthService {
         'full_name': name,
         'avatar_url': avatarUrl,
       }..removeWhere((key, value) => value == null),
-      shouldCreateUser: true,
+      shouldCreateUser: shouldCreateUser,
     );
   }
 

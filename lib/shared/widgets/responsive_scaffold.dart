@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'orbit_logo.dart';
 import 'glass_card.dart';
 import '../../core/constants/app_constants.dart';
+import '../../features/auth/presentation/view_models/auth_view_model.dart';
+import 'package:provider/provider.dart';
 
 class ResponsiveScaffold extends StatefulWidget {
   final Widget body;
@@ -135,16 +137,37 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
                   )),
                 
                 // Avatar at the very end
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.2), width: 1.5),
-                  ),
-                  child: const CircleAvatar(
-                    radius: 16,
-                    backgroundImage: NetworkImage('https://i.pravatar.cc/150?u=orbit'),
+                PopupMenuButton<String>(
+                  onSelected: (value) async {
+                    if (value == 'logout') {
+                      final nav = Navigator.of(context);
+                      await context.read<AuthViewModel>().logout();
+                      nav.pushNamedAndRemoveUntil('/login', (route) => false);
+                    }
+                  },
+                  itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                    const PopupMenuItem<String>(
+                      value: 'logout',
+                      child: Text('Logout'),
+                    ),
+                  ],
+                  child: Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.2), width: 1.5),
+                    ),
+                    child: CircleAvatar(
+                      radius: 16,
+                      backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+                      backgroundImage: context.watch<AuthViewModel>().user?.avatarUrl != null
+                          ? NetworkImage(context.watch<AuthViewModel>().user!.avatarUrl!)
+                          : null,
+                      child: context.watch<AuthViewModel>().user?.avatarUrl == null
+                          ? Icon(Icons.person, size: 16, color: theme.colorScheme.primary)
+                          : null,
+                    ),
                   ),
                 ),
               ],
@@ -258,27 +281,57 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
               borderRadius: AppRadius.xl,
               child: Row(
                 children: [
-                  const CircleAvatar(
+                  CircleAvatar(
                     radius: 18,
-                    backgroundImage: NetworkImage('https://i.pravatar.cc/150?u=orbit'),
+                    backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+                    backgroundImage: context.watch<AuthViewModel>().user?.avatarUrl != null
+                        ? NetworkImage(context.watch<AuthViewModel>().user!.avatarUrl!)
+                        : null,
+                    child: context.watch<AuthViewModel>().user?.avatarUrl == null
+                        ? Icon(Icons.person, size: 18, color: theme.colorScheme.primary)
+                        : null,
                   ),
                   const SizedBox(width: AppSpacing.sm),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('Mohammad', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
-                        Text('Pro Member', style: TextStyle(fontSize: 10, color: Colors.grey), maxLines: 1, overflow: TextOverflow.ellipsis),
+                        Text(context.watch<AuthViewModel>().user?.name ?? 'User', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
+                        const Text('Pro Member', style: TextStyle(fontSize: 10, color: Colors.grey), maxLines: 1, overflow: TextOverflow.ellipsis),
                       ],
                     ),
                   ),
-                  const Icon(Icons.settings, size: 16, color: Colors.grey),
+                  PopupMenuButton<String>(
+                    onSelected: (value) async {
+                      if (value == 'logout') {
+                        final nav = Navigator.of(context);
+                        await context.read<AuthViewModel>().logout();
+                        nav.pushNamedAndRemoveUntil('/login', (route) => false);
+                      }
+                    },
+                    itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                      const PopupMenuItem<String>(
+                        value: 'logout',
+                        child: Text('Logout'),
+                      ),
+                    ],
+                    child: const Icon(Icons.settings, size: 16, color: Colors.grey),
+                  ),
                 ],
               ),
             )
           else
-            const CircleAvatar(radius: 20, backgroundImage: NetworkImage('https://i.pravatar.cc/150?u=orbit')),
+            CircleAvatar(
+              radius: 20,
+              backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+              backgroundImage: context.watch<AuthViewModel>().user?.avatarUrl != null
+                  ? NetworkImage(context.watch<AuthViewModel>().user!.avatarUrl!)
+                  : null,
+              child: context.watch<AuthViewModel>().user?.avatarUrl == null
+                  ? Icon(Icons.person, size: 20, color: theme.colorScheme.primary)
+                  : null,
+            ),
         ],
       ),
     );

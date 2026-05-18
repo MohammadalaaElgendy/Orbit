@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../shared/widgets/auth_background.dart';
 import '../../../../shared/widgets/orbit_logo.dart';
 import '../view_models/auth_view_model.dart';
+import '../../domain/repositories/auth_repository.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -22,16 +24,13 @@ class _SplashScreenState extends State<SplashScreen> {
     await Future.delayed(const Duration(milliseconds: 2000));
     if (!mounted) return;
 
-    final authViewModel = context.read<AuthViewModel>();
+    final session = Supabase.instance.client.auth.currentSession;
     
-    if (authViewModel.user != null) {
-      if (authViewModel.user!.isVerified) {
-        Navigator.pushReplacementNamed(context, '/dashboard');
-      } else {
-        // If logged in but not verified (shouldn't happen with current flow, 
-        // but good for safety), go to login
-        Navigator.pushReplacementNamed(context, '/login');
-      }
+    if (session != null) {
+      // Ensure the ViewModel has the latest user data before navigating
+      final authRepo = context.read<AuthRepository>();
+      context.read<AuthViewModel>().user = authRepo.currentUser;
+      Navigator.pushReplacementNamed(context, '/dashboard');
     } else {
       Navigator.pushReplacementNamed(context, '/welcome');
     }
