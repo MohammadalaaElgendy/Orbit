@@ -1,7 +1,5 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../features/auth/presentation/view_models/auth_view_model.dart';
 import 'orbit_logo.dart';
 import 'glass_card.dart';
 import '../../core/constants/app_constants.dart';
@@ -27,43 +25,6 @@ class ResponsiveScaffold extends StatefulWidget {
 }
 
 class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
-  void _showUserMenu(BuildContext context) {
-    final authViewModel = context.read<AuthViewModel>();
-    
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: GlassCard(
-          borderRadius: AppRadius.xl,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-            ListTile(
-              leading: const Icon(Icons.person_outline),
-              title: Text(authViewModel.user?.name ?? 'User'),
-              subtitle: Text(authViewModel.user?.email ?? ''),
-            ),
-            const Divider(),
-            ListTile(
-              leading: const Icon(Icons.logout, color: Colors.red),
-              title: const Text('Logout', style: TextStyle(color: Colors.red)),
-              onTap: () async {
-                Navigator.pop(context);
-                await authViewModel.logout();
-                if (context.mounted) {
-                  Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
-                }
-              },
-            ),
-          ],
-        ),
-      ),
-    ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -123,8 +84,6 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
         ? Colors.white.withValues(alpha: 0.15) 
         : Colors.white.withValues(alpha: 0.3);
     
-    final user = context.watch<AuthViewModel>().user;
-    
     return Container(
       decoration: BoxDecoration(
         boxShadow: [
@@ -176,21 +135,16 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
                   )),
                 
                 // Avatar at the very end
-                GestureDetector(
-                  onTap: () => _showUserMenu(context),
-                  child: Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.2), width: 1.5),
-                    ),
-                    child: CircleAvatar(
-                      radius: 16,
-                      backgroundImage: user?.avatarUrl != null 
-                          ? NetworkImage(user!.avatarUrl!) 
-                          : const NetworkImage('https://i.pravatar.cc/150?u=orbit'),
-                    ),
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.2), width: 1.5),
+                  ),
+                  child: const CircleAvatar(
+                    radius: 16,
+                    backgroundImage: NetworkImage('https://i.pravatar.cc/150?u=orbit'),
                   ),
                 ),
               ],
@@ -259,7 +213,6 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
   }
 
   Widget _buildSideNavigation(ThemeData theme, bool isDesktop) {
-    final user = context.watch<AuthViewModel>().user;
     return Container(
       width: isDesktop ? 280 : 80,
       height: double.infinity,
@@ -300,46 +253,32 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
           _buildNavItem(Icons.flag_rounded, 'Milestones', 2, isDesktop),
           const Spacer(),
           if (isDesktop)
-            InkWell(
-              onTap: () => _showUserMenu(context),
-              borderRadius: BorderRadius.circular(AppRadius.xl),
-              child: GlassCard(
-                padding: const EdgeInsets.all(AppSpacing.sm),
-                borderRadius: AppRadius.xl,
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 18,
-                      backgroundImage: user?.avatarUrl != null 
-                          ? NetworkImage(user!.avatarUrl!) 
-                          : const NetworkImage('https://i.pravatar.cc/150?u=orbit'),
+            GlassCard(
+              padding: const EdgeInsets.all(AppSpacing.sm),
+              borderRadius: AppRadius.xl,
+              child: Row(
+                children: [
+                  const CircleAvatar(
+                    radius: 18,
+                    backgroundImage: NetworkImage('https://i.pravatar.cc/150?u=orbit'),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('Mohammad', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
+                        Text('Pro Member', style: TextStyle(fontSize: 10, color: Colors.grey), maxLines: 1, overflow: TextOverflow.ellipsis),
+                      ],
                     ),
-                    const SizedBox(width: AppSpacing.sm),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(user?.name ?? 'User', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
-                          const Text('Pro Member', style: TextStyle(fontSize: 10, color: Colors.grey), maxLines: 1, overflow: TextOverflow.ellipsis),
-                        ],
-                      ),
-                    ),
-                    const Icon(Icons.settings, size: 16, color: Colors.grey),
-                  ],
-                ),
+                  ),
+                  const Icon(Icons.settings, size: 16, color: Colors.grey),
+                ],
               ),
             )
           else
-            GestureDetector(
-              onTap: () => _showUserMenu(context),
-              child: CircleAvatar(
-                radius: 20, 
-                backgroundImage: user?.avatarUrl != null 
-                    ? NetworkImage(user!.avatarUrl!) 
-                    : const NetworkImage('https://i.pravatar.cc/150?u=orbit'),
-              ),
-            ),
+            const CircleAvatar(radius: 20, backgroundImage: NetworkImage('https://i.pravatar.cc/150?u=orbit')),
         ],
       ),
     );

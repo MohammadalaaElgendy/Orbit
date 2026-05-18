@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../shared/models/workspace.dart';
@@ -148,8 +149,12 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
     final projects = viewModel.projects;
     final members = viewModel.members;
 
-    return Scaffold(
-      body: Container(
+    final isDark = theme.brightness == Brightness.dark;
+
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+      child: Scaffold(
+        body: Container(
         width: double.infinity,
         height: double.infinity,
         decoration: BoxDecoration(
@@ -395,6 +400,7 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
               ),
             ],
           ),
+        ),
       ),
     );
   }

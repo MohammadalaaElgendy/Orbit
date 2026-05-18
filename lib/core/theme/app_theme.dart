@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../constants/app_constants.dart';
 import 'app_colors.dart';
 
@@ -23,6 +24,11 @@ class AppTheme {
         onError: AppColors.onError,
       ),
       scaffoldBackgroundColor: AppColors.backgroundLight,
+      appBarTheme: const AppBarTheme(
+        systemOverlayStyle: SystemUiOverlayStyle.dark,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
       textTheme: _textTheme(Brightness.light),
       filledButtonTheme: _filledButtonTheme(Brightness.light),
       inputDecorationTheme: _inputDecorationTheme(Brightness.light),
@@ -49,6 +55,11 @@ class AppTheme {
         onError: AppColors.onError,
       ),
       scaffoldBackgroundColor: AppColors.backgroundDark,
+      appBarTheme: const AppBarTheme(
+        systemOverlayStyle: SystemUiOverlayStyle.light,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
       textTheme: _textTheme(Brightness.dark),
       filledButtonTheme: _filledButtonTheme(Brightness.dark),
       inputDecorationTheme: _inputDecorationTheme(Brightness.dark),
