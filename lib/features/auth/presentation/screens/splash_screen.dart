@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../../shared/widgets/auth_background.dart';
 import '../../../../shared/widgets/orbit_logo.dart';
+import '../view_models/auth_view_model.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -13,17 +15,25 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _navigateToWelcome();
+    _checkAuth();
   }
 
-  Future<void> _navigateToWelcome() async {
-    try {
-      await Future.delayed(const Duration(milliseconds: 1500));
-      if (mounted) {
-        Navigator.pushReplacementNamed(context, '/welcome');
+  Future<void> _checkAuth() async {
+    await Future.delayed(const Duration(milliseconds: 2000));
+    if (!mounted) return;
+
+    final authViewModel = context.read<AuthViewModel>();
+    
+    if (authViewModel.user != null) {
+      if (authViewModel.user!.isVerified) {
+        Navigator.pushReplacementNamed(context, '/dashboard');
+      } else {
+        // If logged in but not verified (shouldn't happen with current flow, 
+        // but good for safety), go to login
+        Navigator.pushReplacementNamed(context, '/login');
       }
-    } catch (e) {
-      debugPrint('Error during splash navigation: $e');
+    } else {
+      Navigator.pushReplacementNamed(context, '/welcome');
     }
   }
 

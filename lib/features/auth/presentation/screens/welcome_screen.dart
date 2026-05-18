@@ -56,7 +56,7 @@ class WelcomeScreen extends StatelessWidget {
                     delay: 600,
                     child: OrbitButton(
                       text: 'Launch Workspace',
-                      onPressed: () => Navigator.pushNamed(context, '/register'),
+                      onPressed: () => Navigator.pushReplacementNamed(context, '/login'),
                       icon: const Icon(Icons.arrow_forward, size: 18),
                     ),
                   ),
@@ -66,7 +66,7 @@ class WelcomeScreen extends StatelessWidget {
                     child: OrbitButton(
                       text: 'Sign In to Orbit',
                       style: OrbitButtonStyle.secondary,
-                      onPressed: () => Navigator.pushNamed(context, '/login'),
+                      onPressed: () => Navigator.pushReplacementNamed(context, '/login'),
                     ),
                   ),
                   const SizedBox(height: AppSpacing.xxl),

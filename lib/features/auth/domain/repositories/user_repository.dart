@@ -14,6 +14,8 @@ class UserRepository {
       name: Value(user.name),
       email: Value(user.email),
       avatarUrl: Value(user.avatarUrl),
+      isVerified: Value(user.isVerified),
+      authProvider: Value(user.authProvider),
       createdAt: Value(DateTime.now()),
       updatedAt: Value(DateTime.now()),
     ));
@@ -26,6 +28,8 @@ class UserRepository {
               name: row.name,
               email: row.email,
               avatarUrl: row.avatarUrl,
+              isVerified: row.isVerified,
+              authProvider: row.authProvider,
             ))
         .toList());
   }
@@ -38,6 +42,8 @@ class UserRepository {
       name: row.name,
       email: row.email,
       avatarUrl: row.avatarUrl,
+      isVerified: row.isVerified,
+      authProvider: row.authProvider,
     );
   }
 
@@ -49,6 +55,8 @@ class UserRepository {
       name: row.name,
       email: row.email,
       avatarUrl: row.avatarUrl,
+      isVerified: row.isVerified,
+      authProvider: row.authProvider,
     );
   }
 
@@ -60,6 +68,8 @@ class UserRepository {
               name: row.name,
               email: row.email,
               avatarUrl: row.avatarUrl,
+              isVerified: row.isVerified,
+              authProvider: row.authProvider,
             ))
         .toList();
   }

@@ -19,6 +19,8 @@ class Users extends Table {
   TextColumn get name => text()();
   TextColumn get email => text()();
   TextColumn get avatarUrl => text().nullable()();
+  BoolColumn get isVerified => boolean().withDefault(const Constant(false))();
+  TextColumn get authProvider => text().nullable()();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
   DateTimeColumn get deletedAt => dateTime().nullable()();
@@ -42,8 +44,8 @@ class Workspaces extends Table {
 
 class WorkspaceMembers extends Table {
   TextColumn get id => text()();
-  TextColumn get workspaceId => text().references(Workspaces, #id)();
-  TextColumn get userId => text().references(Users, #id)();
+  TextColumn get workspaceId => text().references(Workspaces, #id, onUpdate: KeyAction.cascade, onDelete: KeyAction.cascade)();
+  TextColumn get userId => text().references(Users, #id, onUpdate: KeyAction.cascade, onDelete: KeyAction.cascade)();
   TextColumn get role => text()(); // String enum
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
@@ -55,7 +57,7 @@ class WorkspaceMembers extends Table {
 
 class Projects extends Table {
   TextColumn get id => text()();
-  TextColumn get workspaceId => text().references(Workspaces, #id)();
+  TextColumn get workspaceId => text().references(Workspaces, #id, onUpdate: KeyAction.cascade, onDelete: KeyAction.cascade)();
   TextColumn get name => text()();
   TextColumn get description => text()();
   TextColumn get color => text().nullable()();
@@ -69,7 +71,7 @@ class Projects extends Table {
 
 class Milestones extends Table {
   TextColumn get id => text()();
-  TextColumn get projectId => text().references(Projects, #id)();
+  TextColumn get projectId => text().references(Projects, #id, onUpdate: KeyAction.cascade, onDelete: KeyAction.cascade)();
   TextColumn get name => text()();
   TextColumn get description => text()();
   DateTimeColumn get dueDate => dateTime().nullable()();
@@ -83,11 +85,11 @@ class Milestones extends Table {
 
 class Tasks extends Table {
   TextColumn get id => text()();
-  TextColumn get milestoneId => text().references(Milestones, #id)();
-  TextColumn get parentTaskId => text().nullable().references(Tasks, #id)();
+  TextColumn get milestoneId => text().references(Milestones, #id, onUpdate: KeyAction.cascade, onDelete: KeyAction.cascade)();
+  TextColumn get parentTaskId => text().nullable().references(Tasks, #id, onUpdate: KeyAction.cascade, onDelete: KeyAction.cascade)();
   TextColumn get title => text()();
   TextColumn get description => text()();
-  TextColumn get assigneeId => text().nullable().references(Users, #id)();
+  TextColumn get assigneeId => text().nullable().references(Users, #id, onUpdate: KeyAction.cascade, onDelete: KeyAction.setNull)();
   TextColumn get priority => text()(); // String enum
   TextColumn get status => text()(); // String enum
   DateTimeColumn get startDate => dateTime().nullable()();
@@ -131,7 +133,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -142,6 +144,24 @@ class AppDatabase extends _$AppDatabase {
           } else if (from < 3) {
             // Ensure seedControl is created if version 2 was missed or failed
             await m.createTable(seedControl);
+          }
+          if (from < 4) {
+            await m.addColumn(users, users.isVerified);
+            await m.addColumn(users, users.authProvider);
+          }
+          if (from < 5) {
+            // Foreign key changes require table recreation in SQLite.
+            // For development, we can trigger a recreation of the affected tables.
+            // Note: This will delete existing data in these tables!
+            await m.deleteTable(tasks.actualTableName);
+            await m.deleteTable(milestones.actualTableName);
+            await m.deleteTable(projects.actualTableName);
+            await m.deleteTable(workspaceMembers.actualTableName);
+            
+            await m.createTable(workspaceMembers);
+            await m.createTable(projects);
+            await m.createTable(milestones);
+            await m.createTable(tasks);
           }
         },
         beforeOpen: (details) async {

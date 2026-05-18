@@ -46,6 +46,32 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _isVerifiedMeta = const VerificationMeta(
+    'isVerified',
+  );
+  @override
+  late final GeneratedColumn<bool> isVerified = GeneratedColumn<bool>(
+    'is_verified',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_verified" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _authProviderMeta = const VerificationMeta(
+    'authProvider',
+  );
+  @override
+  late final GeneratedColumn<String> authProvider = GeneratedColumn<String>(
+    'auth_provider',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -85,6 +111,8 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
     name,
     email,
     avatarUrl,
+    isVerified,
+    authProvider,
     createdAt,
     updatedAt,
     deletedAt,
@@ -126,6 +154,21 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
       context.handle(
         _avatarUrlMeta,
         avatarUrl.isAcceptableOrUnknown(data['avatar_url']!, _avatarUrlMeta),
+      );
+    }
+    if (data.containsKey('is_verified')) {
+      context.handle(
+        _isVerifiedMeta,
+        isVerified.isAcceptableOrUnknown(data['is_verified']!, _isVerifiedMeta),
+      );
+    }
+    if (data.containsKey('auth_provider')) {
+      context.handle(
+        _authProviderMeta,
+        authProvider.isAcceptableOrUnknown(
+          data['auth_provider']!,
+          _authProviderMeta,
+        ),
       );
     }
     if (data.containsKey('created_at')) {
@@ -175,6 +218,14 @@ class $UsersTable extends Users with TableInfo<$UsersTable, User> {
         DriftSqlType.string,
         data['${effectivePrefix}avatar_url'],
       ),
+      isVerified: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_verified'],
+      )!,
+      authProvider: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}auth_provider'],
+      ),
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -201,6 +252,8 @@ class User extends DataClass implements Insertable<User> {
   final String name;
   final String email;
   final String? avatarUrl;
+  final bool isVerified;
+  final String? authProvider;
   final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime? deletedAt;
@@ -209,6 +262,8 @@ class User extends DataClass implements Insertable<User> {
     required this.name,
     required this.email,
     this.avatarUrl,
+    required this.isVerified,
+    this.authProvider,
     required this.createdAt,
     required this.updatedAt,
     this.deletedAt,
@@ -221,6 +276,10 @@ class User extends DataClass implements Insertable<User> {
     map['email'] = Variable<String>(email);
     if (!nullToAbsent || avatarUrl != null) {
       map['avatar_url'] = Variable<String>(avatarUrl);
+    }
+    map['is_verified'] = Variable<bool>(isVerified);
+    if (!nullToAbsent || authProvider != null) {
+      map['auth_provider'] = Variable<String>(authProvider);
     }
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -238,6 +297,10 @@ class User extends DataClass implements Insertable<User> {
       avatarUrl: avatarUrl == null && nullToAbsent
           ? const Value.absent()
           : Value(avatarUrl),
+      isVerified: Value(isVerified),
+      authProvider: authProvider == null && nullToAbsent
+          ? const Value.absent()
+          : Value(authProvider),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       deletedAt: deletedAt == null && nullToAbsent
@@ -256,6 +319,8 @@ class User extends DataClass implements Insertable<User> {
       name: serializer.fromJson<String>(json['name']),
       email: serializer.fromJson<String>(json['email']),
       avatarUrl: serializer.fromJson<String?>(json['avatarUrl']),
+      isVerified: serializer.fromJson<bool>(json['isVerified']),
+      authProvider: serializer.fromJson<String?>(json['authProvider']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
@@ -269,6 +334,8 @@ class User extends DataClass implements Insertable<User> {
       'name': serializer.toJson<String>(name),
       'email': serializer.toJson<String>(email),
       'avatarUrl': serializer.toJson<String?>(avatarUrl),
+      'isVerified': serializer.toJson<bool>(isVerified),
+      'authProvider': serializer.toJson<String?>(authProvider),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'deletedAt': serializer.toJson<DateTime?>(deletedAt),
@@ -280,6 +347,8 @@ class User extends DataClass implements Insertable<User> {
     String? name,
     String? email,
     Value<String?> avatarUrl = const Value.absent(),
+    bool? isVerified,
+    Value<String?> authProvider = const Value.absent(),
     DateTime? createdAt,
     DateTime? updatedAt,
     Value<DateTime?> deletedAt = const Value.absent(),
@@ -288,6 +357,8 @@ class User extends DataClass implements Insertable<User> {
     name: name ?? this.name,
     email: email ?? this.email,
     avatarUrl: avatarUrl.present ? avatarUrl.value : this.avatarUrl,
+    isVerified: isVerified ?? this.isVerified,
+    authProvider: authProvider.present ? authProvider.value : this.authProvider,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
     deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
@@ -298,6 +369,12 @@ class User extends DataClass implements Insertable<User> {
       name: data.name.present ? data.name.value : this.name,
       email: data.email.present ? data.email.value : this.email,
       avatarUrl: data.avatarUrl.present ? data.avatarUrl.value : this.avatarUrl,
+      isVerified: data.isVerified.present
+          ? data.isVerified.value
+          : this.isVerified,
+      authProvider: data.authProvider.present
+          ? data.authProvider.value
+          : this.authProvider,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
@@ -311,6 +388,8 @@ class User extends DataClass implements Insertable<User> {
           ..write('name: $name, ')
           ..write('email: $email, ')
           ..write('avatarUrl: $avatarUrl, ')
+          ..write('isVerified: $isVerified, ')
+          ..write('authProvider: $authProvider, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt')
@@ -319,8 +398,17 @@ class User extends DataClass implements Insertable<User> {
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, name, email, avatarUrl, createdAt, updatedAt, deletedAt);
+  int get hashCode => Object.hash(
+    id,
+    name,
+    email,
+    avatarUrl,
+    isVerified,
+    authProvider,
+    createdAt,
+    updatedAt,
+    deletedAt,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -329,6 +417,8 @@ class User extends DataClass implements Insertable<User> {
           other.name == this.name &&
           other.email == this.email &&
           other.avatarUrl == this.avatarUrl &&
+          other.isVerified == this.isVerified &&
+          other.authProvider == this.authProvider &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.deletedAt == this.deletedAt);
@@ -339,6 +429,8 @@ class UsersCompanion extends UpdateCompanion<User> {
   final Value<String> name;
   final Value<String> email;
   final Value<String?> avatarUrl;
+  final Value<bool> isVerified;
+  final Value<String?> authProvider;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<DateTime?> deletedAt;
@@ -348,6 +440,8 @@ class UsersCompanion extends UpdateCompanion<User> {
     this.name = const Value.absent(),
     this.email = const Value.absent(),
     this.avatarUrl = const Value.absent(),
+    this.isVerified = const Value.absent(),
+    this.authProvider = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.deletedAt = const Value.absent(),
@@ -358,6 +452,8 @@ class UsersCompanion extends UpdateCompanion<User> {
     required String name,
     required String email,
     this.avatarUrl = const Value.absent(),
+    this.isVerified = const Value.absent(),
+    this.authProvider = const Value.absent(),
     required DateTime createdAt,
     required DateTime updatedAt,
     this.deletedAt = const Value.absent(),
@@ -372,6 +468,8 @@ class UsersCompanion extends UpdateCompanion<User> {
     Expression<String>? name,
     Expression<String>? email,
     Expression<String>? avatarUrl,
+    Expression<bool>? isVerified,
+    Expression<String>? authProvider,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<DateTime>? deletedAt,
@@ -382,6 +480,8 @@ class UsersCompanion extends UpdateCompanion<User> {
       if (name != null) 'name': name,
       if (email != null) 'email': email,
       if (avatarUrl != null) 'avatar_url': avatarUrl,
+      if (isVerified != null) 'is_verified': isVerified,
+      if (authProvider != null) 'auth_provider': authProvider,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (deletedAt != null) 'deleted_at': deletedAt,
@@ -394,6 +494,8 @@ class UsersCompanion extends UpdateCompanion<User> {
     Value<String>? name,
     Value<String>? email,
     Value<String?>? avatarUrl,
+    Value<bool>? isVerified,
+    Value<String?>? authProvider,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
     Value<DateTime?>? deletedAt,
@@ -404,6 +506,8 @@ class UsersCompanion extends UpdateCompanion<User> {
       name: name ?? this.name,
       email: email ?? this.email,
       avatarUrl: avatarUrl ?? this.avatarUrl,
+      isVerified: isVerified ?? this.isVerified,
+      authProvider: authProvider ?? this.authProvider,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       deletedAt: deletedAt ?? this.deletedAt,
@@ -425,6 +529,12 @@ class UsersCompanion extends UpdateCompanion<User> {
     }
     if (avatarUrl.present) {
       map['avatar_url'] = Variable<String>(avatarUrl.value);
+    }
+    if (isVerified.present) {
+      map['is_verified'] = Variable<bool>(isVerified.value);
+    }
+    if (authProvider.present) {
+      map['auth_provider'] = Variable<String>(authProvider.value);
     }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
@@ -448,6 +558,8 @@ class UsersCompanion extends UpdateCompanion<User> {
           ..write('name: $name, ')
           ..write('email: $email, ')
           ..write('avatarUrl: $avatarUrl, ')
+          ..write('isVerified: $isVerified, ')
+          ..write('authProvider: $authProvider, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt, ')
@@ -952,7 +1064,7 @@ class $WorkspaceMembersTable extends WorkspaceMembers
     type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES workspaces (id)',
+      'REFERENCES workspaces (id) ON UPDATE CASCADE ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _userIdMeta = const VerificationMeta('userId');
@@ -964,7 +1076,7 @@ class $WorkspaceMembersTable extends WorkspaceMembers
     type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES users (id)',
+      'REFERENCES users (id) ON UPDATE CASCADE ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _roleMeta = const VerificationMeta('role');
@@ -1423,7 +1535,7 @@ class $ProjectsTable extends Projects with TableInfo<$ProjectsTable, Project> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES workspaces (id)',
+      'REFERENCES workspaces (id) ON UPDATE CASCADE ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
@@ -1946,7 +2058,7 @@ class $MilestonesTable extends Milestones
     type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES projects (id)',
+      'REFERENCES projects (id) ON UPDATE CASCADE ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _nameMeta = const VerificationMeta('name');
@@ -2465,7 +2577,7 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES milestones (id)',
+      'REFERENCES milestones (id) ON UPDATE CASCADE ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _parentTaskIdMeta = const VerificationMeta(
@@ -2479,7 +2591,7 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES tasks (id)',
+      'REFERENCES tasks (id) ON UPDATE CASCADE ON DELETE CASCADE',
     ),
   );
   static const VerificationMeta _titleMeta = const VerificationMeta('title');
@@ -2513,7 +2625,7 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
     type: DriftSqlType.string,
     requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES users (id)',
+      'REFERENCES users (id) ON UPDATE CASCADE ON DELETE SET NULL',
     ),
   );
   static const VerificationMeta _priorityMeta = const VerificationMeta(
@@ -3513,6 +3625,107 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     tasks,
     seedControl,
   ];
+  @override
+  StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'workspaces',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('workspace_members', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'workspaces',
+        limitUpdateKind: UpdateKind.update,
+      ),
+      result: [TableUpdate('workspace_members', kind: UpdateKind.update)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'users',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('workspace_members', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'users',
+        limitUpdateKind: UpdateKind.update,
+      ),
+      result: [TableUpdate('workspace_members', kind: UpdateKind.update)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'workspaces',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('projects', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'workspaces',
+        limitUpdateKind: UpdateKind.update,
+      ),
+      result: [TableUpdate('projects', kind: UpdateKind.update)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'projects',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('milestones', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'projects',
+        limitUpdateKind: UpdateKind.update,
+      ),
+      result: [TableUpdate('milestones', kind: UpdateKind.update)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'milestones',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('tasks', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'milestones',
+        limitUpdateKind: UpdateKind.update,
+      ),
+      result: [TableUpdate('tasks', kind: UpdateKind.update)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'tasks',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('tasks', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'tasks',
+        limitUpdateKind: UpdateKind.update,
+      ),
+      result: [TableUpdate('tasks', kind: UpdateKind.update)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'users',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('tasks', kind: UpdateKind.update)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'users',
+        limitUpdateKind: UpdateKind.update,
+      ),
+      result: [TableUpdate('tasks', kind: UpdateKind.update)],
+    ),
+  ]);
 }
 
 typedef $$UsersTableCreateCompanionBuilder =
@@ -3521,6 +3734,8 @@ typedef $$UsersTableCreateCompanionBuilder =
       required String name,
       required String email,
       Value<String?> avatarUrl,
+      Value<bool> isVerified,
+      Value<String?> authProvider,
       required DateTime createdAt,
       required DateTime updatedAt,
       Value<DateTime?> deletedAt,
@@ -3532,6 +3747,8 @@ typedef $$UsersTableUpdateCompanionBuilder =
       Value<String> name,
       Value<String> email,
       Value<String?> avatarUrl,
+      Value<bool> isVerified,
+      Value<String?> authProvider,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<DateTime?> deletedAt,
@@ -3607,6 +3824,16 @@ class $$UsersTableFilterComposer extends Composer<_$AppDatabase, $UsersTable> {
 
   ColumnFilters<String> get avatarUrl => $composableBuilder(
     column: $table.avatarUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isVerified => $composableBuilder(
+    column: $table.isVerified,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get authProvider => $composableBuilder(
+    column: $table.authProvider,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3705,6 +3932,16 @@ class $$UsersTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get isVerified => $composableBuilder(
+    column: $table.isVerified,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get authProvider => $composableBuilder(
+    column: $table.authProvider,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -3741,6 +3978,16 @@ class $$UsersTableAnnotationComposer
 
   GeneratedColumn<String> get avatarUrl =>
       $composableBuilder(column: $table.avatarUrl, builder: (column) => column);
+
+  GeneratedColumn<bool> get isVerified => $composableBuilder(
+    column: $table.isVerified,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get authProvider => $composableBuilder(
+    column: $table.authProvider,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -3834,6 +4081,8 @@ class $$UsersTableTableManager
                 Value<String> name = const Value.absent(),
                 Value<String> email = const Value.absent(),
                 Value<String?> avatarUrl = const Value.absent(),
+                Value<bool> isVerified = const Value.absent(),
+                Value<String?> authProvider = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<DateTime?> deletedAt = const Value.absent(),
@@ -3843,6 +4092,8 @@ class $$UsersTableTableManager
                 name: name,
                 email: email,
                 avatarUrl: avatarUrl,
+                isVerified: isVerified,
+                authProvider: authProvider,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,
@@ -3854,6 +4105,8 @@ class $$UsersTableTableManager
                 required String name,
                 required String email,
                 Value<String?> avatarUrl = const Value.absent(),
+                Value<bool> isVerified = const Value.absent(),
+                Value<String?> authProvider = const Value.absent(),
                 required DateTime createdAt,
                 required DateTime updatedAt,
                 Value<DateTime?> deletedAt = const Value.absent(),
@@ -3863,6 +4116,8 @@ class $$UsersTableTableManager
                 name: name,
                 email: email,
                 avatarUrl: avatarUrl,
+                isVerified: isVerified,
+                authProvider: authProvider,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,
