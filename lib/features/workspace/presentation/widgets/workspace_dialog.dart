@@ -198,19 +198,16 @@ class _WorkspaceDialogState extends State<WorkspaceDialog> {
                     // Search Field
                     TextFormField(
                       controller: _searchController,
-                      onChanged: _onSearch,
+                      onFieldSubmitted: _onSearch, // لا يبحث إلا عند الضغط على Enter أو زر البحث
+                      textInputAction: TextInputAction.search,
+                      keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
-                        hintText: 'Search members by email...',
-                        prefixIcon: const Icon(Icons.search, size: 20),
-                        suffixIcon: _searchController.text.isNotEmpty 
-                          ? IconButton(
-                              icon: const Icon(Icons.close, size: 20),
-                              onPressed: () {
-                                _searchController.clear();
-                                _onSearch('');
-                              },
-                            )
-                          : null,
+                        hintText: 'Enter exact email address...',
+                        prefixIcon: const Icon(Icons.email_outlined, size: 20),
+                        suffixIcon: IconButton(
+                          icon: const Icon(Icons.search),
+                          onPressed: () => _onSearch(_searchController.text),
+                        ),
                         contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                       ),

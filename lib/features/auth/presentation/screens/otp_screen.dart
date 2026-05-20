@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../shared/widgets/glass_card.dart';
 import '../../../../shared/widgets/orbit_button.dart';
-import '../../../../shared/widgets/orbit_text_field.dart';
+import '../../../../shared/widgets/orbit_pin_field.dart';
 import '../../../../shared/widgets/auth_background.dart';
 import '../../../../shared/widgets/orbit_logo.dart';
 import '../view_models/auth_view_model.dart';
@@ -49,7 +49,7 @@ class OtpScreen extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'Enter the 6-digit code sent to your email',
+                      'Enter the 6-digit code sent to\n${authViewModel.emailController.text}',
                       textAlign: TextAlign.center,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
@@ -61,13 +61,24 @@ class OtpScreen extends StatelessWidget {
                       borderColor: Colors.white.withValues(alpha: 0.1),
                       child: Column(
                         children: [
-                          OrbitTextField(
-                            label: 'OTP Code',
-                            hint: '123456',
-                            controller: authViewModel.otpController,
-                            keyboardType: TextInputType.number,
+                          const Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              'OTP Code',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                            ),
                           ),
-                          const SizedBox(height: AppSpacing.lg),
+                          const SizedBox(height: AppSpacing.md),
+                          OrbitPinField(
+                            controller: authViewModel.otpController,
+                            onCompleted: (pin) async {
+                              final success = await authViewModel.verifyOtp();
+                              if (success && context.mounted) {
+                                Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (route) => false);
+                              }
+                            },
+                          ),
+                          const SizedBox(height: AppSpacing.xl),
                           if (authViewModel.errorMessage != null)
                             Padding(
                               padding: const EdgeInsets.only(bottom: AppSpacing.md),

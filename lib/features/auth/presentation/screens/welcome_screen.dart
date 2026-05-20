@@ -55,18 +55,9 @@ class WelcomeScreen extends StatelessWidget {
                   _buildAnimatedItem(
                     delay: 600,
                     child: OrbitButton(
-                      text: 'Launch Workspace',
+                      text: 'Sign In to Orbit',
                       onPressed: () => Navigator.pushReplacementNamed(context, '/login'),
                       icon: const Icon(Icons.arrow_forward, size: 18),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  _buildAnimatedItem(
-                    delay: 800,
-                    child: OrbitButton(
-                      text: 'Sign In to Orbit',
-                      style: OrbitButtonStyle.secondary,
-                      onPressed: () => Navigator.pushReplacementNamed(context, '/login'),
                     ),
                   ),
                   const SizedBox(height: AppSpacing.xxl),

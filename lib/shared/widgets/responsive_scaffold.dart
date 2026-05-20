@@ -27,6 +27,169 @@ class ResponsiveScaffold extends StatefulWidget {
 }
 
 class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
+  void _showAvatarOptions(BuildContext context) {
+    final authViewModel = context.read<AuthViewModel>();
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => GlassCard(
+        padding: const EdgeInsets.all(AppSpacing.lg),
+        borderRadius: AppRadius.xxl,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined),
+              title: Text(authViewModel.user?.avatarUrl == null ? 'Add Photo' : 'Change Photo'),
+              onTap: () {
+                Navigator.pop(context);
+                authViewModel.updateProfileAvatar();
+              },
+            ),
+            if (authViewModel.user?.avatarUrl != null)
+              ListTile(
+                leading: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                title: const Text('Remove Photo', style: TextStyle(color: Colors.redAccent)),
+                onTap: () {
+                  Navigator.pop(context);
+                  authViewModel.deleteProfileAvatar();
+                },
+              ),
+            const SizedBox(height: AppSpacing.sm),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showUserMenu(BuildContext context) {
+    final theme = Theme.of(context);
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black.withValues(alpha: 0.3),
+      builder: (context) => Consumer<AuthViewModel>(
+        builder: (context, authViewModel, child) {
+          final user = authViewModel.user;
+          final isLoading = authViewModel.isLoading;
+
+          return BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface.withValues(alpha: 0.8),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.xxl)),
+                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Opacity(
+                        opacity: isLoading ? 0.5 : 1.0,
+                        child: CircleAvatar(
+                          radius: 30,
+                          backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+                          backgroundImage: user?.avatarUrl != null ? NetworkImage(user!.avatarUrl!) : null,
+                          onBackgroundImageError: user?.avatarUrl != null ? (e, s) => debugPrint("Load error") : null,
+                          child: user?.avatarUrl == null ? Icon(Icons.person, size: 30, color: theme.colorScheme.primary) : null,
+                        ),
+                      ),
+                      if (isLoading)
+                        SizedBox(
+                          width: 30,
+                          height: 30,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+                          ),
+                        ),
+                      if (!isLoading)
+                        Positioned(
+                          right: -2,
+                          bottom: -2,
+                          child: GestureDetector(
+                            onTap: () => _showAvatarOptions(context),
+                            child: Container(
+                              padding: const EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                color: theme.colorScheme.primary,
+                                shape: BoxShape.circle,
+                                border: Border.all(color: theme.colorScheme.surface, width: 1.5),
+                              ),
+                              child: const Icon(Icons.edit, size: 10, color: Colors.white),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    user?.name ?? 'User',
+                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    user?.email ?? '',
+                    style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 11),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  const Divider(),
+                  IgnorePointer(
+                    ignoring: isLoading,
+                    child: Opacity(
+                      opacity: isLoading ? 0.5 : 1.0,
+                      child: Column(
+                        children: [
+                          ListTile(
+                            visualDensity: const VisualDensity(vertical: -4),
+                            leading: const Icon(Icons.person_outlined, size: 20),
+                            title: const Text('Profile Settings', style: TextStyle(fontSize: 13)),
+                            onTap: () => Navigator.pop(context),
+                          ),
+                          ListTile(
+                            visualDensity: const VisualDensity(vertical: -4),
+                            leading: const Icon(Icons.palette, size: 20),
+                            title: const Text('Appearance', style: TextStyle(fontSize: 13)),
+                            onTap: () => Navigator.pop(context),
+                          ),
+                          ListTile(
+                            visualDensity: const VisualDensity(vertical: -4),
+                            leading: const Icon(Icons.logout, color: Colors.redAccent, size: 20),
+                            title: const Text('Logout', style: TextStyle(color: Colors.redAccent, fontSize: 13)),
+                            onTap: () async {
+                              final nav = Navigator.of(context);
+                              await authViewModel.logout();
+                              nav.pushNamedAndRemoveUntil('/welcome', (route) => false);
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: MediaQuery.of(context).padding.bottom + AppSpacing.xs),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -129,28 +292,14 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
                   )
                 ),
                 const Spacer(),
-                // Actions & Avatar
                 if (widget.actions != null) 
                   ...widget.actions!.map((action) => Padding(
                     padding: const EdgeInsetsDirectional.only(end: AppSpacing.sm),
                     child: action,
                   )),
                 
-                // Avatar at the very end
-                PopupMenuButton<String>(
-                  onSelected: (value) async {
-                    if (value == 'logout') {
-                      final nav = Navigator.of(context);
-                      await context.read<AuthViewModel>().logout();
-                      nav.pushNamedAndRemoveUntil('/login', (route) => false);
-                    }
-                  },
-                  itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                    const PopupMenuItem<String>(
-                      value: 'logout',
-                      child: Text('Logout'),
-                    ),
-                  ],
+                GestureDetector(
+                  onTap: () => _showUserMenu(context),
                   child: Container(
                     width: 32,
                     height: 32,
@@ -164,6 +313,7 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
                       backgroundImage: context.watch<AuthViewModel>().user?.avatarUrl != null
                           ? NetworkImage(context.watch<AuthViewModel>().user!.avatarUrl!)
                           : null,
+                      onBackgroundImageError: context.watch<AuthViewModel>().user?.avatarUrl != null ? (e, s) => debugPrint("Load error") : null,
                       child: context.watch<AuthViewModel>().user?.avatarUrl == null
                           ? Icon(Icons.person, size: 16, color: theme.colorScheme.primary)
                           : null,
@@ -276,61 +426,54 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
           _buildNavItem(Icons.flag_rounded, 'Milestones', 2, isDesktop),
           const Spacer(),
           if (isDesktop)
-            GlassCard(
-              padding: const EdgeInsets.all(AppSpacing.sm),
-              borderRadius: AppRadius.xl,
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    radius: 18,
-                    backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
-                    backgroundImage: context.watch<AuthViewModel>().user?.avatarUrl != null
-                        ? NetworkImage(context.watch<AuthViewModel>().user!.avatarUrl!)
-                        : null,
-                    child: context.watch<AuthViewModel>().user?.avatarUrl == null
-                        ? Icon(Icons.person, size: 18, color: theme.colorScheme.primary)
-                        : null,
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(context.watch<AuthViewModel>().user?.name ?? 'User', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
-                        const Text('Pro Member', style: TextStyle(fontSize: 10, color: Colors.grey), maxLines: 1, overflow: TextOverflow.ellipsis),
-                      ],
+            GestureDetector(
+              onTap: () => _showUserMenu(context),
+              child: GlassCard(
+                padding: const EdgeInsets.all(AppSpacing.sm),
+                borderRadius: AppRadius.xl,
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      radius: 18,
+                      backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+                      backgroundImage: context.watch<AuthViewModel>().user?.avatarUrl != null
+                          ? NetworkImage(context.watch<AuthViewModel>().user!.avatarUrl!)
+                          : null,
+                      onBackgroundImageError: context.watch<AuthViewModel>().user?.avatarUrl != null ? (e, s) => debugPrint("Load error") : null,
+                      child: context.watch<AuthViewModel>().user?.avatarUrl == null
+                          ? Icon(Icons.person, size: 18, color: theme.colorScheme.primary)
+                          : null,
                     ),
-                  ),
-                  PopupMenuButton<String>(
-                    onSelected: (value) async {
-                      if (value == 'logout') {
-                        final nav = Navigator.of(context);
-                        await context.read<AuthViewModel>().logout();
-                        nav.pushNamedAndRemoveUntil('/login', (route) => false);
-                      }
-                    },
-                    itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                      const PopupMenuItem<String>(
-                        value: 'logout',
-                        child: Text('Logout'),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(context.watch<AuthViewModel>().user?.name ?? 'User', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
+                          const Text('Pro Member', style: TextStyle(fontSize: 10, color: Colors.grey), maxLines: 1, overflow: TextOverflow.ellipsis),
+                        ],
                       ),
-                    ],
-                    child: const Icon(Icons.settings, size: 16, color: Colors.grey),
-                  ),
-                ],
+                    ),
+                    const Icon(Icons.settings, size: 16, color: Colors.grey),
+                  ],
+                ),
               ),
             )
           else
-            CircleAvatar(
-              radius: 20,
-              backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
-              backgroundImage: context.watch<AuthViewModel>().user?.avatarUrl != null
-                  ? NetworkImage(context.watch<AuthViewModel>().user!.avatarUrl!)
-                  : null,
-              child: context.watch<AuthViewModel>().user?.avatarUrl == null
-                  ? Icon(Icons.person, size: 20, color: theme.colorScheme.primary)
-                  : null,
+            GestureDetector(
+              onTap: () => _showUserMenu(context),
+              child: CircleAvatar(
+                radius: 20,
+                backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+                backgroundImage: context.watch<AuthViewModel>().user?.avatarUrl != null
+                    ? NetworkImage(context.watch<AuthViewModel>().user!.avatarUrl!)
+                    : null,
+                onBackgroundImageError: context.watch<AuthViewModel>().user?.avatarUrl != null ? (e, s) => debugPrint("Load error") : null,
+                child: context.watch<AuthViewModel>().user?.avatarUrl == null
+                    ? Icon(Icons.person, size: 20, color: theme.colorScheme.primary)
+                    : null,
+              ),
             ),
         ],
       ),

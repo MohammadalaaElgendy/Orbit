@@ -7,6 +7,7 @@ class GlassCard extends StatelessWidget {
   final EdgeInsetsGeometry? padding;
   final double? borderRadius;
   final Color? borderColor;
+  final Color? backgroundColor;
   final double blur;
   final double opacity;
   final bool frosted;
@@ -17,6 +18,7 @@ class GlassCard extends StatelessWidget {
     this.padding,
     this.borderRadius,
     this.borderColor,
+    this.backgroundColor,
     this.blur = 15.0,
     this.opacity = 0.7, // Matching .glass-card background: rgba(255, 255, 255, 0.7)
     this.frosted = false
@@ -31,7 +33,7 @@ class GlassCard extends StatelessWidget {
     return Container(
       padding: padding ?? const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: isDark ? Colors.transparent : Colors.white.withValues(alpha: 0.45), // Increased opacity for better "material" feel
+        color: backgroundColor ?? (isDark ? Colors.transparent : Colors.white.withValues(alpha: 0.45)), // Increased opacity for better "material" feel
         borderRadius: BorderRadius.circular(radius),
         border: Border.all(
           color: borderColor ?? (isDark 

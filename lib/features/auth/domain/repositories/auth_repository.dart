@@ -9,33 +9,42 @@ class AuthRepository {
   final UserRepository _userRepository;
 
   AuthRepository(this._authService, this._userRepository) {
-    // Listen to auth changes and sync with local DB automatically
+    // الاستماع التلقائي لتغييرات الحالة وحفظ البيانات فوراً
     _authService.authStateChanges.listen((data) async {
-      final sUser = data.session?.user;
+      final sUser = data.session?.user ?? _authService.currentUser;
       if (sUser != null) {
-        final userName = sUser.userMetadata?['full_name']?.toString().isNotEmpty == true 
-            ? sUser.userMetadata!['full_name'] 
-            : sUser.email?.split('@').first ?? 'User';
-            
-        final user = User(
-          id: sUser.id,
-          name: userName,
-          email: sUser.email ?? '',
-          avatarUrl: sUser.userMetadata?['avatar_url'],
-          isVerified: true, // If we have a session, the user is verified.
-          authProvider: sUser.appMetadata['provider'] ?? 'email',
-        );
-        
+        final user = _mapSupabaseUserToModel(sUser);
         try {
-          final existingUser = await _userRepository.getUserById(user.id);
-          if (existingUser == null) {
-            await _userRepository.createUser(user);
-          }
+          await _userRepository.createUser(user);
+          debugPrint('✅ User synced to local DB: ${user.email} | Avatar: ${user.avatarUrl}');
         } catch (e) {
-          debugPrint('Error syncing user to local database: $e');
+          debugPrint('❌ Error syncing user to local DB: $e');
         }
       }
     });
+  }
+
+  // وظيفة موحدة لتحويل مستخدم سوبابيس إلى الموديل الخاص بنا
+  User _mapSupabaseUserToModel(supabase.User sUser) {
+    final metadata = sUser.userMetadata ?? {};
+    
+    // البحث عن الاسم في عدة مفاتيح محتملة
+    final String userName = metadata['full_name']?.toString() ?? 
+                           metadata['name']?.toString() ?? 
+                           sUser.email?.split('@').first ?? 'User';
+                           
+    // البحث عن الصورة في عدة مفاتيح محتملة (جوجل يستخدم picture أحياناً)
+    final String? avatarUrl = metadata['avatar_url']?.toString() ?? 
+                             metadata['picture']?.toString();
+
+    return User(
+      id: sUser.id,
+      name: userName,
+      email: sUser.email ?? '',
+      avatarUrl: avatarUrl,
+      isVerified: sUser.emailConfirmedAt != null || sUser.appMetadata['provider'] == 'google',
+      authProvider: sUser.appMetadata['provider']?.toString() ?? 'email',
+    );
   }
 
   Stream<supabase.AuthState> get authStateChanges => _authService.authStateChanges;
@@ -43,18 +52,7 @@ class AuthRepository {
   User? get currentUser {
     final sUser = _authService.currentUser;
     if (sUser == null) return null;
-    
-    final userName = sUser.userMetadata?['full_name']?.toString().isNotEmpty == true 
-        ? sUser.userMetadata!['full_name'] 
-        : sUser.email?.split('@').first ?? 'User';
-
-    return User(
-      id: sUser.id,
-      name: userName,
-      email: sUser.email ?? '',
-      avatarUrl: sUser.userMetadata?['avatar_url'],
-      isVerified: true, // Valid session implies verified
-    );
+    return _mapSupabaseUserToModel(sUser);
   }
 
   Future<void> signInWithOtp(String email, {String? name, String? avatarUrl, bool shouldCreateUser = true}) async {
@@ -70,46 +68,61 @@ class AuthRepository {
     final sUser = response.user;
     
     if (sUser != null) {
-      final user = User(
-        id: sUser.id,
-        name: sUser.userMetadata?['full_name'] ?? '',
-        email: sUser.email ?? '',
-        avatarUrl: sUser.userMetadata?['avatar_url'],
-        isVerified: true,
-        authProvider: 'email',
-      );
-      
-      // Sync with local database
-      final existingUser = await _userRepository.getUserById(user.id);
-      if (existingUser == null) {
-        await _userRepository.createUser(user);
-      } else {
-        // Update local user if needed
-      }
+      final user = _mapSupabaseUserToModel(sUser);
+      // حفظ يدوي فوري للتأكد من تسجيل الصورة
+      await _userRepository.createUser(user);
     }
   }
 
   Future<void> signInWithGoogle() async {
     final response = await _authService.signInWithGoogle();
     if (response?.user != null) {
-      final sUser = response!.user!;
-      final user = User(
-        id: sUser.id,
-        name: sUser.userMetadata?['full_name'] ?? '',
-        email: sUser.email ?? '',
-        avatarUrl: sUser.userMetadata?['avatar_url'],
-        isVerified: true,
-        authProvider: 'google',
-      );
-      
-      final existingUser = await _userRepository.getUserById(user.id);
-      if (existingUser == null) {
-        await _userRepository.createUser(user);
-      }
+      final user = _mapSupabaseUserToModel(response!.user!);
+      await _userRepository.createUser(user);
     }
   }
 
   Future<void> signOut() async {
     await _authService.signOut();
+  }
+
+  Future<void> updateAvatar(Uint8List bytes, String fileName) async {
+    final String? oldUrl = currentUser?.avatarUrl;
+    final String? newUrl = await _authService.uploadAvatar(bytes, fileName);
+    
+    if (newUrl != null) {
+      await _authService.updateUserMetadata(
+        name: currentUser?.name ?? 'User', 
+        avatarUrl: newUrl
+      );
+      
+      // تحديث محلي فوري
+      if (currentUser != null) {
+        await _userRepository.createUser(currentUser!.copyWith(avatarUrl: newUrl));
+      }
+      
+      if (oldUrl != null && oldUrl != newUrl) {
+        await _authService.deleteAvatar(oldUrl);
+      }
+    }
+  }
+
+  Future<void> deleteAvatar() async {
+    final oldUrl = currentUser?.avatarUrl;
+    
+    // 1. تحديث سوبابيس (Metadata) بوضع نل
+    await _authService.updateUserMetadata(name: currentUser?.name ?? 'User', avatarUrl: null);
+    
+    // 2. تحديث محلي فوري لمسح اللينك من الـ DB
+    if (currentUser != null) {
+      final updatedUser = currentUser!.copyWith(avatarUrl: null);
+      await _userRepository.createUser(updatedUser);
+      debugPrint('🧹 Local DB updated: Avatar link removed');
+    }
+
+    // 3. مسح الملف الفعلي من الـ Storage
+    if (oldUrl != null) {
+      await _authService.deleteAvatar(oldUrl);
+    }
   }
 }

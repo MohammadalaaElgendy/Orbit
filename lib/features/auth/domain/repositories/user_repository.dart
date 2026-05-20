@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../shared/models/user.dart' as model;
 import '../../data/sources/local/user_dao.dart';
 import '../../../../core/data/database/app_database.dart' as db;
@@ -9,7 +11,7 @@ class UserRepository {
   UserRepository(this._userDao);
 
   Future<void> createUser(model.User user) async {
-    await _userDao.create(db.UsersCompanion(
+    await _userDao.upsert(db.UsersCompanion(
       id: Value(user.id),
       name: Value(user.name),
       email: Value(user.email),
@@ -61,16 +63,35 @@ class UserRepository {
   }
 
   Future<List<model.User>> searchUsers(String query) async {
-    final rows = await _userDao.searchUsers(query);
-    return rows
-        .map((row) => model.User(
-              id: row.id,
-              name: row.name,
-              email: row.email,
-              avatarUrl: row.avatarUrl,
-              isVerified: row.isVerified,
-              authProvider: row.authProvider,
-            ))
-        .toList();
+    final currentUserId = Supabase.instance.client.auth.currentUser?.id;
+
+    // إذا كان الاستعلام ليس إيميلاً صالحاً، لا تبحث أصلاً حفاظاً على الخصوصية
+    if (!query.contains('@') || !query.contains('.')) return [];
+
+    // البحث في سوبابيس عن إيميل مطابق تماماً
+    try {
+      final response = await Supabase.instance.client
+          .from('profiles')
+          .select()
+          .eq('email', query.trim()) // بحث دقيق (Exact Match)
+          .neq('id', currentUserId ?? '') // منع البحث عن النفس
+          .limit(1);
+
+      if ((response as List).isEmpty) return [];
+
+      final data = response.first;
+      return [
+        model.User(
+          id: data['id'],
+          name: data['full_name'] ?? 'User',
+          email: data['email'] ?? '',
+          avatarUrl: data['avatar_url'],
+          isVerified: true,
+        )
+      ];
+    } catch (e) {
+      debugPrint('Remote search failed: $e');
+      return [];
+    }
   }
 }

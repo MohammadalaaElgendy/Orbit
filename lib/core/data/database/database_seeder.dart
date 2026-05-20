@@ -31,12 +31,8 @@ class DatabaseSeeder {
     final uuid = const Uuid();
     final now = DateTime.now();
 
-    // 1. Create Mock Users
-    final users = [
-      model.User(id: uuid.v4(), name: 'John Doe', email: 'john@example.com', avatarUrl: 'https://i.pravatar.cc/150?u=1'),
-      model.User(id: uuid.v4(), name: 'Jane Smith', email: 'jane@example.com', avatarUrl: 'https://i.pravatar.cc/150?u=2'),
-      model.User(id: uuid.v4(), name: 'Alex Rivera', email: 'alex@example.com', avatarUrl: 'https://i.pravatar.cc/150?u=3'),
-    ];
+    // 1. Create Mock Users (REMOVED - Use real users from Supabase)
+    final users = <model.User>[];
 
     for (var user in users) {
       await userRepo.createUser(user);
