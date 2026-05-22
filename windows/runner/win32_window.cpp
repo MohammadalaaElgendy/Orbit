@@ -216,6 +216,15 @@ Win32Window::MessageHandler(HWND hwnd,
     case WM_DWMCOLORIZATIONCOLORCHANGED:
       UpdateTheme(hwnd);
       return 0;
+
+    case WM_COPYDATA: {
+      COPYDATASTRUCT* cds = reinterpret_cast<COPYDATASTRUCT*>(lparam);
+      if (cds->dwData == 0) {
+        std::wstring link(reinterpret_cast<wchar_t*>(cds->lpData));
+        OnProtocolUrlReceived(link);
+      }
+      return TRUE;
+    }
   }
 
   return DefWindowProc(window_handle_, message, wparam, lparam);

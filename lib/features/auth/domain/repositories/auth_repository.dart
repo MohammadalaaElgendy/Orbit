@@ -16,10 +16,7 @@ class AuthRepository {
         final user = _mapSupabaseUserToModel(sUser);
         try {
           await _userRepository.createUser(user);
-          debugPrint('✅ User synced to local DB: ${user.email} | Avatar: ${user.avatarUrl}');
-        } catch (e) {
-          debugPrint('❌ Error syncing user to local DB: $e');
-        }
+        } catch (e) { }
       }
     });
   }
@@ -74,12 +71,13 @@ class AuthRepository {
     }
   }
 
-  Future<void> signInWithGoogle() async {
+  Future<supabase.AuthResponse?> signInWithGoogle() async {
     final response = await _authService.signInWithGoogle();
     if (response?.user != null) {
       final user = _mapSupabaseUserToModel(response!.user!);
       await _userRepository.createUser(user);
     }
+    return response;
   }
 
   Future<void> signOut() async {
@@ -117,7 +115,6 @@ class AuthRepository {
     if (currentUser != null) {
       final updatedUser = currentUser!.copyWith(avatarUrl: null);
       await _userRepository.createUser(updatedUser);
-      debugPrint('🧹 Local DB updated: Avatar link removed');
     }
 
     // 3. مسح الملف الفعلي من الـ Storage

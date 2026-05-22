@@ -1,7 +1,10 @@
 import 'dart:ui';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:protocol_handler/protocol_handler.dart';
 import 'core/theme/app_theme.dart';
 import 'core/data/database/app_database.dart';
 
@@ -32,12 +35,20 @@ import 'l10n/app_localizations.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
+  // تسجيل البروتوكول للديسكتوب لكي يتمكن المتصفح من العودة للتطبيق بعد تسجيل الدخول
+  if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
+    await protocolHandler.register('io.supabase.orbit');
+  }
+  
   const String supabaseUrl = 'https://ysrahcfgllkkedpwjmjg.supabase.co';
   const String supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlzcmFoY2ZnbGxra2VkcHdqbWpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjgzOTcsImV4cCI6MjA5MjcwNDM5N30._kRvAUwM8fM2qN-VL-aOHqlyUuDNwyUPHJKlREAHFuA';
 
   await Supabase.initialize(
     url: supabaseUrl,
     anonKey: supabaseAnonKey,
+    authOptions: const FlutterAuthClientOptions(
+      authFlowType: AuthFlowType.pkce,
+    ),
     debug: true,
   );
 

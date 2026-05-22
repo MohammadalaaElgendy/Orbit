@@ -71,6 +71,9 @@ class Win32Window {
   // Called when Destroy is called.
   virtual void OnDestroy();
 
+  // استقبال الرابط من النسخة الثانية
+  virtual void OnProtocolUrlReceived(const std::wstring& url) { (void)url; }
+
  private:
   friend class WindowClassRegistrar;
 

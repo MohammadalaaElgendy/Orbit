@@ -11,10 +11,9 @@
 int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
                       _In_ wchar_t *command_line, _In_ int show_command) {
 
-  // تحقق مما إذا كانت هناك نسخة من التطبيق تعمل بالفعل
+  // التحقق مما إذا كانت هناك نسخة من التطبيق تعمل بالفعل
   HWND hwnd = FindWindowW(L"FLUTTER_RUNNER_WIN32_WINDOW", L"Orbit");
   if (hwnd) {
-    // التطبيق مفتوح، أرسل له الرابط الجديد
     int argc;
     wchar_t** argv = CommandLineToArgvW(GetCommandLineW(), &argc);
     if (argv && argc > 1) {
@@ -26,7 +25,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
       SendMessage(hwnd, WM_COPYDATA, (WPARAM)hwnd, (LPARAM)&cds);
       LocalFree(argv);
     }
-    // إحضار النافذة الحالية للمقدمة
     SetForegroundWindow(hwnd);
     if (IsIconic(hwnd)) ShowWindow(hwnd, SW_RESTORE);
     return EXIT_SUCCESS;

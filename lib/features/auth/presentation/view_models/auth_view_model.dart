@@ -5,6 +5,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:app_links/app_links.dart';
 import 'package:image/image.dart' as img;
+import 'package:flutter/services.dart';
 import '../../../../shared/models/user.dart' as model;
 import '../../domain/repositories/auth_repository.dart';
 
@@ -12,6 +13,7 @@ class AuthViewModel extends ChangeNotifier {
   final AuthRepository authRepository;
   final _appLinks = AppLinks();
   StreamSubscription? _linkSubscription;
+  static const _channel = MethodChannel('com.orbit.app/deep_link');
 
   model.User? user;
   bool isLoading = false;
@@ -33,17 +35,27 @@ class AuthViewModel extends ChangeNotifier {
   AuthViewModel({required this.authRepository}) {
     _init();
     _setupDeepLinks();
+    _setupNativeChannel();
+  }
+
+  void _setupNativeChannel() {
+    _channel.setMethodCallHandler((call) async {
+      if (call.method == "onLinkReceived") {
+        final String? url = call.arguments;
+        if (url != null) {
+          _handleIncomingUri(Uri.parse(url));
+        }
+      }
+    });
   }
 
   void _init() {
     user = authRepository.currentUser;
-    // الاستماع لأي تغيير (جوجل ديسكتوب بيعتمد على ده)
+    // الاستماع لأي تغيير في حالة تسجيل الدخول
     _supabase.auth.onAuthStateChange.listen((data) {
-      final session = data.session;
-      debugPrint("🔔 Auth State Change: ${data.event}");
-      
-      if (session != null) {
+      if (data.session != null) {
         user = authRepository.currentUser;
+        isLoading = false;
         _loginSuccessController.add(true);
         notifyListeners();
       }
@@ -53,8 +65,10 @@ class AuthViewModel extends ChangeNotifier {
   void _setupDeepLinks() async {
     try {
       final initialUri = await _appLinks.getInitialLink();
-      if (initialUri != null) _handleIncomingUri(initialUri);
-    } catch (e) { debugPrint("DeepLink Error: $e"); }
+      if (initialUri != null) {
+        _handleIncomingUri(initialUri);
+      }
+    } catch (e) { }
 
     _linkSubscription = _appLinks.uriLinkStream.listen((uri) {
       _handleIncomingUri(uri);
@@ -62,15 +76,29 @@ class AuthViewModel extends ChangeNotifier {
   }
 
   void _handleIncomingUri(Uri uri) async {
-    debugPrint("🚀 [DeepLink] Processing: $uri");
     String urlStr = uri.toString();
-    if (urlStr.contains('#access_token=') || urlStr.contains('#code=')) {
+
+    if (urlStr.contains('#')) {
       urlStr = urlStr.replaceFirst('#', '?');
     }
+
     try {
       await _supabase.auth.getSessionFromUrl(Uri.parse(urlStr));
-      debugPrint("✅ Session established via DeepLink!");
-    } catch (e) { debugPrint("❌ Deep link error: $e"); }
+      user = authRepository.currentUser;
+      isLoading = false;
+      _loginSuccessController.add(true);
+      notifyListeners();
+        } catch (e) {
+      if (e.toString().contains('session already established')) {
+        isLoading = false;
+        _loginSuccessController.add(true);
+        notifyListeners();
+      } else {
+        isLoading = false;
+        errorMessage = _cleanErrorMessage(e.toString());
+        notifyListeners();
+      }
+    }
   }
 
   Future<void> signInWithGoogle() async {
@@ -79,7 +107,16 @@ class AuthViewModel extends ChangeNotifier {
     notifyListeners();
     try {
       await authRepository.signInWithGoogle();
-      // في الديسكتوب، سوبابيس بتهندل السيشن أوتوماتيك عن طريق الـ Local Server
+      
+      user = authRepository.currentUser;
+      if (user != null) {
+        isLoading = false;
+        _loginSuccessController.add(true);
+        notifyListeners();
+      } else {
+        isLoading = false;
+        notifyListeners();
+      }
     } catch (e) {
       errorMessage = _cleanErrorMessage(e.toString());
       isLoading = false;
@@ -156,7 +193,7 @@ class AuthViewModel extends ChangeNotifier {
         email: email,
         data: {
           'full_name': name,
-          'avatar_url': ?avatarUrl,
+          'avatar_url': avatarUrl,
         },
         shouldCreateUser: true,
       );
@@ -206,7 +243,7 @@ class AuthViewModel extends ChangeNotifier {
         pickedAvatarName = result.files.single.name;
         notifyListeners();
       }
-    } catch (e) { debugPrint("Error picking avatar: $e"); }
+    } catch (e) { }
   }
 
   Future<void> updateProfileAvatar() async {
