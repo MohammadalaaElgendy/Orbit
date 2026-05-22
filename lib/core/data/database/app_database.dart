@@ -34,6 +34,7 @@ class Workspaces extends Table {
   TextColumn get name => text()();
   TextColumn get description => text()();
   TextColumn get imageUrl => text().nullable()();
+  TextColumn get createdBy => text().references(Users, #id, onUpdate: KeyAction.cascade, onDelete: KeyAction.cascade)();
   DateTimeColumn get createdAt => dateTime()();
   DateTimeColumn get updatedAt => dateTime()();
   DateTimeColumn get deletedAt => dateTime().nullable()();
@@ -90,6 +91,7 @@ class Tasks extends Table {
   TextColumn get title => text()();
   TextColumn get description => text()();
   TextColumn get assigneeId => text().nullable().references(Users, #id, onUpdate: KeyAction.cascade, onDelete: KeyAction.setNull)();
+  TextColumn get createdBy => text().references(Users, #id, onUpdate: KeyAction.cascade, onDelete: KeyAction.cascade)();
   TextColumn get priority => text()(); // String enum
   TextColumn get status => text()(); // String enum
   DateTimeColumn get startDate => dateTime().nullable()();
@@ -133,35 +135,18 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 1;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onUpgrade: (m, from, to) async {
-          if (from < 2) {
-            await m.createTable(workspaceMembers);
-            await m.createTable(seedControl);
-          } else if (from < 3) {
-            // Ensure seedControl is created if version 2 was missed or failed
-            await m.createTable(seedControl);
-          }
-          if (from < 4) {
-            await m.addColumn(users, users.isVerified);
-            await m.addColumn(users, users.authProvider);
-          }
-          if (from < 5) {
-            // Foreign key changes require table recreation in SQLite.
-            // For development, we can trigger a recreation of the affected tables.
-            // Note: This will delete existing data in these tables!
-            await m.deleteTable(tasks.actualTableName);
-            await m.deleteTable(milestones.actualTableName);
-            await m.deleteTable(projects.actualTableName);
-            await m.deleteTable(workspaceMembers.actualTableName);
-            
-            await m.createTable(workspaceMembers);
-            await m.createTable(projects);
-            await m.createTable(milestones);
-            await m.createTable(tasks);
+          // إذا حدث أي اختلاف في النسخ (ترقية أو تراجع)
+          // نقوم بمسح الجداول وإعادة بنائها لضمان التوافق في مرحلة التطوير
+          for (final table in allTables) {
+            try {
+              await m.deleteTable(table.actualTableName);
+            } catch (_) {}
+            await m.createTable(table);
           }
         },
         beforeOpen: (details) async {
@@ -193,8 +178,9 @@ class AppDatabase extends _$AppDatabase {
 
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
-    final dbFolder = await getApplicationDocumentsDirectory();
+    final dbFolder = await getApplicationSupportDirectory();
     final file = File(p.join(dbFolder.path, 'orbit.db'));
+    
     return NativeDatabase.createInBackground(file);
   });
 }

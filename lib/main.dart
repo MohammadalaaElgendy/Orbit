@@ -105,10 +105,10 @@ class OrbitApp extends StatelessWidget {
         Provider.value(value: taskRepo),
         ChangeNotifierProvider(create: (_) => ThemeModel()),
         ChangeNotifierProvider(create: (context) => AuthViewModel(authRepository: authRepo)),
-        ChangeNotifierProvider(create: (context) => DashboardViewModel(workspaceRepository: workspaceRepo, milestoneRepository: milestoneRepo, taskRepository: taskRepo)),
-        ChangeNotifierProvider(create: (context) => WorkspaceViewModel(workspaceRepository: workspaceRepo, projectRepository: projectRepo, userRepository: userRepo)),
+        ChangeNotifierProvider(create: (context) => DashboardViewModel(workspaceRepository: workspaceRepo, milestoneRepository: milestoneRepo, taskRepository: taskRepo, authRepository: authRepo)),
+        ChangeNotifierProvider(create: (context) => WorkspaceViewModel(workspaceRepository: workspaceRepo, projectRepository: projectRepo, userRepository: userRepo, authRepository: authRepo)),
         ChangeNotifierProvider(create: (context) => MilestoneViewModel(milestoneRepository: milestoneRepo, projectRepository: projectRepo, workspaceRepository: workspaceRepo, taskRepository: taskRepo)),
-        ChangeNotifierProvider(create: (context) => TaskViewModel(taskRepository: taskRepo, milestoneRepository: milestoneRepo, projectRepository: projectRepo, workspaceRepository: workspaceRepo)),
+        ChangeNotifierProvider(create: (context) => TaskViewModel(taskRepository: taskRepo, milestoneRepository: milestoneRepo, projectRepository: projectRepo, workspaceRepository: workspaceRepo, authRepository: authRepo)),
       ],
       child: Consumer<ThemeModel>(
         builder: (context, themeModel, child) {

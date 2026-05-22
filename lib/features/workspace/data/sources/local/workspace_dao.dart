@@ -21,6 +21,27 @@ class WorkspaceDao extends DatabaseAccessor<AppDatabase> with _$WorkspaceDaoMixi
     return (select(workspaces)..where((t) => t.deletedAt.isNull())).watch();
   }
 
+  /// Get all workspaces where the user is a member (Many-to-Many)
+  Stream<List<Workspace>> watchWorkspacesForUser(String userId) {
+    final query = select(workspaces).join([
+      innerJoin(workspaceMembers, workspaceMembers.workspaceId.equalsExp(workspaces.id)),
+    ])
+      ..where(workspaceMembers.userId.equals(userId) & workspaces.deletedAt.isNull());
+
+    return query.watch().map((rows) => rows.map((row) => row.readTable(workspaces)).toList());
+  }
+
+  /// Check if a user is an admin in a workspace
+  Future<bool> isUserAdmin(String userId, String workspaceId) async {
+    final query = select(workspaceMembers)
+      ..where((t) =>
+          t.userId.equals(userId) &
+          t.workspaceId.equals(workspaceId) &
+          t.role.equals('admin'));
+    final result = await query.getSingleOrNull();
+    return result != null;
+  }
+
   Future<Workspace?> getById(String id) {
     return (select(workspaces)..where((t) => t.id.equals(id))).getSingleOrNull();
   }

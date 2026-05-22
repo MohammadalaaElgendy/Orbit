@@ -230,20 +230,21 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
     }
 
     // Mobile View
-    final appBarHeight = kToolbarHeight + topPadding;
+    final appBarExtraPadding = AppSpacing.sm; // مسافة إضافية عن شريط الإشعارات
+    final appBarHeight = kToolbarHeight + topPadding + appBarExtraPadding;
     return Scaffold(
       extendBody: true,
       extendBodyBehindAppBar: true,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(appBarHeight),
-        child: _buildCustomGlassAppBar(theme, topPadding),
+        child: _buildCustomGlassAppBar(theme, topPadding, appBarExtraPadding),
       ),
       body: widget.body,
       bottomNavigationBar: _buildFloatingGlassBottomNav(theme),
     );
   }
 
-  Widget _buildCustomGlassAppBar(ThemeData theme, double topPadding) {
+  Widget _buildCustomGlassAppBar(ThemeData theme, double topPadding, double extraPadding) {
     final isDark = theme.brightness == Brightness.dark;
     final bgColor = isDark 
         ? Colors.white.withValues(alpha: 0.15) 
@@ -267,8 +268,8 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
           child: Container(
-            padding: EdgeInsets.fromLTRB(AppSpacing.md, topPadding, AppSpacing.md, 0),
-            height: kToolbarHeight + topPadding,
+            padding: EdgeInsets.fromLTRB(AppSpacing.md, topPadding + extraPadding, AppSpacing.md, extraPadding),
+            height: kToolbarHeight + topPadding + extraPadding,
             decoration: BoxDecoration(
               color: bgColor,
               borderRadius: const BorderRadius.only(
@@ -386,96 +387,118 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
   }
 
   Widget _buildSideNavigation(ThemeData theme, bool isDesktop) {
+    final topPadding = MediaQuery.of(context).padding.top;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    
     return Container(
       width: isDesktop ? 280 : 80,
       height: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl, horizontal: AppSpacing.md),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         border: Border(right: BorderSide(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5))),
       ),
-      child: Column(
-        crossAxisAlignment: isDesktop ? CrossAxisAlignment.start : CrossAxisAlignment.center,
-        children: [
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: isDesktop ? AppSpacing.md : 0),
-            child: isDesktop 
-              ? Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    const OrbitLogo(size: 38),
-                    const SizedBox(width: AppSpacing.md),
-                    Flexible(
-                      child: Text(
-                        'Orbit', 
-                        style: theme.textTheme.headlineSmall?.copyWith(
-                          fontWeight: FontWeight.w900,
-                          letterSpacing: -1.0,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          return SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: IntrinsicHeight(
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    AppSpacing.md, 
+                    AppSpacing.xl + topPadding, 
+                    AppSpacing.md, 
+                    AppSpacing.xl + bottomPadding
+                  ),
+                  child: Column(
+                    crossAxisAlignment: isDesktop ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: isDesktop ? AppSpacing.md : 0),
+                        child: isDesktop 
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                const OrbitLogo(size: 38),
+                                const SizedBox(width: AppSpacing.md),
+                                Flexible(
+                                  child: Text(
+                                    'Orbit', 
+                                    style: theme.textTheme.headlineSmall?.copyWith(
+                                      fontWeight: FontWeight.w900,
+                                      letterSpacing: -1.0,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            )
+                          : const Center(child: OrbitLogo(size: 38)),
+                      ),
+                      const SizedBox(height: AppSpacing.xxl),
+                      _buildNavItem(Icons.dashboard_rounded, 'Dashboard', 0, isDesktop),
+                      _buildNavItem(Icons.work_rounded, 'Workspaces', 1, isDesktop),
+                      _buildNavItem(Icons.flag_rounded, 'Milestones', 2, isDesktop),
+                      const Spacer(),
+                      if (isDesktop)
+                        GestureDetector(
+                          onTap: () => _showUserMenu(context),
+                          child: GlassCard(
+                            padding: const EdgeInsets.all(AppSpacing.sm),
+                            borderRadius: AppRadius.xl,
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 18,
+                                  backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+                                  backgroundImage: context.watch<AuthViewModel>().user?.avatarUrl != null
+                                      ? NetworkImage(context.watch<AuthViewModel>().user!.avatarUrl!)
+                                      : null,
+                                  onBackgroundImageError: context.watch<AuthViewModel>().user?.avatarUrl != null ? (e, s) => debugPrint("Load error") : null,
+                                  child: context.watch<AuthViewModel>().user?.avatarUrl == null
+                                      ? Icon(Icons.person, size: 18, color: theme.colorScheme.primary)
+                                      : null,
+                                ),
+                                const SizedBox(width: AppSpacing.sm),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(context.watch<AuthViewModel>().user?.name ?? 'User', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
+                                      const Text('Pro Member', style: TextStyle(fontSize: 10, color: Colors.grey), maxLines: 1, overflow: TextOverflow.ellipsis),
+                                    ],
+                                  ),
+                                ),
+                                const Icon(Icons.settings, size: 16, color: Colors.grey),
+                              ],
+                            ),
+                          ),
+                        )
+                      else
+                        GestureDetector(
+                          onTap: () => _showUserMenu(context),
+                          child: CircleAvatar(
+                            radius: 20,
+                            backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
+                            backgroundImage: context.watch<AuthViewModel>().user?.avatarUrl != null
+                                ? NetworkImage(context.watch<AuthViewModel>().user!.avatarUrl!)
+                                : null,
+                            onBackgroundImageError: context.watch<AuthViewModel>().user?.avatarUrl != null ? (e, s) => debugPrint("Load error") : null,
+                            child: context.watch<AuthViewModel>().user?.avatarUrl == null
+                                ? Icon(Icons.person, size: 20, color: theme.colorScheme.primary)
+                                : null,
+                          ),
                         ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                  ],
-                )
-              : const Center(child: OrbitLogo(size: 38)),
-          ),
-          const SizedBox(height: AppSpacing.xxl),
-          _buildNavItem(Icons.dashboard_rounded, 'Dashboard', 0, isDesktop),
-          _buildNavItem(Icons.work_rounded, 'Workspaces', 1, isDesktop),
-          _buildNavItem(Icons.flag_rounded, 'Milestones', 2, isDesktop),
-          const Spacer(),
-          if (isDesktop)
-            GestureDetector(
-              onTap: () => _showUserMenu(context),
-              child: GlassCard(
-                padding: const EdgeInsets.all(AppSpacing.sm),
-                borderRadius: AppRadius.xl,
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 18,
-                      backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
-                      backgroundImage: context.watch<AuthViewModel>().user?.avatarUrl != null
-                          ? NetworkImage(context.watch<AuthViewModel>().user!.avatarUrl!)
-                          : null,
-                      onBackgroundImageError: context.watch<AuthViewModel>().user?.avatarUrl != null ? (e, s) => debugPrint("Load error") : null,
-                      child: context.watch<AuthViewModel>().user?.avatarUrl == null
-                          ? Icon(Icons.person, size: 18, color: theme.colorScheme.primary)
-                          : null,
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(context.watch<AuthViewModel>().user?.name ?? 'User', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
-                          const Text('Pro Member', style: TextStyle(fontSize: 10, color: Colors.grey), maxLines: 1, overflow: TextOverflow.ellipsis),
-                        ],
-                      ),
-                    ),
-                    const Icon(Icons.settings, size: 16, color: Colors.grey),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            )
-          else
-            GestureDetector(
-              onTap: () => _showUserMenu(context),
-              child: CircleAvatar(
-                radius: 20,
-                backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
-                backgroundImage: context.watch<AuthViewModel>().user?.avatarUrl != null
-                    ? NetworkImage(context.watch<AuthViewModel>().user!.avatarUrl!)
-                    : null,
-                onBackgroundImageError: context.watch<AuthViewModel>().user?.avatarUrl != null ? (e, s) => debugPrint("Load error") : null,
-                child: context.watch<AuthViewModel>().user?.avatarUrl == null
-                    ? Icon(Icons.person, size: 20, color: theme.colorScheme.primary)
-                    : null,
-              ),
             ),
-        ],
+          );
+        },
       ),
     );
   }
@@ -510,8 +533,9 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
   }
 
   Widget _buildTopHeader(ThemeData theme) {
+    final topPadding = MediaQuery.of(context).padding.top;
     return Padding(
-      padding: const EdgeInsets.all(AppSpacing.lg),
+      padding: EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.lg + topPadding, AppSpacing.lg, AppSpacing.lg),
       child: Row(
         children: [
           Text(widget.title, style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w900)),

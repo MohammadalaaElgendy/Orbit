@@ -59,6 +59,11 @@ class SupabaseAuthService {
       serverClientId: webClientId,
     );
     
+    // إجبار ظهور قائمة اختيار الحسابات عن طريق تسجيل الخروج من جوجل أولاً
+    try {
+      await googleSignIn.signOut();
+    } catch (_) {}
+    
     final googleUser = await googleSignIn.signIn();
     final googleAuth = await googleUser?.authentication;
 
@@ -98,7 +103,11 @@ class SupabaseAuthService {
         final fileName = Uri.decodeComponent(match.group(1)!);
         await _supabase.storage.from('avatars').remove([fileName]);
       }
-    } catch (e) { }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('Error deleting avatar: $e');
+      }
+    }
   }
 
   Future<void> updateUserMetadata({required String name, String? avatarUrl}) async {

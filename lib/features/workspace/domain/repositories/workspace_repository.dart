@@ -16,22 +16,31 @@ class WorkspaceRepository {
       name: Value(workspace.name),
       description: Value(workspace.description),
       imageUrl: Value(workspace.imageUrl),
+      createdBy: Value(workspace.createdBy),
       createdAt: Value(workspace.createdAt),
       updatedAt: Value(workspace.updatedAt),
     ));
+    
+    // Also add the creator as an admin automatically
+    await addMemberToWorkspace(workspace.id, workspace.createdBy, 'admin');
   }
 
-  Stream<List<model.Workspace>> watchWorkspaces() {
-    return _workspaceDao.watchAll().map((rows) => rows
+  Stream<List<model.Workspace>> watchWorkspacesForUser(String userId) {
+    return _workspaceDao.watchWorkspacesForUser(userId).map((rows) => rows
         .map((row) => model.Workspace(
               id: row.id,
               name: row.name,
               description: row.description,
               imageUrl: row.imageUrl,
+              createdBy: row.createdBy,
               createdAt: row.createdAt,
               updatedAt: row.updatedAt,
             ))
         .toList());
+  }
+
+  Future<bool> isUserAdmin(String userId, String workspaceId) {
+    return _workspaceDao.isUserAdmin(userId, workspaceId);
   }
 
   Future<model.Workspace?> getWorkspaceById(String id) async {
@@ -42,6 +51,7 @@ class WorkspaceRepository {
       name: row.name,
       description: row.description,
       imageUrl: row.imageUrl,
+      createdBy: row.createdBy,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
     );
@@ -53,6 +63,7 @@ class WorkspaceRepository {
       name: Value(workspace.name),
       description: Value(workspace.description),
       imageUrl: Value(workspace.imageUrl),
+      createdBy: Value(workspace.createdBy),
       createdAt: Value(workspace.createdAt),
       updatedAt: Value(DateTime.now()),
     ));

@@ -31,12 +31,16 @@ class DatabaseSeeder {
     final uuid = const Uuid();
     final now = DateTime.now();
 
-    // 1. Create Mock Users (REMOVED - Use real users from Supabase)
-    final users = <model.User>[];
-
-    for (var user in users) {
-      await userRepo.createUser(user);
-    }
+    // 1. Create a Mock User (Necessary for relations)
+    final userId = uuid.v4();
+    final mockUser = model.User(
+      id: userId,
+      name: 'Orbit Dev',
+      email: 'dev@orbit.com',
+      avatarUrl: 'https://i.pravatar.cc/150?u=$userId',
+      isVerified: true,
+    );
+    await userRepo.createUser(mockUser);
 
     // 2. Create Workspace
     final wsId = uuid.v4();
@@ -45,14 +49,10 @@ class DatabaseSeeder {
       name: 'Orbit Development',
       description: 'Main workspace for Orbit project tracking.',
       imageUrl: 'assets/images/workspaces/ws_1.webp',
+      createdBy: userId,
       createdAt: now,
       updatedAt: now,
     ));
-
-    // Add members to workspace
-    for (var user in users) {
-      await workspaceRepo.addMemberToWorkspace(wsId, user.id, 'member');
-    }
 
     // 3. Create Project
     final projectId = uuid.v4();
@@ -85,7 +85,8 @@ class DatabaseSeeder {
       milestoneId: milestoneId,
       title: 'Database & Repository Updates',
       description: 'Update Drift schema and implement repository methods.',
-      assigneeId: users[0].id,
+      assigneeId: userId,
+      createdBy: userId,
       status: model.TaskStatus.inProgress,
       priority: model.TaskPriority.high,
       createdAt: now,
@@ -99,6 +100,7 @@ class DatabaseSeeder {
       parentTaskId: taskId,
       title: 'Add SeedControl Table',
       description: 'Create a dedicated table for seed management.',
+      createdBy: userId,
       status: model.TaskStatus.done,
       priority: model.TaskPriority.medium,
       createdAt: now,
@@ -111,6 +113,7 @@ class DatabaseSeeder {
       parentTaskId: taskId,
       title: 'Update Repositories',
       description: 'Add CRUD and member management methods.',
+      createdBy: userId,
       status: model.TaskStatus.inProgress,
       priority: model.TaskPriority.medium,
       createdAt: now,
@@ -123,6 +126,7 @@ class DatabaseSeeder {
       name: 'Marketing',
       description: 'Growth strategies and global campaigns.',
       imageUrl: 'assets/images/workspaces/ws_2.webp',
+      createdBy: userId,
       createdAt: now,
       updatedAt: now,
     ));

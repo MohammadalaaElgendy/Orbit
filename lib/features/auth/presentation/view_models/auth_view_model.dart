@@ -68,7 +68,11 @@ class AuthViewModel extends ChangeNotifier {
       if (initialUri != null) {
         _handleIncomingUri(initialUri);
       }
-    } catch (e) { }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('Error getting initial deep link: $e');
+      }
+    }
 
     _linkSubscription = _appLinks.uriLinkStream.listen((uri) {
       _handleIncomingUri(uri);
@@ -243,7 +247,11 @@ class AuthViewModel extends ChangeNotifier {
         pickedAvatarName = result.files.single.name;
         notifyListeners();
       }
-    } catch (e) { }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('Error picking avatar: $e');
+      }
+    }
   }
 
   Future<void> updateProfileAvatar() async {

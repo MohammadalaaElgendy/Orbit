@@ -6,6 +6,7 @@ import '../../domain/repositories/task_repository.dart';
 import '../../../milestone/domain/repositories/milestone_repository.dart';
 import '../../../workspace/domain/repositories/project_repository.dart';
 import '../../../workspace/domain/repositories/workspace_repository.dart';
+import '../../../auth/domain/repositories/auth_repository.dart';
 import 'dart:async';
 import 'package:uuid/uuid.dart';
 
@@ -14,6 +15,7 @@ class TaskViewModel extends ChangeNotifier {
   final MilestoneRepository _milestoneRepository;
   final ProjectRepository _projectRepository;
   final WorkspaceRepository _workspaceRepository;
+  final AuthRepository _authRepository;
 
   Task? _currentTask;
   Task? get currentTask => _currentTask;
@@ -33,10 +35,12 @@ class TaskViewModel extends ChangeNotifier {
     required MilestoneRepository milestoneRepository,
     required ProjectRepository projectRepository,
     required WorkspaceRepository workspaceRepository,
+    required AuthRepository authRepository,
   })  : _taskRepository = taskRepository,
         _milestoneRepository = milestoneRepository,
         _projectRepository = projectRepository,
-        _workspaceRepository = workspaceRepository;
+        _workspaceRepository = workspaceRepository,
+        _authRepository = authRepository;
 
   void loadTaskDetails(Task task) async {
     _currentTask = task;
@@ -79,6 +83,9 @@ class TaskViewModel extends ChangeNotifier {
     TaskStatus status = TaskStatus.todo,
     DateTime? dueDate,
   }) async {
+    final currentUser = _authRepository.currentUser;
+    if (currentUser == null) return;
+
     final task = Task(
       id: const Uuid().v4(),
       milestoneId: milestoneId,
@@ -86,6 +93,7 @@ class TaskViewModel extends ChangeNotifier {
       title: title,
       description: description,
       assigneeId: assigneeId,
+      createdBy: currentUser.id,
       priority: priority,
       status: status,
       dueDate: dueDate,

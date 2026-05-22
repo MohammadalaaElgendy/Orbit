@@ -53,6 +53,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                       status: status,
                       priority: priority,
                       assigneeId: assigneeId,
+                      createdBy: currentTask.createdBy,
                       dueDate: dueDate,
                       createdAt: currentTask.createdAt,
                       updatedAt: DateTime.now(),

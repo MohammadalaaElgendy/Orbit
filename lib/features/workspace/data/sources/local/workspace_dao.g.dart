@@ -4,8 +4,8 @@ part of 'workspace_dao.dart';
 
 // ignore_for_file: type=lint
 mixin _$WorkspaceDaoMixin on DatabaseAccessor<AppDatabase> {
-  $WorkspacesTable get workspaces => attachedDatabase.workspaces;
   $UsersTable get users => attachedDatabase.users;
+  $WorkspacesTable get workspaces => attachedDatabase.workspaces;
   $WorkspaceMembersTable get workspaceMembers =>
       attachedDatabase.workspaceMembers;
   WorkspaceDaoManager get managers => WorkspaceDaoManager(this);
@@ -14,10 +14,10 @@ mixin _$WorkspaceDaoMixin on DatabaseAccessor<AppDatabase> {
 class WorkspaceDaoManager {
   final _$WorkspaceDaoMixin _db;
   WorkspaceDaoManager(this._db);
-  $$WorkspacesTableTableManager get workspaces =>
-      $$WorkspacesTableTableManager(_db.attachedDatabase, _db.workspaces);
   $$UsersTableTableManager get users =>
       $$UsersTableTableManager(_db.attachedDatabase, _db.users);
+  $$WorkspacesTableTableManager get workspaces =>
+      $$WorkspacesTableTableManager(_db.attachedDatabase, _db.workspaces);
   $$WorkspaceMembersTableTableManager get workspaceMembers =>
       $$WorkspaceMembersTableTableManager(
         _db.attachedDatabase,

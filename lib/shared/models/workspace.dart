@@ -3,6 +3,7 @@ class Workspace {
   final String name;
   final String description;
   final String? imageUrl;
+  final String createdBy;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -11,6 +12,7 @@ class Workspace {
     required this.name,
     required this.description,
     this.imageUrl,
+    required this.createdBy,
     required this.createdAt,
     required this.updatedAt,
   });

@@ -615,6 +615,20 @@ class $WorkspacesTable extends Workspaces
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _createdByMeta = const VerificationMeta(
+    'createdBy',
+  );
+  @override
+  late final GeneratedColumn<String> createdBy = GeneratedColumn<String>(
+    'created_by',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES users (id) ON UPDATE CASCADE ON DELETE CASCADE',
+    ),
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -654,6 +668,7 @@ class $WorkspacesTable extends Workspaces
     name,
     description,
     imageUrl,
+    createdBy,
     createdAt,
     updatedAt,
     deletedAt,
@@ -699,6 +714,14 @@ class $WorkspacesTable extends Workspaces
         _imageUrlMeta,
         imageUrl.isAcceptableOrUnknown(data['image_url']!, _imageUrlMeta),
       );
+    }
+    if (data.containsKey('created_by')) {
+      context.handle(
+        _createdByMeta,
+        createdBy.isAcceptableOrUnknown(data['created_by']!, _createdByMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdByMeta);
     }
     if (data.containsKey('created_at')) {
       context.handle(
@@ -747,6 +770,10 @@ class $WorkspacesTable extends Workspaces
         DriftSqlType.string,
         data['${effectivePrefix}image_url'],
       ),
+      createdBy: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}created_by'],
+      )!,
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
@@ -773,6 +800,7 @@ class Workspace extends DataClass implements Insertable<Workspace> {
   final String name;
   final String description;
   final String? imageUrl;
+  final String createdBy;
   final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime? deletedAt;
@@ -781,6 +809,7 @@ class Workspace extends DataClass implements Insertable<Workspace> {
     required this.name,
     required this.description,
     this.imageUrl,
+    required this.createdBy,
     required this.createdAt,
     required this.updatedAt,
     this.deletedAt,
@@ -794,6 +823,7 @@ class Workspace extends DataClass implements Insertable<Workspace> {
     if (!nullToAbsent || imageUrl != null) {
       map['image_url'] = Variable<String>(imageUrl);
     }
+    map['created_by'] = Variable<String>(createdBy);
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
     if (!nullToAbsent || deletedAt != null) {
@@ -810,6 +840,7 @@ class Workspace extends DataClass implements Insertable<Workspace> {
       imageUrl: imageUrl == null && nullToAbsent
           ? const Value.absent()
           : Value(imageUrl),
+      createdBy: Value(createdBy),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
       deletedAt: deletedAt == null && nullToAbsent
@@ -828,6 +859,7 @@ class Workspace extends DataClass implements Insertable<Workspace> {
       name: serializer.fromJson<String>(json['name']),
       description: serializer.fromJson<String>(json['description']),
       imageUrl: serializer.fromJson<String?>(json['imageUrl']),
+      createdBy: serializer.fromJson<String>(json['createdBy']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
       deletedAt: serializer.fromJson<DateTime?>(json['deletedAt']),
@@ -841,6 +873,7 @@ class Workspace extends DataClass implements Insertable<Workspace> {
       'name': serializer.toJson<String>(name),
       'description': serializer.toJson<String>(description),
       'imageUrl': serializer.toJson<String?>(imageUrl),
+      'createdBy': serializer.toJson<String>(createdBy),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
       'deletedAt': serializer.toJson<DateTime?>(deletedAt),
@@ -852,6 +885,7 @@ class Workspace extends DataClass implements Insertable<Workspace> {
     String? name,
     String? description,
     Value<String?> imageUrl = const Value.absent(),
+    String? createdBy,
     DateTime? createdAt,
     DateTime? updatedAt,
     Value<DateTime?> deletedAt = const Value.absent(),
@@ -860,6 +894,7 @@ class Workspace extends DataClass implements Insertable<Workspace> {
     name: name ?? this.name,
     description: description ?? this.description,
     imageUrl: imageUrl.present ? imageUrl.value : this.imageUrl,
+    createdBy: createdBy ?? this.createdBy,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
     deletedAt: deletedAt.present ? deletedAt.value : this.deletedAt,
@@ -872,6 +907,7 @@ class Workspace extends DataClass implements Insertable<Workspace> {
           ? data.description.value
           : this.description,
       imageUrl: data.imageUrl.present ? data.imageUrl.value : this.imageUrl,
+      createdBy: data.createdBy.present ? data.createdBy.value : this.createdBy,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
       deletedAt: data.deletedAt.present ? data.deletedAt.value : this.deletedAt,
@@ -885,6 +921,7 @@ class Workspace extends DataClass implements Insertable<Workspace> {
           ..write('name: $name, ')
           ..write('description: $description, ')
           ..write('imageUrl: $imageUrl, ')
+          ..write('createdBy: $createdBy, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt')
@@ -898,6 +935,7 @@ class Workspace extends DataClass implements Insertable<Workspace> {
     name,
     description,
     imageUrl,
+    createdBy,
     createdAt,
     updatedAt,
     deletedAt,
@@ -910,6 +948,7 @@ class Workspace extends DataClass implements Insertable<Workspace> {
           other.name == this.name &&
           other.description == this.description &&
           other.imageUrl == this.imageUrl &&
+          other.createdBy == this.createdBy &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt &&
           other.deletedAt == this.deletedAt);
@@ -920,6 +959,7 @@ class WorkspacesCompanion extends UpdateCompanion<Workspace> {
   final Value<String> name;
   final Value<String> description;
   final Value<String?> imageUrl;
+  final Value<String> createdBy;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   final Value<DateTime?> deletedAt;
@@ -929,6 +969,7 @@ class WorkspacesCompanion extends UpdateCompanion<Workspace> {
     this.name = const Value.absent(),
     this.description = const Value.absent(),
     this.imageUrl = const Value.absent(),
+    this.createdBy = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.deletedAt = const Value.absent(),
@@ -939,6 +980,7 @@ class WorkspacesCompanion extends UpdateCompanion<Workspace> {
     required String name,
     required String description,
     this.imageUrl = const Value.absent(),
+    required String createdBy,
     required DateTime createdAt,
     required DateTime updatedAt,
     this.deletedAt = const Value.absent(),
@@ -946,6 +988,7 @@ class WorkspacesCompanion extends UpdateCompanion<Workspace> {
   }) : id = Value(id),
        name = Value(name),
        description = Value(description),
+       createdBy = Value(createdBy),
        createdAt = Value(createdAt),
        updatedAt = Value(updatedAt);
   static Insertable<Workspace> custom({
@@ -953,6 +996,7 @@ class WorkspacesCompanion extends UpdateCompanion<Workspace> {
     Expression<String>? name,
     Expression<String>? description,
     Expression<String>? imageUrl,
+    Expression<String>? createdBy,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
     Expression<DateTime>? deletedAt,
@@ -963,6 +1007,7 @@ class WorkspacesCompanion extends UpdateCompanion<Workspace> {
       if (name != null) 'name': name,
       if (description != null) 'description': description,
       if (imageUrl != null) 'image_url': imageUrl,
+      if (createdBy != null) 'created_by': createdBy,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (deletedAt != null) 'deleted_at': deletedAt,
@@ -975,6 +1020,7 @@ class WorkspacesCompanion extends UpdateCompanion<Workspace> {
     Value<String>? name,
     Value<String>? description,
     Value<String?>? imageUrl,
+    Value<String>? createdBy,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
     Value<DateTime?>? deletedAt,
@@ -985,6 +1031,7 @@ class WorkspacesCompanion extends UpdateCompanion<Workspace> {
       name: name ?? this.name,
       description: description ?? this.description,
       imageUrl: imageUrl ?? this.imageUrl,
+      createdBy: createdBy ?? this.createdBy,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       deletedAt: deletedAt ?? this.deletedAt,
@@ -1006,6 +1053,9 @@ class WorkspacesCompanion extends UpdateCompanion<Workspace> {
     }
     if (imageUrl.present) {
       map['image_url'] = Variable<String>(imageUrl.value);
+    }
+    if (createdBy.present) {
+      map['created_by'] = Variable<String>(createdBy.value);
     }
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
@@ -1029,6 +1079,7 @@ class WorkspacesCompanion extends UpdateCompanion<Workspace> {
           ..write('name: $name, ')
           ..write('description: $description, ')
           ..write('imageUrl: $imageUrl, ')
+          ..write('createdBy: $createdBy, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('deletedAt: $deletedAt, ')
@@ -2628,6 +2679,20 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
       'REFERENCES users (id) ON UPDATE CASCADE ON DELETE SET NULL',
     ),
   );
+  static const VerificationMeta _createdByMeta = const VerificationMeta(
+    'createdBy',
+  );
+  @override
+  late final GeneratedColumn<String> createdBy = GeneratedColumn<String>(
+    'created_by',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES users (id) ON UPDATE CASCADE ON DELETE CASCADE',
+    ),
+  );
   static const VerificationMeta _priorityMeta = const VerificationMeta(
     'priority',
   );
@@ -2711,6 +2776,7 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
     title,
     description,
     assigneeId,
+    createdBy,
     priority,
     status,
     startDate,
@@ -2780,6 +2846,14 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
         _assigneeIdMeta,
         assigneeId.isAcceptableOrUnknown(data['assignee_id']!, _assigneeIdMeta),
       );
+    }
+    if (data.containsKey('created_by')) {
+      context.handle(
+        _createdByMeta,
+        createdBy.isAcceptableOrUnknown(data['created_by']!, _createdByMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdByMeta);
     }
     if (data.containsKey('priority')) {
       context.handle(
@@ -2864,6 +2938,10 @@ class $TasksTable extends Tasks with TableInfo<$TasksTable, Task> {
         DriftSqlType.string,
         data['${effectivePrefix}assignee_id'],
       ),
+      createdBy: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}created_by'],
+      )!,
       priority: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}priority'],
@@ -2908,6 +2986,7 @@ class Task extends DataClass implements Insertable<Task> {
   final String title;
   final String description;
   final String? assigneeId;
+  final String createdBy;
   final String priority;
   final String status;
   final DateTime? startDate;
@@ -2922,6 +3001,7 @@ class Task extends DataClass implements Insertable<Task> {
     required this.title,
     required this.description,
     this.assigneeId,
+    required this.createdBy,
     required this.priority,
     required this.status,
     this.startDate,
@@ -2943,6 +3023,7 @@ class Task extends DataClass implements Insertable<Task> {
     if (!nullToAbsent || assigneeId != null) {
       map['assignee_id'] = Variable<String>(assigneeId);
     }
+    map['created_by'] = Variable<String>(createdBy);
     map['priority'] = Variable<String>(priority);
     map['status'] = Variable<String>(status);
     if (!nullToAbsent || startDate != null) {
@@ -2971,6 +3052,7 @@ class Task extends DataClass implements Insertable<Task> {
       assigneeId: assigneeId == null && nullToAbsent
           ? const Value.absent()
           : Value(assigneeId),
+      createdBy: Value(createdBy),
       priority: Value(priority),
       status: Value(status),
       startDate: startDate == null && nullToAbsent
@@ -2999,6 +3081,7 @@ class Task extends DataClass implements Insertable<Task> {
       title: serializer.fromJson<String>(json['title']),
       description: serializer.fromJson<String>(json['description']),
       assigneeId: serializer.fromJson<String?>(json['assigneeId']),
+      createdBy: serializer.fromJson<String>(json['createdBy']),
       priority: serializer.fromJson<String>(json['priority']),
       status: serializer.fromJson<String>(json['status']),
       startDate: serializer.fromJson<DateTime?>(json['startDate']),
@@ -3018,6 +3101,7 @@ class Task extends DataClass implements Insertable<Task> {
       'title': serializer.toJson<String>(title),
       'description': serializer.toJson<String>(description),
       'assigneeId': serializer.toJson<String?>(assigneeId),
+      'createdBy': serializer.toJson<String>(createdBy),
       'priority': serializer.toJson<String>(priority),
       'status': serializer.toJson<String>(status),
       'startDate': serializer.toJson<DateTime?>(startDate),
@@ -3035,6 +3119,7 @@ class Task extends DataClass implements Insertable<Task> {
     String? title,
     String? description,
     Value<String?> assigneeId = const Value.absent(),
+    String? createdBy,
     String? priority,
     String? status,
     Value<DateTime?> startDate = const Value.absent(),
@@ -3049,6 +3134,7 @@ class Task extends DataClass implements Insertable<Task> {
     title: title ?? this.title,
     description: description ?? this.description,
     assigneeId: assigneeId.present ? assigneeId.value : this.assigneeId,
+    createdBy: createdBy ?? this.createdBy,
     priority: priority ?? this.priority,
     status: status ?? this.status,
     startDate: startDate.present ? startDate.value : this.startDate,
@@ -3073,6 +3159,7 @@ class Task extends DataClass implements Insertable<Task> {
       assigneeId: data.assigneeId.present
           ? data.assigneeId.value
           : this.assigneeId,
+      createdBy: data.createdBy.present ? data.createdBy.value : this.createdBy,
       priority: data.priority.present ? data.priority.value : this.priority,
       status: data.status.present ? data.status.value : this.status,
       startDate: data.startDate.present ? data.startDate.value : this.startDate,
@@ -3092,6 +3179,7 @@ class Task extends DataClass implements Insertable<Task> {
           ..write('title: $title, ')
           ..write('description: $description, ')
           ..write('assigneeId: $assigneeId, ')
+          ..write('createdBy: $createdBy, ')
           ..write('priority: $priority, ')
           ..write('status: $status, ')
           ..write('startDate: $startDate, ')
@@ -3111,6 +3199,7 @@ class Task extends DataClass implements Insertable<Task> {
     title,
     description,
     assigneeId,
+    createdBy,
     priority,
     status,
     startDate,
@@ -3129,6 +3218,7 @@ class Task extends DataClass implements Insertable<Task> {
           other.title == this.title &&
           other.description == this.description &&
           other.assigneeId == this.assigneeId &&
+          other.createdBy == this.createdBy &&
           other.priority == this.priority &&
           other.status == this.status &&
           other.startDate == this.startDate &&
@@ -3145,6 +3235,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
   final Value<String> title;
   final Value<String> description;
   final Value<String?> assigneeId;
+  final Value<String> createdBy;
   final Value<String> priority;
   final Value<String> status;
   final Value<DateTime?> startDate;
@@ -3160,6 +3251,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     this.title = const Value.absent(),
     this.description = const Value.absent(),
     this.assigneeId = const Value.absent(),
+    this.createdBy = const Value.absent(),
     this.priority = const Value.absent(),
     this.status = const Value.absent(),
     this.startDate = const Value.absent(),
@@ -3176,6 +3268,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     required String title,
     required String description,
     this.assigneeId = const Value.absent(),
+    required String createdBy,
     required String priority,
     required String status,
     this.startDate = const Value.absent(),
@@ -3188,6 +3281,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
        milestoneId = Value(milestoneId),
        title = Value(title),
        description = Value(description),
+       createdBy = Value(createdBy),
        priority = Value(priority),
        status = Value(status),
        createdAt = Value(createdAt),
@@ -3199,6 +3293,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     Expression<String>? title,
     Expression<String>? description,
     Expression<String>? assigneeId,
+    Expression<String>? createdBy,
     Expression<String>? priority,
     Expression<String>? status,
     Expression<DateTime>? startDate,
@@ -3215,6 +3310,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
       if (title != null) 'title': title,
       if (description != null) 'description': description,
       if (assigneeId != null) 'assignee_id': assigneeId,
+      if (createdBy != null) 'created_by': createdBy,
       if (priority != null) 'priority': priority,
       if (status != null) 'status': status,
       if (startDate != null) 'start_date': startDate,
@@ -3233,6 +3329,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
     Value<String>? title,
     Value<String>? description,
     Value<String?>? assigneeId,
+    Value<String>? createdBy,
     Value<String>? priority,
     Value<String>? status,
     Value<DateTime?>? startDate,
@@ -3249,6 +3346,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
       title: title ?? this.title,
       description: description ?? this.description,
       assigneeId: assigneeId ?? this.assigneeId,
+      createdBy: createdBy ?? this.createdBy,
       priority: priority ?? this.priority,
       status: status ?? this.status,
       startDate: startDate ?? this.startDate,
@@ -3280,6 +3378,9 @@ class TasksCompanion extends UpdateCompanion<Task> {
     }
     if (assigneeId.present) {
       map['assignee_id'] = Variable<String>(assigneeId.value);
+    }
+    if (createdBy.present) {
+      map['created_by'] = Variable<String>(createdBy.value);
     }
     if (priority.present) {
       map['priority'] = Variable<String>(priority.value);
@@ -3317,6 +3418,7 @@ class TasksCompanion extends UpdateCompanion<Task> {
           ..write('title: $title, ')
           ..write('description: $description, ')
           ..write('assigneeId: $assigneeId, ')
+          ..write('createdBy: $createdBy, ')
           ..write('priority: $priority, ')
           ..write('status: $status, ')
           ..write('startDate: $startDate, ')
@@ -3629,6 +3731,20 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
     WritePropagation(
       on: TableUpdateQuery.onTableName(
+        'users',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('workspaces', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'users',
+        limitUpdateKind: UpdateKind.update,
+      ),
+      result: [TableUpdate('workspaces', kind: UpdateKind.update)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
         'workspaces',
         limitUpdateKind: UpdateKind.delete,
       ),
@@ -3725,6 +3841,20 @@ abstract class _$AppDatabase extends GeneratedDatabase {
       ),
       result: [TableUpdate('tasks', kind: UpdateKind.update)],
     ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'users',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('tasks', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'users',
+        limitUpdateKind: UpdateKind.update,
+      ),
+      result: [TableUpdate('tasks', kind: UpdateKind.update)],
+    ),
   ]);
 }
 
@@ -3759,6 +3889,24 @@ final class $$UsersTableReferences
     extends BaseReferences<_$AppDatabase, $UsersTable, User> {
   $$UsersTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
+  static MultiTypedResultKey<$WorkspacesTable, List<Workspace>>
+  _workspacesRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.workspaces,
+    aliasName: $_aliasNameGenerator(db.users.id, db.workspaces.createdBy),
+  );
+
+  $$WorkspacesTableProcessedTableManager get workspacesRefs {
+    final manager = $$WorkspacesTableTableManager(
+      $_db,
+      $_db.workspaces,
+    ).filter((f) => f.createdBy.id.sqlEquals($_itemColumn<String>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_workspacesRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+
   static MultiTypedResultKey<$WorkspaceMembersTable, List<WorkspaceMember>>
   _workspaceMembersRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.workspaceMembers,
@@ -3774,25 +3922,6 @@ final class $$UsersTableReferences
     final cache = $_typedResult.readTableOrNull(
       _workspaceMembersRefsTable($_db),
     );
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
-  static MultiTypedResultKey<$TasksTable, List<Task>> _tasksRefsTable(
-    _$AppDatabase db,
-  ) => MultiTypedResultKey.fromTable(
-    db.tasks,
-    aliasName: $_aliasNameGenerator(db.users.id, db.tasks.assigneeId),
-  );
-
-  $$TasksTableProcessedTableManager get tasksRefs {
-    final manager = $$TasksTableTableManager(
-      $_db,
-      $_db.tasks,
-    ).filter((f) => f.assigneeId.id.sqlEquals($_itemColumn<String>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_tasksRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -3852,6 +3981,31 @@ class $$UsersTableFilterComposer extends Composer<_$AppDatabase, $UsersTable> {
     builder: (column) => ColumnFilters(column),
   );
 
+  Expression<bool> workspacesRefs(
+    Expression<bool> Function($$WorkspacesTableFilterComposer f) f,
+  ) {
+    final $$WorkspacesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.workspaces,
+      getReferencedColumn: (t) => t.createdBy,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$WorkspacesTableFilterComposer(
+            $db: $db,
+            $table: $db.workspaces,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
   Expression<bool> workspaceMembersRefs(
     Expression<bool> Function($$WorkspaceMembersTableFilterComposer f) f,
   ) {
@@ -3868,31 +4022,6 @@ class $$UsersTableFilterComposer extends Composer<_$AppDatabase, $UsersTable> {
           }) => $$WorkspaceMembersTableFilterComposer(
             $db: $db,
             $table: $db.workspaceMembers,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<bool> tasksRefs(
-    Expression<bool> Function($$TasksTableFilterComposer f) f,
-  ) {
-    final $$TasksTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.tasks,
-      getReferencedColumn: (t) => t.assigneeId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$TasksTableFilterComposer(
-            $db: $db,
-            $table: $db.tasks,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -3998,6 +4127,31 @@ class $$UsersTableAnnotationComposer
   GeneratedColumn<DateTime> get deletedAt =>
       $composableBuilder(column: $table.deletedAt, builder: (column) => column);
 
+  Expression<T> workspacesRefs<T extends Object>(
+    Expression<T> Function($$WorkspacesTableAnnotationComposer a) f,
+  ) {
+    final $$WorkspacesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.workspaces,
+      getReferencedColumn: (t) => t.createdBy,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$WorkspacesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.workspaces,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
   Expression<T> workspaceMembersRefs<T extends Object>(
     Expression<T> Function($$WorkspaceMembersTableAnnotationComposer a) f,
   ) {
@@ -4022,31 +4176,6 @@ class $$UsersTableAnnotationComposer
     );
     return f(composer);
   }
-
-  Expression<T> tasksRefs<T extends Object>(
-    Expression<T> Function($$TasksTableAnnotationComposer a) f,
-  ) {
-    final $$TasksTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.tasks,
-      getReferencedColumn: (t) => t.assigneeId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$TasksTableAnnotationComposer(
-            $db: $db,
-            $table: $db.tasks,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
 }
 
 class $$UsersTableTableManager
@@ -4062,7 +4191,10 @@ class $$UsersTableTableManager
           $$UsersTableUpdateCompanionBuilder,
           (User, $$UsersTableReferences),
           User,
-          PrefetchHooks Function({bool workspaceMembersRefs, bool tasksRefs})
+          PrefetchHooks Function({
+            bool workspacesRefs,
+            bool workspaceMembersRefs,
+          })
         > {
   $$UsersTableTableManager(_$AppDatabase db, $UsersTable table)
     : super(
@@ -4130,16 +4262,33 @@ class $$UsersTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({workspaceMembersRefs = false, tasksRefs = false}) {
+              ({workspacesRefs = false, workspaceMembersRefs = false}) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
+                    if (workspacesRefs) db.workspaces,
                     if (workspaceMembersRefs) db.workspaceMembers,
-                    if (tasksRefs) db.tasks,
                   ],
                   addJoins: null,
                   getPrefetchedDataCallback: (items) async {
                     return [
+                      if (workspacesRefs)
+                        await $_getPrefetchedData<User, $UsersTable, Workspace>(
+                          currentTable: table,
+                          referencedTable: $$UsersTableReferences
+                              ._workspacesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$UsersTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).workspacesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.createdBy == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                       if (workspaceMembersRefs)
                         await $_getPrefetchedData<
                           User,
@@ -4158,19 +4307,6 @@ class $$UsersTableTableManager
                           referencedItemsForCurrentItem:
                               (item, referencedItems) => referencedItems.where(
                                 (e) => e.userId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                      if (tasksRefs)
-                        await $_getPrefetchedData<User, $UsersTable, Task>(
-                          currentTable: table,
-                          referencedTable: $$UsersTableReferences
-                              ._tasksRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$UsersTableReferences(db, table, p0).tasksRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.assigneeId == item.id,
                               ),
                           typedResults: items,
                         ),
@@ -4194,7 +4330,7 @@ typedef $$UsersTableProcessedTableManager =
       $$UsersTableUpdateCompanionBuilder,
       (User, $$UsersTableReferences),
       User,
-      PrefetchHooks Function({bool workspaceMembersRefs, bool tasksRefs})
+      PrefetchHooks Function({bool workspacesRefs, bool workspaceMembersRefs})
     >;
 typedef $$WorkspacesTableCreateCompanionBuilder =
     WorkspacesCompanion Function({
@@ -4202,6 +4338,7 @@ typedef $$WorkspacesTableCreateCompanionBuilder =
       required String name,
       required String description,
       Value<String?> imageUrl,
+      required String createdBy,
       required DateTime createdAt,
       required DateTime updatedAt,
       Value<DateTime?> deletedAt,
@@ -4213,6 +4350,7 @@ typedef $$WorkspacesTableUpdateCompanionBuilder =
       Value<String> name,
       Value<String> description,
       Value<String?> imageUrl,
+      Value<String> createdBy,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
       Value<DateTime?> deletedAt,
@@ -4222,6 +4360,24 @@ typedef $$WorkspacesTableUpdateCompanionBuilder =
 final class $$WorkspacesTableReferences
     extends BaseReferences<_$AppDatabase, $WorkspacesTable, Workspace> {
   $$WorkspacesTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $UsersTable _createdByTable(_$AppDatabase db) => db.users.createAlias(
+    $_aliasNameGenerator(db.workspaces.createdBy, db.users.id),
+  );
+
+  $$UsersTableProcessedTableManager get createdBy {
+    final $_column = $_itemColumn<String>('created_by')!;
+
+    final manager = $$UsersTableTableManager(
+      $_db,
+      $_db.users,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_createdByTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
 
   static MultiTypedResultKey<$WorkspaceMembersTable, List<WorkspaceMember>>
   _workspaceMembersRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
@@ -4309,6 +4465,29 @@ class $$WorkspacesTableFilterComposer
     column: $table.deletedAt,
     builder: (column) => ColumnFilters(column),
   );
+
+  $$UsersTableFilterComposer get createdBy {
+    final $$UsersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.createdBy,
+      referencedTable: $db.users,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UsersTableFilterComposer(
+            $db: $db,
+            $table: $db.users,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 
   Expression<bool> workspaceMembersRefs(
     Expression<bool> Function($$WorkspaceMembersTableFilterComposer f) f,
@@ -4404,6 +4583,29 @@ class $$WorkspacesTableOrderingComposer
     column: $table.deletedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  $$UsersTableOrderingComposer get createdBy {
+    final $$UsersTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.createdBy,
+      referencedTable: $db.users,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UsersTableOrderingComposer(
+            $db: $db,
+            $table: $db.users,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$WorkspacesTableAnnotationComposer
@@ -4437,6 +4639,29 @@ class $$WorkspacesTableAnnotationComposer
 
   GeneratedColumn<DateTime> get deletedAt =>
       $composableBuilder(column: $table.deletedAt, builder: (column) => column);
+
+  $$UsersTableAnnotationComposer get createdBy {
+    final $$UsersTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.createdBy,
+      referencedTable: $db.users,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UsersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.users,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 
   Expression<T> workspaceMembersRefs<T extends Object>(
     Expression<T> Function($$WorkspaceMembersTableAnnotationComposer a) f,
@@ -4502,7 +4727,11 @@ class $$WorkspacesTableTableManager
           $$WorkspacesTableUpdateCompanionBuilder,
           (Workspace, $$WorkspacesTableReferences),
           Workspace,
-          PrefetchHooks Function({bool workspaceMembersRefs, bool projectsRefs})
+          PrefetchHooks Function({
+            bool createdBy,
+            bool workspaceMembersRefs,
+            bool projectsRefs,
+          })
         > {
   $$WorkspacesTableTableManager(_$AppDatabase db, $WorkspacesTable table)
     : super(
@@ -4521,6 +4750,7 @@ class $$WorkspacesTableTableManager
                 Value<String> name = const Value.absent(),
                 Value<String> description = const Value.absent(),
                 Value<String?> imageUrl = const Value.absent(),
+                Value<String> createdBy = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
                 Value<DateTime?> deletedAt = const Value.absent(),
@@ -4530,6 +4760,7 @@ class $$WorkspacesTableTableManager
                 name: name,
                 description: description,
                 imageUrl: imageUrl,
+                createdBy: createdBy,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,
@@ -4541,6 +4772,7 @@ class $$WorkspacesTableTableManager
                 required String name,
                 required String description,
                 Value<String?> imageUrl = const Value.absent(),
+                required String createdBy,
                 required DateTime createdAt,
                 required DateTime updatedAt,
                 Value<DateTime?> deletedAt = const Value.absent(),
@@ -4550,6 +4782,7 @@ class $$WorkspacesTableTableManager
                 name: name,
                 description: description,
                 imageUrl: imageUrl,
+                createdBy: createdBy,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 deletedAt: deletedAt,
@@ -4564,14 +4797,50 @@ class $$WorkspacesTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({workspaceMembersRefs = false, projectsRefs = false}) {
+              ({
+                createdBy = false,
+                workspaceMembersRefs = false,
+                projectsRefs = false,
+              }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (workspaceMembersRefs) db.workspaceMembers,
                     if (projectsRefs) db.projects,
                   ],
-                  addJoins: null,
+                  addJoins:
+                      <
+                        T extends TableManagerState<
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic,
+                          dynamic
+                        >
+                      >(state) {
+                        if (createdBy) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.createdBy,
+                                    referencedTable: $$WorkspacesTableReferences
+                                        ._createdByTable(db),
+                                    referencedColumn:
+                                        $$WorkspacesTableReferences
+                                            ._createdByTable(db)
+                                            .id,
+                                  )
+                                  as T;
+                        }
+
+                        return state;
+                      },
                   getPrefetchedDataCallback: (items) async {
                     return [
                       if (workspaceMembersRefs)
@@ -4636,7 +4905,11 @@ typedef $$WorkspacesTableProcessedTableManager =
       $$WorkspacesTableUpdateCompanionBuilder,
       (Workspace, $$WorkspacesTableReferences),
       Workspace,
-      PrefetchHooks Function({bool workspaceMembersRefs, bool projectsRefs})
+      PrefetchHooks Function({
+        bool createdBy,
+        bool workspaceMembersRefs,
+        bool projectsRefs,
+      })
     >;
 typedef $$WorkspaceMembersTableCreateCompanionBuilder =
     WorkspaceMembersCompanion Function({
@@ -6035,6 +6308,7 @@ typedef $$TasksTableCreateCompanionBuilder =
       required String title,
       required String description,
       Value<String?> assigneeId,
+      required String createdBy,
       required String priority,
       required String status,
       Value<DateTime?> startDate,
@@ -6052,6 +6326,7 @@ typedef $$TasksTableUpdateCompanionBuilder =
       Value<String> title,
       Value<String> description,
       Value<String?> assigneeId,
+      Value<String> createdBy,
       Value<String> priority,
       Value<String> status,
       Value<DateTime?> startDate,
@@ -6114,6 +6389,24 @@ final class $$TasksTableReferences
       $_db.users,
     ).filter((f) => f.id.sqlEquals($_column));
     final item = $_typedResult.readTableOrNull(_assigneeIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $UsersTable _createdByTable(_$AppDatabase db) => db.users.createAlias(
+    $_aliasNameGenerator(db.tasks.createdBy, db.users.id),
+  );
+
+  $$UsersTableProcessedTableManager get createdBy {
+    final $_column = $_itemColumn<String>('created_by')!;
+
+    final manager = $$UsersTableTableManager(
+      $_db,
+      $_db.users,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_createdByTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: [item]),
@@ -6229,6 +6522,29 @@ class $$TasksTableFilterComposer extends Composer<_$AppDatabase, $TasksTable> {
     final $$UsersTableFilterComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.assigneeId,
+      referencedTable: $db.users,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UsersTableFilterComposer(
+            $db: $db,
+            $table: $db.users,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$UsersTableFilterComposer get createdBy {
+    final $$UsersTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.createdBy,
       referencedTable: $db.users,
       getReferencedColumn: (t) => t.id,
       builder:
@@ -6376,6 +6692,29 @@ class $$TasksTableOrderingComposer
     );
     return composer;
   }
+
+  $$UsersTableOrderingComposer get createdBy {
+    final $$UsersTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.createdBy,
+      referencedTable: $db.users,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UsersTableOrderingComposer(
+            $db: $db,
+            $table: $db.users,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$TasksTableAnnotationComposer
@@ -6487,6 +6826,29 @@ class $$TasksTableAnnotationComposer
     );
     return composer;
   }
+
+  $$UsersTableAnnotationComposer get createdBy {
+    final $$UsersTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.createdBy,
+      referencedTable: $db.users,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$UsersTableAnnotationComposer(
+            $db: $db,
+            $table: $db.users,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$TasksTableTableManager
@@ -6506,6 +6868,7 @@ class $$TasksTableTableManager
             bool milestoneId,
             bool parentTaskId,
             bool assigneeId,
+            bool createdBy,
           })
         > {
   $$TasksTableTableManager(_$AppDatabase db, $TasksTable table)
@@ -6527,6 +6890,7 @@ class $$TasksTableTableManager
                 Value<String> title = const Value.absent(),
                 Value<String> description = const Value.absent(),
                 Value<String?> assigneeId = const Value.absent(),
+                Value<String> createdBy = const Value.absent(),
                 Value<String> priority = const Value.absent(),
                 Value<String> status = const Value.absent(),
                 Value<DateTime?> startDate = const Value.absent(),
@@ -6542,6 +6906,7 @@ class $$TasksTableTableManager
                 title: title,
                 description: description,
                 assigneeId: assigneeId,
+                createdBy: createdBy,
                 priority: priority,
                 status: status,
                 startDate: startDate,
@@ -6559,6 +6924,7 @@ class $$TasksTableTableManager
                 required String title,
                 required String description,
                 Value<String?> assigneeId = const Value.absent(),
+                required String createdBy,
                 required String priority,
                 required String status,
                 Value<DateTime?> startDate = const Value.absent(),
@@ -6574,6 +6940,7 @@ class $$TasksTableTableManager
                 title: title,
                 description: description,
                 assigneeId: assigneeId,
+                createdBy: createdBy,
                 priority: priority,
                 status: status,
                 startDate: startDate,
@@ -6594,6 +6961,7 @@ class $$TasksTableTableManager
                 milestoneId = false,
                 parentTaskId = false,
                 assigneeId = false,
+                createdBy = false,
               }) {
                 return PrefetchHooks(
                   db: db,
@@ -6653,6 +7021,19 @@ class $$TasksTableTableManager
                                   )
                                   as T;
                         }
+                        if (createdBy) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.createdBy,
+                                    referencedTable: $$TasksTableReferences
+                                        ._createdByTable(db),
+                                    referencedColumn: $$TasksTableReferences
+                                        ._createdByTable(db)
+                                        .id,
+                                  )
+                                  as T;
+                        }
 
                         return state;
                       },
@@ -6681,6 +7062,7 @@ typedef $$TasksTableProcessedTableManager =
         bool milestoneId,
         bool parentTaskId,
         bool assigneeId,
+        bool createdBy,
       })
     >;
 typedef $$SeedControlTableCreateCompanionBuilder =

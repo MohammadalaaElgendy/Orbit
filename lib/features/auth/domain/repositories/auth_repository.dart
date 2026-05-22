@@ -16,7 +16,11 @@ class AuthRepository {
         final user = _mapSupabaseUserToModel(sUser);
         try {
           await _userRepository.createUser(user);
-        } catch (e) { }
+        } catch (e) {
+          if (kDebugMode) {
+            debugPrint('Error syncing user to local DB: $e');
+          }
+        }
       }
     });
   }

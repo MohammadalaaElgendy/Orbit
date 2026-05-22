@@ -3,6 +3,7 @@ import '../../../../shared/models/workspace.dart';
 import '../../../../shared/models/project.dart';
 import '../../../../shared/models/user.dart';
 import '../../../auth/domain/repositories/user_repository.dart';
+import '../../../auth/domain/repositories/auth_repository.dart';
 import '../../domain/repositories/workspace_repository.dart';
 import '../../domain/repositories/project_repository.dart';
 import 'dart:async';
@@ -12,6 +13,7 @@ class WorkspaceViewModel extends ChangeNotifier {
   final WorkspaceRepository _workspaceRepository;
   final ProjectRepository _projectRepository;
   final UserRepository _userRepository;
+  final AuthRepository _authRepository;
 
   Workspace? _currentWorkspace;
   Workspace? get currentWorkspace => _currentWorkspace;
@@ -33,9 +35,11 @@ class WorkspaceViewModel extends ChangeNotifier {
     required WorkspaceRepository workspaceRepository,
     required ProjectRepository projectRepository,
     required UserRepository userRepository,
+    required AuthRepository authRepository,
   })  : _workspaceRepository = workspaceRepository,
         _projectRepository = projectRepository,
-        _userRepository = userRepository {
+        _userRepository = userRepository,
+        _authRepository = authRepository {
     _init();
   }
 
@@ -64,19 +68,25 @@ class WorkspaceViewModel extends ChangeNotifier {
   }
 
   Future<void> createWorkspace(String name, String description, String? imageUrl, List<String> memberIds) async {
+    final currentUser = _authRepository.currentUser;
+    if (currentUser == null) return;
+
     final workspaceId = const Uuid().v4();
     final workspace = Workspace(
       id: workspaceId,
       name: name,
       description: description,
       imageUrl: imageUrl,
+      createdBy: currentUser.id,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );
     await _workspaceRepository.createWorkspace(workspace);
     
     for (final userId in memberIds) {
-      await _workspaceRepository.addMemberToWorkspace(workspaceId, userId, 'member');
+      if (userId != currentUser.id) {
+        await _workspaceRepository.addMemberToWorkspace(workspaceId, userId, 'member');
+      }
     }
   }
 
@@ -89,6 +99,7 @@ class WorkspaceViewModel extends ChangeNotifier {
       name: name,
       description: description,
       imageUrl: imageUrl ?? ws.imageUrl,
+      createdBy: ws.createdBy,
       createdAt: ws.createdAt,
       updatedAt: DateTime.now(),
     );

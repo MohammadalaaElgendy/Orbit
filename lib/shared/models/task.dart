@@ -8,6 +8,7 @@ class Task {
   final String title;
   final String description;
   final String? assigneeId;
+  final String createdBy;
   final TaskStatus status;
   final TaskPriority priority;
   final DateTime? startDate;
@@ -25,6 +26,7 @@ class Task {
     required this.title,
     required this.description,
     this.assigneeId,
+    required this.createdBy,
     this.status = TaskStatus.todo,
     this.priority = TaskPriority.medium,
     this.startDate,

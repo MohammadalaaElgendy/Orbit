@@ -6,6 +6,7 @@ import '../../../../shared/models/user.dart';
 import '../../domain/repositories/task_repository.dart';
 import '../../../workspace/domain/repositories/workspace_repository.dart';
 import '../../../milestone/domain/repositories/milestone_repository.dart';
+import '../../../auth/domain/repositories/auth_repository.dart';
 import 'dart:async';
 import 'package:uuid/uuid.dart';
 
@@ -13,6 +14,7 @@ class DashboardViewModel extends ChangeNotifier {
   final WorkspaceRepository _workspaceRepository;
   final MilestoneRepository _milestoneRepository;
   final TaskRepository _taskRepository;
+  final AuthRepository _authRepository;
 
   List<Workspace> _workspaces = [];
   List<Workspace> get workspaces => _workspaces;
@@ -50,15 +52,20 @@ class DashboardViewModel extends ChangeNotifier {
     required WorkspaceRepository workspaceRepository,
     required MilestoneRepository milestoneRepository,
     required TaskRepository taskRepository,
+    required AuthRepository authRepository,
   })  : _workspaceRepository = workspaceRepository,
         _milestoneRepository = milestoneRepository,
-        _taskRepository = taskRepository {
+        _taskRepository = taskRepository,
+        _authRepository = authRepository {
     _init();
   }
 
   void _init() {
-    // Watch Workspaces
-    _workspaceSub = _workspaceRepository.watchWorkspaces().listen((data) async {
+    final currentUser = _authRepository.currentUser;
+    if (currentUser == null) return;
+
+    // Watch Workspaces for specific user
+    _workspaceSub = _workspaceRepository.watchWorkspacesForUser(currentUser.id).listen((data) async {
       _workspaces = data;
       for (var ws in data) {
         final members = await _workspaceRepository.watchWorkspaceMembers(ws.id).first;
@@ -96,19 +103,25 @@ class DashboardViewModel extends ChangeNotifier {
   }
 
   Future<void> createWorkspace(String name, String description, String? imageUrl, List<String> memberIds) async {
+    final currentUser = _authRepository.currentUser;
+    if (currentUser == null) return;
+
     final workspaceId = const Uuid().v4();
     final workspace = Workspace(
       id: workspaceId,
       name: name,
       description: description,
       imageUrl: imageUrl,
+      createdBy: currentUser.id,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );
     await _workspaceRepository.createWorkspace(workspace);
     
     for (final userId in memberIds) {
-      await _workspaceRepository.addMemberToWorkspace(workspaceId, userId, 'member');
+      if (userId != currentUser.id) {
+        await _workspaceRepository.addMemberToWorkspace(workspaceId, userId, 'member');
+      }
     }
   }
 
@@ -121,6 +134,7 @@ class DashboardViewModel extends ChangeNotifier {
       name: name,
       description: description,
       imageUrl: imageUrl ?? ws.imageUrl,
+      createdBy: ws.createdBy,
       createdAt: ws.createdAt,
       updatedAt: DateTime.now(),
     );
