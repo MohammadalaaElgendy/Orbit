@@ -38,6 +38,13 @@ class _ProjectDialogState extends State<ProjectDialog> {
   }
 
   @override
+  void dispose() {
+    _nameController.dispose();
+    _descController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isEdit = widget.project != null;
@@ -52,43 +59,60 @@ class _ProjectDialogState extends State<ProjectDialog> {
             padding: const EdgeInsets.all(AppSpacing.lg),
             borderRadius: AppRadius.xl,
             child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
               child: Form(
                 key: _formKey,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      isEdit ? 'Edit Project' : 'Create Project',
-                      style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900),
+                    Row(
+                      children: [
+                        Icon(
+                          isEdit ? Icons.edit_note_rounded : Icons.rocket_launch_rounded, 
+                          color: theme.colorScheme.primary, 
+                          size: 28
+                        ),
+                        const SizedBox(width: AppSpacing.md),
+                        Text(
+                          isEdit ? 'Edit Project' : 'New Project',
+                          style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900, letterSpacing: -0.5),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: AppSpacing.lg),
+                    const SizedBox(height: AppSpacing.xl),
                     TextFormField(
                       controller: _nameController,
+                      style: theme.textTheme.bodyLarge,
                       decoration: InputDecoration(
-                        labelText: 'Name',
+                        labelText: 'Project Name',
+                        hintText: 'e.g., Mobile App Development',
+                        prefixIcon: const Icon(Icons.folder_outlined),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                       ),
-                      validator: (v) => v == null || v.isEmpty ? 'Name is required' : null,
+                      validator: (v) => v == null || v.isEmpty ? 'Please enter a project name' : null,
                     ),
                     const SizedBox(height: AppSpacing.md),
                     TextFormField(
                       controller: _descController,
                       maxLines: 2,
+                      style: theme.textTheme.bodyMedium,
                       decoration: InputDecoration(
                         labelText: 'Description',
+                        hintText: 'Briefly describe the project goals',
+                        prefixIcon: const Icon(Icons.description_outlined),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                       ),
                     ),
+                    const SizedBox(height: AppSpacing.lg),
+                    Text('Project Theme Color', style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
                     const SizedBox(height: AppSpacing.md),
-                    Text('Color', style: theme.textTheme.labelLarge),
-                    const SizedBox(height: AppSpacing.xs),
                     SizedBox(
-                      height: 40,
+                      height: 50,
                       child: ListView.separated(
                         scrollDirection: Axis.horizontal,
                         itemCount: _colors.length,
-                        separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.sm),
+                        separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.md),
                         itemBuilder: (context, index) {
                           final colorHex = _colors[index];
                           final color = Color(int.parse(colorHex.replaceAll('#', '0xFF')));
@@ -96,29 +120,34 @@ class _ProjectDialogState extends State<ProjectDialog> {
 
                           return GestureDetector(
                             onTap: () => setState(() => _selectedColor = colorHex),
-                            child: Container(
-                              width: 40,
-                              height: 40,
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              width: isSelected ? 48 : 40,
+                              height: isSelected ? 48 : 40,
                               decoration: BoxDecoration(
                                 color: color,
                                 shape: BoxShape.circle,
-                                border: isSelected ? Border.all(color: theme.colorScheme.onSurface, width: 2) : null,
+                                border: isSelected ? Border.all(color: theme.colorScheme.onSurface, width: 3) : null,
+                                boxShadow: isSelected ? [
+                                  BoxShadow(color: color.withValues(alpha: 0.4), blurRadius: 10, offset: const Offset(0, 4))
+                                ] : null,
                               ),
-                              child: isSelected ? const Icon(Icons.check, color: Colors.white, size: 20) : null,
+                              child: isSelected ? const Icon(Icons.check, color: Colors.white, size: 24) : null,
                             ),
                           );
                         },
                       ),
                     ),
-                    const SizedBox(height: AppSpacing.xl),
+                    const SizedBox(height: AppSpacing.xxl),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         TextButton(
                           onPressed: () => Navigator.pop(context),
+                          style: TextButton.styleFrom(foregroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
                           child: const Text('Cancel'),
                         ),
-                        const SizedBox(width: AppSpacing.sm),
+                        const SizedBox(width: AppSpacing.md),
                         ElevatedButton(
                           onPressed: () {
                             if (_formKey.currentState?.validate() ?? false) {
@@ -129,9 +158,11 @@ class _ProjectDialogState extends State<ProjectDialog> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: theme.colorScheme.primary,
                             foregroundColor: theme.colorScheme.onPrimary,
+                            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl, vertical: AppSpacing.md),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+                            elevation: 0,
                           ),
-                          child: Text(isEdit ? 'Save' : 'Create'),
+                          child: Text(isEdit ? 'Save Changes' : 'Create Project', style: const TextStyle(fontWeight: FontWeight.bold)),
                         ),
                       ],
                     ),

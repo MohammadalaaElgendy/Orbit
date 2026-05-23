@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:orbit/core/constants/app_constants.dart';
 import 'package:orbit/shared/models/workspace.dart';
 import 'package:orbit/shared/models/user.dart';
-import 'package:orbit/features/dashboard/presentation/view_models/dashboard_view_model.dart';
-import 'package:orbit/features/workspace/presentation/view_models/workspace_view_model.dart';
-import 'package:orbit/features/workspace/presentation/widgets/workspace_dialog.dart';
+import 'package:orbit/features/workspace/presentation/widgets/workspace_menu_sheet.dart';
 import 'package:orbit/shared/widgets/smart_image.dart';
 
 class WorkspaceCard extends StatelessWidget {
@@ -25,56 +22,7 @@ class WorkspaceCard extends StatelessWidget {
   void _showWorkspaceMenu(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      builder: (_) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            leading: const Icon(Icons.edit_rounded),
-            title: const Text('Edit Workspace'),
-            onTap: () async {
-              Navigator.pop(context);
-              final members = await context.read<WorkspaceViewModel>().getWorkspaceMembers(ws.id);
-              if (!context.mounted) return;
-              
-              showDialog(
-                context: context,
-                builder: (_) => WorkspaceDialog(
-                  workspace: ws,
-                  currentMembers: members,
-                  onSave: (name, desc, imageUrl, memberIds) => context.read<DashboardViewModel>().updateWorkspace(
-                    ws.id, name, desc, imageUrl, memberIds,
-                  ),
-                ),
-              );
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.delete_outline_rounded, color: Colors.red),
-            title: const Text('Delete Workspace', style: TextStyle(color: Colors.red)),
-            onTap: () {
-              Navigator.pop(context);
-              showDialog(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('Delete Workspace'),
-                  content: const Text('Are you sure you want to delete this workspace? This action is reversible but will hide it from your dashboard.'),
-                  actions: [
-                    TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-                    TextButton(
-                      onPressed: () {
-                        context.read<DashboardViewModel>().deleteWorkspace(ws.id);
-                        Navigator.pop(context);
-                      }, 
-                      child: const Text('Delete', style: TextStyle(color: Colors.red))
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-          const SizedBox(height: AppSpacing.lg),
-        ],
-      ),
+      builder: (_) => WorkspaceMenuSheet(workspace: ws),
     );
   }
 

@@ -58,7 +58,7 @@ class OrbitLogo extends StatelessWidget {
           // Main Icon - Rocket
           Icon(
             Icons.rocket_launch_rounded,
-            color: isDark ? Colors.white : theme.colorScheme.primary,
+            color: isDark ? Colors.white : (showGlassBackground ? theme.colorScheme.primary : Colors.white),
             size: size * 0.55,
           ),
         ],

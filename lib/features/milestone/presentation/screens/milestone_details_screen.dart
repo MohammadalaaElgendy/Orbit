@@ -5,8 +5,7 @@ import '../../../../shared/models/milestone.dart' as model;
 import '../../../../shared/widgets/glass_card.dart';
 import '../../../dashboard/presentation/widgets/task_card.dart';
 import '../view_models/milestone_view_model.dart';
-
-import '../widgets/milestone_dialog.dart';
+import '../widgets/milestone_menu_sheet.dart';
 import '../../../dashboard/presentation/widgets/task_dialog.dart';
 import '../../../dashboard/presentation/view_models/task_view_model.dart';
 
@@ -31,48 +30,10 @@ class _MilestoneDetailsScreenState extends State<MilestoneDetailsScreen> {
   }
 
   void _showMilestoneMenu() {
-    final viewModel = context.read<MilestoneViewModel>();
-    final currentMilestone = viewModel.currentMilestone ?? widget.milestone;
     showModalBottomSheet(
       context: context,
-      builder: (_) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            leading: const Icon(Icons.edit_rounded),
-            title: const Text('Edit Milestone'),
-            onTap: () {
-              Navigator.pop(context);
-              showDialog(
-                context: context,
-                builder: (_) => MilestoneDialog(
-                  milestone: currentMilestone,
-                  onSave: (name, desc, dueDate) {
-                    viewModel.updateMilestone(model.Milestone(
-                      id: currentMilestone.id,
-                      projectId: currentMilestone.projectId,
-                      name: name,
-                      description: desc,
-                      dueDate: dueDate,
-                      createdAt: currentMilestone.createdAt,
-                      updatedAt: DateTime.now(),
-                    ));
-                  },
-                ),
-              );
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.delete_outline_rounded, color: Colors.red),
-            title: const Text('Delete Milestone', style: TextStyle(color: Colors.red)),
-            onTap: () {
-              Navigator.pop(context);
-              viewModel.deleteMilestone(currentMilestone.id);
-              Navigator.pop(context);
-            },
-          ),
-          const SizedBox(height: AppSpacing.lg),
-        ],
+      builder: (_) => MilestoneMenuSheet(
+        milestone: context.read<MilestoneViewModel>().currentMilestone ?? widget.milestone,
       ),
     );
   }

@@ -8,6 +8,7 @@ import '../../../../shared/widgets/glass_card.dart';
 import '../widgets/task_card.dart';
 import '../view_models/task_view_model.dart';
 import '../widgets/task_dialog.dart';
+import '../widgets/task_menu_sheet.dart';
 import '../../../../shared/widgets/smart_image.dart';
 
 class TaskDetailsScreen extends StatefulWidget {
@@ -26,54 +27,10 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
   }
 
   void _showTaskMenu() {
-    final viewModel = context.read<TaskViewModel>();
-    final currentTask = viewModel.currentTask ?? widget.task;
     showModalBottomSheet(
       context: context,
-      builder: (_) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            leading: const Icon(Icons.edit_rounded),
-            title: const Text('Edit Task'),
-            onTap: () {
-              Navigator.pop(context);
-              showDialog(
-                context: context,
-                builder: (_) => TaskDialog(
-                  task: currentTask,
-                  workspaceMembers: viewModel.workspaceMembers,
-                  onSave: ({required description, required priority, required status, required title, assigneeId, dueDate}) {
-                    viewModel.updateTask(Task(
-                      id: currentTask.id,
-                      milestoneId: currentTask.milestoneId,
-                      parentTaskId: currentTask.parentTaskId,
-                      title: title,
-                      description: description,
-                      status: status,
-                      priority: priority,
-                      assigneeId: assigneeId,
-                      createdBy: currentTask.createdBy,
-                      dueDate: dueDate,
-                      createdAt: currentTask.createdAt,
-                      updatedAt: DateTime.now(),
-                    ));
-                  },
-                ),
-              );
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.delete_outline_rounded, color: Colors.red),
-            title: const Text('Delete Task', style: TextStyle(color: Colors.red)),
-            onTap: () {
-              Navigator.pop(context);
-              viewModel.deleteTask(currentTask.id);
-              Navigator.pop(context);
-            },
-          ),
-          const SizedBox(height: AppSpacing.lg),
-        ],
+      builder: (_) => TaskMenuSheet(
+        task: context.read<TaskViewModel>().currentTask ?? widget.task,
       ),
     );
   }

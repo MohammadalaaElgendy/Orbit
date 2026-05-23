@@ -3,8 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
-    <uses-permission android:name="android.permission.USE_EXACT_ALARM"
-        tools:ignore="ExactAlarm" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" tools:ignore="ExactAlarm" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.BLUETOOTH" tools:node="remove"/>
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" tools:node="remove"/>
     <uses-permission android:name="android.permission.INTERNET"/>

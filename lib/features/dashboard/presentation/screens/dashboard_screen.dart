@@ -7,6 +7,7 @@ import 'package:orbit/features/dashboard/presentation/widgets/dashboard_stats.da
 import 'package:orbit/features/dashboard/presentation/widgets/workspace_card.dart';
 import 'package:orbit/features/dashboard/presentation/widgets/milestone_card.dart';
 import 'package:orbit/features/dashboard/presentation/widgets/task_card.dart';
+import 'package:orbit/features/dashboard/presentation/widgets/all_tasks_dialog.dart';
 import 'package:orbit/features/dashboard/presentation/view_models/dashboard_view_model.dart';
 import 'package:orbit/features/workspace/presentation/widgets/workspace_dialog.dart';
 import 'package:orbit/shared/widgets/top_padding.dart';
@@ -135,7 +136,15 @@ class DashboardScreen extends StatelessWidget {
 
           if (tasks.isNotEmpty) ...[
             const SizedBox(height: AppSpacing.xl),
-            _buildSectionHeader(theme, 'Recent Activity', 'View all'),
+            _buildSectionHeader(
+              theme, 
+              'Recent Activity', 
+              'View all', 
+              onTap: () => showDialog(
+                context: context,
+                builder: (_) => const AllTasksDialog(),
+              ),
+            ),
             const SizedBox(height: AppSpacing.md),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
@@ -192,14 +201,23 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionHeader(ThemeData theme, String title, String subtitle) {
+  Widget _buildSectionHeader(ThemeData theme, String title, String subtitle, {VoidCallback? onTap}) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(title, style: theme.textTheme.headlineSmall?.copyWith(fontSize: 18, fontWeight: FontWeight.w800)),
-          Text(subtitle, style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.primary, fontWeight: FontWeight.bold)),
+          GestureDetector(
+            onTap: onTap,
+            child: Text(
+              subtitle, 
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.primary, 
+                fontWeight: FontWeight.bold
+              ),
+            ),
+          ),
         ],
       ),
     );

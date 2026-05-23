@@ -136,16 +136,25 @@ class DashboardStats extends StatelessWidget {
         else
           ...topMilestones.map((m) => Padding(
             padding: const EdgeInsets.only(bottom: AppSpacing.md),
-            child: _buildMiniProgressRow(theme, m.name, m.progress, _getMilestoneColor(m.name)),
+            child: _buildMiniProgressRow(theme, m.name, m.progress, _getMilestoneColor(m.progress)),
           )),
       ],
     );
   }
 
-  Color _getMilestoneColor(String name) {
-    // Deterministic color based on name
-    final colors = [Colors.blueAccent, Colors.purpleAccent, Colors.orangeAccent, Colors.greenAccent, Colors.pinkAccent];
-    return colors[name.length % colors.length];
+  Color _getMilestoneColor(double progress) {
+    // لوحة ألوان مكونة من 10 مستويات متنوعة وحيوية
+    if (progress >= 1.0) return Colors.purpleAccent;      // إنجاز ملكي (Done)
+    if (progress >= 0.90) return Colors.blueAccent;      // قمة الأداء
+    if (progress >= 0.80) return Colors.cyanAccent;
+    if (progress >= 0.70) return Colors.tealAccent;      // منطقة الثقة
+    if (progress >= 0.60) return Colors.greenAccent;
+    if (progress >= 0.50) return Colors.limeAccent;      // تجاوز المنتصف
+    if (progress >= 0.40) return Colors.yellowAccent;
+    if (progress >= 0.30) return Colors.amberAccent;
+    if (progress >= 0.20) return Colors.orangeAccent;    // البداية النشطة
+    if (progress >= 0.10) return Colors.deepOrangeAccent;
+    return Colors.redAccent;                            // في البداية جداً
   }
 
   Widget _buildMiniProgressRow(ThemeData theme, String label, double value, Color color) {

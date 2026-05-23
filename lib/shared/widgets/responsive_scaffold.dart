@@ -4,9 +4,13 @@ import 'orbit_logo.dart';
 import 'glass_card.dart';
 import '../../core/constants/app_constants.dart';
 import '../../features/auth/presentation/view_models/auth_view_model.dart';
+import '../../features/auth/presentation/widgets/user_profile_sheet.dart';
 import 'package:provider/provider.dart';
 
+import 'package:flutter/services.dart';
+
 class ResponsiveScaffold extends StatefulWidget {
+// ... (rest of class)
   final Widget body;
   final String title;
   final List<Widget>? actions;
@@ -27,179 +31,31 @@ class ResponsiveScaffold extends StatefulWidget {
 }
 
 class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
-  void _showAvatarOptions(BuildContext context) {
-    final authViewModel = context.read<AuthViewModel>();
-
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => GlassCard(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        borderRadius: AppRadius.xxl,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.photo_library_outlined),
-              title: Text(authViewModel.user?.avatarUrl == null ? 'Add Photo' : 'Change Photo'),
-              onTap: () {
-                Navigator.pop(context);
-                authViewModel.updateProfileAvatar();
-              },
-            ),
-            if (authViewModel.user?.avatarUrl != null)
-              ListTile(
-                leading: const Icon(Icons.delete_outline, color: Colors.redAccent),
-                title: const Text('Remove Photo', style: TextStyle(color: Colors.redAccent)),
-                onTap: () {
-                  Navigator.pop(context);
-                  authViewModel.deleteProfileAvatar();
-                },
-              ),
-            const SizedBox(height: AppSpacing.sm),
-          ],
-        ),
-      ),
-    );
-  }
-
   void _showUserMenu(BuildContext context) {
-    final theme = Theme.of(context);
-
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
       barrierColor: Colors.black.withValues(alpha: 0.3),
-      builder: (context) => Consumer<AuthViewModel>(
-        builder: (context, authViewModel, child) {
-          final user = authViewModel.user;
-          final isLoading = authViewModel.isLoading;
-
-          return BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surface.withValues(alpha: 0.8),
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.xxl)),
-                border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Opacity(
-                        opacity: isLoading ? 0.5 : 1.0,
-                        child: CircleAvatar(
-                          radius: 30,
-                          backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
-                          backgroundImage: user?.avatarUrl != null ? NetworkImage(user!.avatarUrl!) : null,
-                          onBackgroundImageError: user?.avatarUrl != null ? (e, s) => debugPrint("Load error") : null,
-                          child: user?.avatarUrl == null ? Icon(Icons.person, size: 30, color: theme.colorScheme.primary) : null,
-                        ),
-                      ),
-                      if (isLoading)
-                        SizedBox(
-                          width: 30,
-                          height: 30,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
-                          ),
-                        ),
-                      if (!isLoading)
-                        Positioned(
-                          right: -2,
-                          bottom: -2,
-                          child: GestureDetector(
-                            onTap: () => _showAvatarOptions(context),
-                            child: Container(
-                              padding: const EdgeInsets.all(4),
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.primary,
-                                shape: BoxShape.circle,
-                                border: Border.all(color: theme.colorScheme.surface, width: 1.5),
-                              ),
-                              child: const Icon(Icons.edit, size: 10, color: Colors.white),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.xs),
-                  Text(
-                    user?.name ?? 'User',
-                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    user?.email ?? '',
-                    style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 11),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  const Divider(),
-                  IgnorePointer(
-                    ignoring: isLoading,
-                    child: Opacity(
-                      opacity: isLoading ? 0.5 : 1.0,
-                      child: Column(
-                        children: [
-                          ListTile(
-                            visualDensity: const VisualDensity(vertical: -4),
-                            leading: const Icon(Icons.person_outlined, size: 20),
-                            title: const Text('Profile Settings', style: TextStyle(fontSize: 13)),
-                            onTap: () => Navigator.pop(context),
-                          ),
-                          ListTile(
-                            visualDensity: const VisualDensity(vertical: -4),
-                            leading: const Icon(Icons.palette, size: 20),
-                            title: const Text('Appearance', style: TextStyle(fontSize: 13)),
-                            onTap: () => Navigator.pop(context),
-                          ),
-                          ListTile(
-                            visualDensity: const VisualDensity(vertical: -4),
-                            leading: const Icon(Icons.logout, color: Colors.redAccent, size: 20),
-                            title: const Text('Logout', style: TextStyle(color: Colors.redAccent, fontSize: 13)),
-                            onTap: () async {
-                              final nav = Navigator.of(context);
-                              await authViewModel.logout();
-                              nav.pushNamedAndRemoveUntil('/welcome', (route) => false);
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: MediaQuery.of(context).padding.bottom + AppSpacing.xs),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
+      builder: (context) => const UserProfileSheet(),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    
+    // ستايل افتراضي يتبع الثيم (أيقونات سوداء في الوضع الفاتح، وبيضاء في الداكن)
+    final systemOverlayStyle = isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark;
+
     final size = MediaQuery.of(context).size;
     final topPadding = MediaQuery.of(context).padding.top;
     final isDesktop = size.width >= 1024;
     final isTablet = size.width >= 600 && size.width < 1024;
 
+    Widget content;
     if (isDesktop || isTablet) {
-      return Scaffold(
+      content = Scaffold(
         body: Row(
           children: [
             _buildSideNavigation(theme, isDesktop),
@@ -227,20 +83,25 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
           ],
         ),
       );
+    } else {
+      // Mobile View
+      final appBarExtraPadding = AppSpacing.sm;
+      final appBarHeight = kToolbarHeight + topPadding + appBarExtraPadding;
+      content = Scaffold(
+        extendBody: true,
+        extendBodyBehindAppBar: true,
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(appBarHeight),
+          child: _buildCustomGlassAppBar(theme, topPadding, appBarExtraPadding),
+        ),
+        body: widget.body,
+        bottomNavigationBar: _buildFloatingGlassBottomNav(theme),
+      );
     }
 
-    // Mobile View
-    final appBarExtraPadding = AppSpacing.sm; // مسافة إضافية عن شريط الإشعارات
-    final appBarHeight = kToolbarHeight + topPadding + appBarExtraPadding;
-    return Scaffold(
-      extendBody: true,
-      extendBodyBehindAppBar: true,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(appBarHeight),
-        child: _buildCustomGlassAppBar(theme, topPadding, appBarExtraPadding),
-      ),
-      body: widget.body,
-      bottomNavigationBar: _buildFloatingGlassBottomNav(theme),
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: systemOverlayStyle,
+      child: content,
     );
   }
 
@@ -284,15 +145,19 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  widget.title, 
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: -0.5,
-                  )
+                Expanded(
+                  child: Text(
+                    widget.title, 
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -0.5,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-                const Spacer(),
+                const SizedBox(width: AppSpacing.sm),
                 if (widget.actions != null) 
                   ...widget.actions!.map((action) => Padding(
                     padding: const EdgeInsetsDirectional.only(end: AppSpacing.sm),

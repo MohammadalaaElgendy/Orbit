@@ -5,6 +5,7 @@ class User {
   final String? avatarUrl;
   final bool isVerified;
   final String? authProvider;
+  final String? role; // تم إضافة الحقل هنا
 
   User({
     required this.id,
@@ -13,6 +14,7 @@ class User {
     this.avatarUrl,
     this.isVerified = false,
     this.authProvider,
+    this.role,
   });
 
   User copyWith({
@@ -22,6 +24,7 @@ class User {
     String? avatarUrl,
     bool? isVerified,
     String? authProvider,
+    String? role,
   }) {
     return User(
       id: id ?? this.id,
@@ -30,6 +33,7 @@ class User {
       avatarUrl: avatarUrl ?? this.avatarUrl,
       isVerified: isVerified ?? this.isVerified,
       authProvider: authProvider ?? this.authProvider,
+      role: role ?? this.role,
     );
   }
 }
