@@ -25,17 +25,23 @@ class OrbitButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     
+    final isDark = theme.brightness == Brightness.dark;
+    
+    // Premium adaptive colors
+    final primaryBg = theme.colorScheme.primary;
+    final primaryText = theme.colorScheme.onPrimary;
+
     Widget buttonChild = Row(
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         if (isLoading)
-          const SizedBox(
+          SizedBox(
             width: 20,
             height: 20,
             child: CircularProgressIndicator(
               strokeWidth: 2,
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              valueColor: AlwaysStoppedAnimation<Color>(primaryText),
             ),
           )
         else ...[
@@ -47,12 +53,6 @@ class OrbitButton extends StatelessWidget {
         ],
       ],
     );
-
-    final isDark = theme.brightness == Brightness.dark;
-    
-    // Premium adaptive colors
-    final primaryBg = isDark ? Colors.white : theme.colorScheme.primary;
-    final primaryText = isDark ? const Color(0xFF0F0069) : Colors.white;
     
     // In light mode, let's keep the button premium with a subtle glow instead of flat
     final primaryShadow = isDark 

@@ -9,6 +9,7 @@ import '../../../../shared/widgets/orbit_button.dart';
 import '../../../../shared/widgets/orbit_text_field.dart';
 import '../../../../shared/widgets/auth_background.dart';
 import '../view_models/auth_view_model.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -50,6 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final authViewModel = context.watch<AuthViewModel>();
+    final l10n = AppLocalizations.of(context)!;
 
     return PopScope(
       canPop: true,
@@ -84,7 +86,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           const OrbitLogo(size: 64, showGlassBackground: true),
                           const SizedBox(height: AppSpacing.md),
                           Text(
-                            'Orbit',
+                            l10n.appTitle,
                             style: theme.textTheme.headlineLarge?.copyWith(
                               color: theme.colorScheme.onSurface,
                               fontWeight: FontWeight.w800,
@@ -92,7 +94,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                           Text(
-                            'SECURE SIGN IN',
+                            l10n.secureSignIn,
                             style: theme.textTheme.labelSmall?.copyWith(
                               letterSpacing: 2.0,
                               color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
@@ -116,14 +118,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Get Started',
+                              l10n.getStarted,
                               style: theme.textTheme.headlineMedium?.copyWith(
                                 color: theme.colorScheme.onSurface,
                               ),
                             ),
                             const SizedBox(height: AppSpacing.xs),
                             Text(
-                              'Enter your email to receive a sign-in code.',
+                              l10n.emailDescription,
                               style: theme.textTheme.bodyMedium?.copyWith(
                                 color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                               ),
@@ -175,15 +177,15 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               const SizedBox(height: AppSpacing.xl),
                               OrbitTextField(
-                                label: 'Full Name (First time only)',
-                                hint: 'Enter your name',
+                                label: l10n.fullNameLabel,
+                                hint: l10n.fullNameHint,
                                 controller: authViewModel.nameController,
                               ),
                               const SizedBox(height: AppSpacing.md),
                             ],
                             OrbitTextField(
-                              label: 'Email address',
-                              hint: 'Enter your email',
+                              label: l10n.emailAddressLabel,
+                              hint: l10n.emailAddressHint,
                               controller: authViewModel.emailController,
                               keyboardType: TextInputType.emailAddress,
                             ),
@@ -234,7 +236,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               ),
                             OrbitButton(
-                              text: authViewModel.userExists == null ? 'Continue' : (authViewModel.userExists! ? 'Send Sign-in Code' : 'Register & Send Code'),
+                              text: authViewModel.userExists == null ? l10n.continueButton : (authViewModel.userExists! ? l10n.sendCodeButton : l10n.registerAndSendCodeButton),
                               isLoading: authViewModel.isLoading,
                               onPressed: () async {
                                 if (authViewModel.userExists == null) {
@@ -258,7 +260,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                   Padding(
                                     padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                                     child: Text(
-                                      'OR',
+                                      l10n.or,
                                       style: theme.textTheme.labelSmall?.copyWith(
                                         color: theme.colorScheme.onSurface.withValues(alpha: 0.3),
                                       ),
@@ -269,7 +271,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                               const SizedBox(height: AppSpacing.lg),
                               OrbitButton(
-                                text: 'Continue with Google',
+                                text: l10n.continueWithGoogle,
                                 style: OrbitButtonStyle.secondary,
                                 icon: Image.asset(
                                   'assets/images/auth/google_logo.png',

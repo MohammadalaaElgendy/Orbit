@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:protocol_handler/protocol_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'core/theme/app_theme.dart';
+import 'core/services/settings_service.dart';
 import 'core/data/database/app_database.dart' hide Workspace, Milestone, Task;
 import 'core/services/sync_service.dart';
 import 'core/services/notification_service.dart';
@@ -43,6 +45,9 @@ import 'l10n/app_localizations.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
+  final prefs = await SharedPreferences.getInstance();
+  final settingsService = SettingsService(prefs);
+
   // تسجيل البروتوكول للديسكتوب لكي يتمكن المتصفح من العودة للتطبيق بعد تسجيل الدخول
   if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
     await protocolHandler.register('io.supabase.orbit');
@@ -83,6 +88,7 @@ void main() async {
     projectRepo: projectRepo,
     milestoneRepo: milestoneRepo,
     taskRepo: taskRepo,
+    settingsService: settingsService,
   ));
 }
 
@@ -95,6 +101,7 @@ class OrbitApp extends StatelessWidget {
   final ProjectRepository projectRepo;
   final MilestoneRepository milestoneRepo;
   final TaskRepository taskRepo;
+  final SettingsService settingsService;
 
   const OrbitApp({
     super.key,
@@ -106,6 +113,7 @@ class OrbitApp extends StatelessWidget {
     required this.projectRepo,
     required this.milestoneRepo,
     required this.taskRepo,
+    required this.settingsService,
   });
 
   @override
@@ -120,22 +128,25 @@ class OrbitApp extends StatelessWidget {
         Provider.value(value: projectRepo),
         Provider.value(value: milestoneRepo),
         Provider.value(value: taskRepo),
-        ChangeNotifierProvider(create: (_) => ThemeModel()),
+        Provider.value(value: settingsService),
+        ChangeNotifierProvider(create: (_) => ThemeModel(settingsService)),
+        ChangeNotifierProvider(create: (_) => LocaleModel(settingsService)),
         ChangeNotifierProvider(create: (context) => AuthViewModel(authRepository: authRepo, syncService: syncService)),
         ChangeNotifierProvider(create: (context) => DashboardViewModel(workspaceRepository: workspaceRepo, milestoneRepository: milestoneRepo, taskRepository: taskRepo, authRepository: authRepo)),
         ChangeNotifierProvider(create: (context) => WorkspaceViewModel(workspaceRepository: workspaceRepo, projectRepository: projectRepo, userRepository: userRepo, authRepository: authRepo)),
         ChangeNotifierProvider(create: (context) => MilestoneViewModel(milestoneRepository: milestoneRepo, projectRepository: projectRepo, workspaceRepository: workspaceRepo, taskRepository: taskRepo)),
         ChangeNotifierProvider(create: (context) => TaskViewModel(taskRepository: taskRepo, milestoneRepository: milestoneRepo, projectRepository: projectRepo, workspaceRepository: workspaceRepo, authRepository: authRepo)),
       ],
-      child: Consumer<ThemeModel>(
-        builder: (context, themeModel, child) {
+      child: Consumer2<ThemeModel, LocaleModel>(
+        builder: (context, themeModel, localeModel, child) {
           return MaterialApp(
             title: 'Orbit',
             debugShowCheckedModeBanner: false,
             scrollBehavior: const AppScrollBehavior(),
-            theme: AppTheme.light,
-            darkTheme: AppTheme.dark,
+            theme: AppTheme.getTheme(themeModel.preset, Brightness.light),
+            darkTheme: AppTheme.getTheme(themeModel.preset, Brightness.dark),
             themeMode: themeModel.mode,
+            locale: localeModel.locale,
             localizationsDelegates: AppLocalizations.localizationsDelegates,
             supportedLocales: AppLocalizations.supportedLocales,
             initialRoute: '/',
@@ -168,10 +179,57 @@ class OrbitApp extends StatelessWidget {
 }
 
 class ThemeModel extends ChangeNotifier {
-  ThemeMode _mode = ThemeMode.system;
+  final SettingsService _settingsService;
+  late ThemeMode _mode;
+  late ThemePreset _preset;
+
+  ThemeModel(this._settingsService) {
+    _mode = _settingsService.getThemeMode();
+    _preset = _settingsService.getThemePreset();
+  }
+
   ThemeMode get mode => _mode;
+  ThemePreset get preset => _preset;
+
+  void setMode(ThemeMode mode) {
+    _mode = mode;
+    _settingsService.setThemeMode(mode);
+    notifyListeners();
+  }
+
+  void setPreset(ThemePreset preset) {
+    _preset = preset;
+    _settingsService.setThemePreset(preset);
+    notifyListeners();
+  }
+
   void toggleTheme() {
     _mode = _mode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
+    _settingsService.setThemeMode(_mode);
+    notifyListeners();
+  }
+}
+
+class LocaleModel extends ChangeNotifier {
+  final SettingsService _settingsService;
+  late Locale? _locale;
+
+  LocaleModel(this._settingsService) {
+    _locale = _settingsService.getLocale();
+  }
+
+  Locale? get locale => _locale;
+
+  void setLocale(Locale locale) {
+    if (!AppLocalizations.supportedLocales.contains(locale)) return;
+    _locale = locale;
+    _settingsService.setLocale(locale);
+    notifyListeners();
+  }
+
+  void clearLocale() {
+    _locale = null;
+    _settingsService.setLocale(null);
     notifyListeners();
   }
 }

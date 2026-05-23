@@ -3,6 +3,7 @@ import '../../../../core/constants/app_constants.dart';
 import '../../../../shared/widgets/glass_card.dart';
 import '../../../../shared/widgets/orbit_button.dart';
 import '../../../../shared/widgets/orbit_text_field.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
   const ForgotPasswordScreen({super.key});
@@ -10,6 +11,7 @@ class ForgotPasswordScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
@@ -38,10 +40,10 @@ class ForgotPasswordScreen extends StatelessWidget {
                 child: const Icon(Icons.key_outlined, color: Colors.white),
               ),
               const SizedBox(height: AppSpacing.md),
-              Text('Reset Password', style: theme.textTheme.headlineLarge),
+              Text(l10n.resetPassword, style: theme.textTheme.headlineLarge),
               const SizedBox(height: AppSpacing.xs),
               Text(
-                'Enter your email to receive a reset link',
+                l10n.resetEmailDescription,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),
@@ -52,18 +54,18 @@ class ForgotPasswordScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const OrbitTextField(
-                      label: 'Email address',
-                      hint: 'Enter your email',
+                    OrbitTextField(
+                      label: l10n.emailAddress,
+                      hint: l10n.emailAddressHint,
                       keyboardType: TextInputType.emailAddress,
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     OrbitButton(
-                      text: 'Send Reset Link',
+                      text: l10n.sendResetLink,
                       onPressed: () {
                         // Show success message or navigate
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Reset link sent to your email')),
+                          SnackBar(content: Text(l10n.resetLinkSent)),
                         );
                         Navigator.pop(context);
                       },

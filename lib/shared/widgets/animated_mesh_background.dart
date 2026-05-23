@@ -1,5 +1,9 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_theme.dart';
+import '../../main.dart';
 
 class AnimatedMeshBackground extends StatefulWidget {
   const AnimatedMeshBackground({super.key});
@@ -31,21 +35,28 @@ class _AnimatedMeshBackgroundState extends State<AnimatedMeshBackground> with Si
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final size = MediaQuery.of(context).size;
-
-    // Premium Adaptive Colors
-    final bgColor = isDark ? const Color(0xFF1E0B9B) : Colors.white;
     
-    final blob1Color = isDark 
-        ? const Color(0xFF4F46E5).withValues(alpha: 0.6) 
-        : const Color(0xFF818CF8).withValues(alpha: 0.25);
-        
-    final blob2Color = isDark 
-        ? const Color(0xFF818CF8).withValues(alpha: 0.5) 
-        : const Color(0xFFC084FC).withValues(alpha: 0.15);
-        
-    final blob3Color = isDark 
-        ? const Color(0xFFFB923C).withValues(alpha: 0.25) 
-        : const Color(0xFFF472B6).withValues(alpha: 0.1);
+    // الحصول على الـ preset الحالي من الـ Provider
+    final themePreset = context.watch<ThemeModel>().preset;
+
+    // Premium Adaptive Colors based on current theme and preset
+    Color bgColor;
+    if (isDark) {
+      switch (themePreset) {
+        case ThemePreset.alexandria: bgColor = AppColors.alexandriaAuthBG; break;
+        case ThemePreset.forest: bgColor = AppColors.forestAuthBG; break;
+        case ThemePreset.sunset: bgColor = AppColors.sunsetAuthBG; break;
+        case ThemePreset.sunrise: bgColor = AppColors.sunriseAuthBG; break;
+        case ThemePreset.lavender: bgColor = AppColors.lavenderAuthBG; break;
+        case ThemePreset.classic: bgColor = AppColors.classicAuthBG; break;
+      }
+    } else {
+      bgColor = Colors.white;
+    }
+    
+    final blob1Color = theme.colorScheme.primary.withValues(alpha: isDark ? 0.3 : 0.2);
+    final blob2Color = theme.colorScheme.secondary.withValues(alpha: isDark ? 0.2 : 0.15);
+    final blob3Color = theme.colorScheme.primaryContainer.withValues(alpha: isDark ? 0.15 : 0.1);
 
     return Container(
       width: double.infinity,

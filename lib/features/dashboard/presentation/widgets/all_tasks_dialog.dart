@@ -5,6 +5,8 @@ import '../../../../shared/widgets/glass_card.dart';
 import '../view_models/dashboard_view_model.dart';
 import 'task_card.dart';
 
+import '../../../../l10n/app_localizations.dart';
+
 class AllTasksDialog extends StatelessWidget {
   const AllTasksDialog({super.key});
 
@@ -12,6 +14,7 @@ class AllTasksDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final allTasks = context.watch<DashboardViewModel>().allTasks;
+    final l10n = AppLocalizations.of(context)!;
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -31,7 +34,7 @@ class AllTasksDialog extends StatelessWidget {
                     Icon(Icons.history_rounded, color: theme.colorScheme.primary, size: 28),
                     const SizedBox(width: AppSpacing.md),
                     Text(
-                      'Recent Activity',
+                      l10n.recentActivity,
                       style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900, letterSpacing: -0.5),
                     ),
                     const Spacer(),
@@ -43,9 +46,9 @@ class AllTasksDialog extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 if (allTasks.isEmpty)
-                  const Expanded(
+                  Expanded(
                     child: Center(
-                      child: Text('No tasks found.'),
+                      child: Text(l10n.noTasksFound),
                     ),
                   )
                 else

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../shared/widgets/glass_card.dart';
 import '../view_models/dashboard_view_model.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class DashboardStats extends StatelessWidget {
   const DashboardStats({super.key});
@@ -11,6 +12,7 @@ class DashboardStats extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final viewModel = context.watch<DashboardViewModel>();
+    final l10n = AppLocalizations.of(context)!;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
@@ -26,14 +28,14 @@ class DashboardStats extends StatelessWidget {
             child: Flex(
               direction: isWide ? Axis.horizontal : Axis.vertical,
               children: [
-                _buildProductivityPulse(theme, viewModel),
+                _buildProductivityPulse(theme, viewModel, l10n),
                 if (isWide) 
                   Container(width: 1, height: 80, margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xl), color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3))
                 else 
                   const SizedBox(height: AppSpacing.xl),
                 Expanded(
                   flex: isWide ? 2 : 0,
-                  child: _buildGoalInsights(theme, viewModel),
+                  child: _buildGoalInsights(theme, viewModel, l10n),
                 ),
               ],
             ),
@@ -43,7 +45,7 @@ class DashboardStats extends StatelessWidget {
     );
   }
 
-  Widget _buildProductivityPulse(ThemeData theme, DashboardViewModel viewModel) {
+  Widget _buildProductivityPulse(ThemeData theme, DashboardViewModel viewModel, AppLocalizations l10n) {
     final progress = viewModel.overallProgress;
     final percentage = (progress * 100).toInt();
 
@@ -73,7 +75,7 @@ class DashboardStats extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'DONE', 
+                  l10n.done, 
                   style: theme.textTheme.labelSmall?.copyWith(
                     fontSize: 10,
                     fontWeight: FontWeight.w900, 
@@ -86,7 +88,7 @@ class DashboardStats extends StatelessWidget {
         ),
         const SizedBox(height: AppSpacing.md),
         Text(
-          'Total Productivity', 
+          l10n.totalProductivity, 
           style: theme.textTheme.bodyMedium?.copyWith(
             fontWeight: FontWeight.w800,
             fontSize: 14,
@@ -96,7 +98,7 @@ class DashboardStats extends StatelessWidget {
     );
   }
 
-  Widget _buildGoalInsights(ThemeData theme, DashboardViewModel viewModel) {
+  Widget _buildGoalInsights(ThemeData theme, DashboardViewModel viewModel, AppLocalizations l10n) {
     final topMilestones = viewModel.topMilestones;
 
     return Column(
@@ -107,7 +109,7 @@ class DashboardStats extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'GOAL PROGRESS', 
+              l10n.goalProgress, 
               style: theme.textTheme.labelSmall?.copyWith(
                 letterSpacing: 1.5, 
                 fontWeight: FontWeight.w900, 
@@ -116,7 +118,7 @@ class DashboardStats extends StatelessWidget {
               ),
             ),
             Text(
-              '${viewModel.completedMilestones}/${viewModel.totalMilestones} Milestones', 
+              '${viewModel.completedMilestones}/${viewModel.totalMilestones} ${l10n.milestones}', 
               style: theme.textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.bold,
                 fontSize: 12,
@@ -129,7 +131,7 @@ class DashboardStats extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
             child: Text(
-              'No active milestones found.',
+              l10n.noActiveMilestones,
               style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
             ),
           )

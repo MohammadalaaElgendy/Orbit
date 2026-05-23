@@ -5,6 +5,7 @@ import '../../../../shared/models/user.dart';
 import '../view_models/workspace_view_model.dart';
 import '../../../../shared/widgets/glass_card.dart';
 import '../../../../shared/widgets/orbit_button.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class MemberSearchDialog extends StatefulWidget {
   final String workspaceId;
@@ -24,6 +25,8 @@ class _MemberSearchDialogState extends State<MemberSearchDialog> {
   void _search() async {
     final email = _emailController.text.trim();
     if (email.isEmpty) return;
+    
+    final l10n = AppLocalizations.of(context)!;
 
     setState(() {
       _isSearching = true;
@@ -38,11 +41,11 @@ class _MemberSearchDialogState extends State<MemberSearchDialog> {
       setState(() {
         _foundUser = user;
         if (user == null) {
-          _error = 'User not found in our database.';
+          _error = l10n.userNotFound;
         }
       });
     } catch (e) {
-      setState(() => _error = 'An unexpected error occurred.');
+      setState(() => _error = l10n.unexpectedError);
     } finally {
       setState(() => _isSearching = false);
     }
@@ -51,6 +54,7 @@ class _MemberSearchDialogState extends State<MemberSearchDialog> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -69,7 +73,7 @@ class _MemberSearchDialogState extends State<MemberSearchDialog> {
                   Icon(Icons.person_add_rounded, color: theme.colorScheme.primary, size: 28),
                   const SizedBox(width: AppSpacing.md),
                   Text(
-                    'Add Member', 
+                    l10n.addMember, 
                     style: theme.textTheme.headlineSmall?.copyWith(
                       fontWeight: FontWeight.w900,
                       letterSpacing: -0.5,
@@ -79,7 +83,7 @@ class _MemberSearchDialogState extends State<MemberSearchDialog> {
               ),
               const SizedBox(height: AppSpacing.lg),
               Text(
-                'Enter the email address of the person you want to invite to this workspace.',
+                l10n.inviteEmailDescription,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                 ),
@@ -90,8 +94,8 @@ class _MemberSearchDialogState extends State<MemberSearchDialog> {
                 autofocus: true,
                 style: theme.textTheme.bodyLarge,
                 decoration: InputDecoration(
-                  labelText: 'Email Address',
-                  hintText: 'Enter user email',
+                  labelText: l10n.emailAddress,
+                  hintText: l10n.enterUserEmail,
                   prefixIcon: const Icon(Icons.alternate_email_rounded),
                   suffixIcon: _emailController.text.isNotEmpty 
                     ? IconButton(
@@ -105,7 +109,7 @@ class _MemberSearchDialogState extends State<MemberSearchDialog> {
               ),
               const SizedBox(height: AppSpacing.lg),
               OrbitButton(
-                text: 'Search Member',
+                text: l10n.searchMember,
                 onPressed: _search,
                 isLoading: _isSearching,
                 icon: const Icon(Icons.search_rounded, size: 20),
@@ -113,7 +117,7 @@ class _MemberSearchDialogState extends State<MemberSearchDialog> {
               
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 300),
-                child: _buildSearchResult(theme),
+                child: _buildSearchResult(theme, l10n),
               ),
 
               const SizedBox(height: AppSpacing.xl),
@@ -122,7 +126,7 @@ class _MemberSearchDialogState extends State<MemberSearchDialog> {
                 style: TextButton.styleFrom(
                   foregroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                 ),
-                child: const Text('Maybe later'),
+                child: Text(l10n.maybeLater),
               ),
             ],
           ),
@@ -131,7 +135,7 @@ class _MemberSearchDialogState extends State<MemberSearchDialog> {
     );
   }
 
-  Widget _buildSearchResult(ThemeData theme) {
+  Widget _buildSearchResult(ThemeData theme, AppLocalizations l10n) {
     if (_isSearching) return const SizedBox.shrink();
 
     if (_error != null) {
@@ -167,7 +171,7 @@ class _MemberSearchDialogState extends State<MemberSearchDialog> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'User Found', 
+              l10n.userFound, 
               style: theme.textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1.2,
@@ -212,7 +216,7 @@ class _MemberSearchDialogState extends State<MemberSearchDialog> {
                   ),
                   const SizedBox(width: AppSpacing.sm),
                   OrbitButton(
-                    text: 'Add',
+                    text: l10n.add,
                     fullWidth: false,
                     onPressed: () {
                       context.read<WorkspaceViewModel>().addMember(widget.workspaceId, _foundUser!.id);

@@ -5,6 +5,7 @@ import '../../../../shared/models/project.dart';
 import '../../../../shared/widgets/confirm_dialog.dart';
 import '../view_models/workspace_view_model.dart';
 import 'project_dialog.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class ProjectMenuSheet extends StatelessWidget {
   final Project project;
@@ -14,13 +15,14 @@ class ProjectMenuSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.read<WorkspaceViewModel>();
+    final l10n = AppLocalizations.of(context)!;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         ListTile(
           leading: const Icon(Icons.edit_rounded),
-          title: const Text('Edit Project'),
+          title: Text(l10n.editProjectLabel),
           onTap: () {
             Navigator.pop(context);
             showDialog(
@@ -41,15 +43,15 @@ class ProjectMenuSheet extends StatelessWidget {
         ),
         ListTile(
           leading: const Icon(Icons.delete_outline_rounded, color: Colors.red),
-          title: const Text('Delete Project', style: TextStyle(color: Colors.red)),
+          title: Text(l10n.deleteProject, style: const TextStyle(color: Colors.red)),
           onTap: () {
             Navigator.pop(context);
             showDialog(
               context: context,
               builder: (context) => ConfirmDialog(
-                title: 'Delete Project',
-                message: 'Are you sure you want to delete "${project.name}"?',
-                confirmLabel: 'Delete',
+                title: l10n.deleteProject,
+                message: l10n.deleteProjectConfirm(project.name),
+                confirmLabel: l10n.delete,
                 confirmColor: Colors.red,
                 onConfirm: () => viewModel.deleteProject(project.id),
               ),

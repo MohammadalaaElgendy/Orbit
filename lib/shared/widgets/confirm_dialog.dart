@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_constants.dart';
 import 'glass_card.dart';
+import '../../l10n/app_localizations.dart';
 
 class ConfirmDialog extends StatelessWidget {
   final String title;
@@ -21,6 +22,7 @@ class ConfirmDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -52,7 +54,7 @@ class ConfirmDialog extends StatelessWidget {
                   Expanded(
                     child: TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: const Text('Cancel'),
+                      child: Text(l10n.cancel),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.md),
@@ -64,7 +66,7 @@ class ConfirmDialog extends StatelessWidget {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: confirmColor ?? theme.colorScheme.primary,
-                        foregroundColor: Colors.white,
+                        foregroundColor: confirmColor != null ? Colors.white : theme.colorScheme.onPrimary,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                       ),
                       child: Text(confirmLabel),

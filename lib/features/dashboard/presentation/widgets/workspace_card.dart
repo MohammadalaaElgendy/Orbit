@@ -4,6 +4,7 @@ import 'package:orbit/shared/models/workspace.dart';
 import 'package:orbit/shared/models/user.dart';
 import 'package:orbit/features/workspace/presentation/widgets/workspace_menu_sheet.dart';
 import 'package:orbit/shared/widgets/smart_image.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class WorkspaceCard extends StatelessWidget {
   final Workspace ws;
@@ -28,6 +29,8 @@ class WorkspaceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: () => Navigator.pushNamed(context, '/workspace-details', arguments: ws),
       child: Container(
@@ -111,13 +114,15 @@ class WorkspaceCard extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF3525CD),
+                            color: theme.brightness == Brightness.light 
+                                ? theme.colorScheme.primary 
+                                : theme.colorScheme.primaryContainer,
                             borderRadius: BorderRadius.circular(AppRadius.full),
                             boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 4, offset: const Offset(0, 2))],
                           ),
-                          child: const Text(
-                            'VIEW DETAILS',
-                            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 9, color: Colors.white, letterSpacing: 0.5)
+                          child: Text(
+                            l10n.viewDetails.toUpperCase(),
+                            style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 9, color: Colors.white, letterSpacing: 0.5)
                           ),
                         ),
                       ],
@@ -140,8 +145,8 @@ class WorkspaceCard extends StatelessWidget {
       width: 60,
       height: 24,
       child: Stack(
-        children: List.generate(displayMembers.length, (i) => Positioned(
-          left: i * 14.0,
+        children: List.generate(displayMembers.length, (i) => PositionedDirectional(
+          start: i * 14.0,
           child: Container(
             decoration: BoxDecoration(
               shape: BoxShape.circle,

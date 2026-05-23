@@ -7,6 +7,8 @@ import 'package:intl/intl.dart';
 
 import '../../../../shared/models/user.dart';
 
+import '../../../../l10n/app_localizations.dart';
+
 class TaskDialog extends StatefulWidget {
   final Task? task;
   final String? milestoneId;
@@ -65,6 +67,7 @@ class _TaskDialogState extends State<TaskDialog> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isEdit = widget.task != null;
+    final l10n = AppLocalizations.of(context)!;
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -92,7 +95,7 @@ class _TaskDialogState extends State<TaskDialog> {
                         ),
                         const SizedBox(width: AppSpacing.md),
                         Text(
-                          isEdit ? 'Edit Task' : 'New Task',
+                          isEdit ? l10n.editTask : l10n.newTask,
                           style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900, letterSpacing: -0.5),
                         ),
                       ],
@@ -102,12 +105,12 @@ class _TaskDialogState extends State<TaskDialog> {
                       controller: _titleController,
                       style: theme.textTheme.bodyLarge,
                       decoration: InputDecoration(
-                        labelText: 'Task Title',
-                        hintText: 'What needs to be done?',
+                        labelText: l10n.taskTitle,
+                        hintText: l10n.taskTitleHint,
                         prefixIcon: const Icon(Icons.title_rounded),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                       ),
-                      validator: (v) => v == null || v.isEmpty ? 'Please enter a task title' : null,
+                      validator: (v) => v == null || v.isEmpty ? l10n.pleaseEnterTaskTitle : null,
                     ),
                     const SizedBox(height: AppSpacing.md),
                     TextFormField(
@@ -115,8 +118,8 @@ class _TaskDialogState extends State<TaskDialog> {
                       maxLines: 2,
                       style: theme.textTheme.bodyMedium,
                       decoration: InputDecoration(
-                        labelText: 'Description',
-                        hintText: 'Add some details about this task',
+                        labelText: l10n.descriptionLabel,
+                        hintText: l10n.taskDescriptionHint,
                         prefixIcon: const Icon(Icons.description_outlined),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                       ),
@@ -129,12 +132,12 @@ class _TaskDialogState extends State<TaskDialog> {
                         isExpanded: true,
                         style: theme.textTheme.bodyMedium,
                         decoration: InputDecoration(
-                          labelText: 'Assignee',
+                          labelText: l10n.assigneeLabel,
                           prefixIcon: const Icon(Icons.person_outline_rounded),
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                         ),
                         items: [
-                          const DropdownMenuItem(value: null, child: Text('Unassigned')),
+                          DropdownMenuItem(value: null, child: Text(l10n.unassigned)),
                           ...widget.workspaceMembers.map((u) => DropdownMenuItem(
                             value: u.id, 
                             child: Row(
@@ -170,13 +173,13 @@ class _TaskDialogState extends State<TaskDialog> {
                           child: DropdownButtonFormField<TaskStatus>(
                             initialValue: _status,
                             decoration: InputDecoration(
-                              labelText: 'Status',
+                              labelText: l10n.statusLabel,
                               prefixIcon: const Icon(Icons.donut_large_rounded),
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                             ),
                             items: TaskStatus.values.map((s) => DropdownMenuItem(
                               value: s, 
-                              child: Text(s.name[0].toUpperCase() + s.name.substring(1))
+                              child: Text('${s.name[0].toUpperCase()}${s.name.substring(1)}')
                             )).toList(),
                             onChanged: (v) => setState(() => _status = v!),
                           ),
@@ -186,13 +189,13 @@ class _TaskDialogState extends State<TaskDialog> {
                           child: DropdownButtonFormField<TaskPriority>(
                             initialValue: _priority,
                             decoration: InputDecoration(
-                              labelText: 'Priority',
+                              labelText: l10n.priorityLabel,
                               prefixIcon: const Icon(Icons.priority_high_rounded),
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                             ),
                             items: TaskPriority.values.map((p) => DropdownMenuItem(
                               value: p, 
-                              child: Text(p.name[0].toUpperCase() + p.name.substring(1))
+                              child: Text('${p.name[0].toUpperCase()}${p.name.substring(1)}')
                             )).toList(),
                             onChanged: (v) => setState(() => _priority = v!),
                           ),
@@ -223,7 +226,7 @@ class _TaskDialogState extends State<TaskDialog> {
                       },
                       child: InputDecorator(
                         decoration: InputDecoration(
-                          labelText: 'Due Date',
+                          labelText: l10n.dueDateLabel,
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                           prefixIcon: const Icon(Icons.calendar_today_rounded, size: 18),
                           suffixIcon: _dueDate != null 
@@ -234,7 +237,7 @@ class _TaskDialogState extends State<TaskDialog> {
                             : null,
                         ),
                         child: Text(
-                          _dueDate == null ? 'Set a deadline' : DateFormat('MMMM dd, yyyy').format(_dueDate!),
+                          _dueDate == null ? l10n.setDeadline : DateFormat('MMMM dd, yyyy').format(_dueDate!),
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: _dueDate == null ? theme.colorScheme.onSurface.withValues(alpha: 0.5) : null,
                           ),
@@ -248,7 +251,7 @@ class _TaskDialogState extends State<TaskDialog> {
                         TextButton(
                           onPressed: () => Navigator.pop(context),
                           style: TextButton.styleFrom(foregroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
-                          child: const Text('Cancel'),
+                          child: Text(l10n.cancel),
                         ),
                         const SizedBox(width: AppSpacing.md),
                         ElevatedButton(
@@ -272,7 +275,7 @@ class _TaskDialogState extends State<TaskDialog> {
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                             elevation: 0,
                           ),
-                          child: Text(isEdit ? 'Save Changes' : 'Create Task', style: const TextStyle(fontWeight: FontWeight.bold)),
+                          child: Text(isEdit ? l10n.saveChanges : l10n.createTask, style: const TextStyle(fontWeight: FontWeight.bold)),
                         ),
                       ],
                     ),

@@ -4,6 +4,7 @@ import '../../../../core/constants/app_constants.dart';
 import '../../../dashboard/presentation/view_models/dashboard_view_model.dart';
 import '../../../dashboard/presentation/widgets/workspace_card.dart';
 import 'package:orbit/shared/widgets/top_padding.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class WorkspacesScreen extends StatelessWidget {
   const WorkspacesScreen({super.key});
@@ -14,6 +15,7 @@ class WorkspacesScreen extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
     final viewModel = context.watch<DashboardViewModel>();
     final workspaces = viewModel.workspaces;
+    final l10n = AppLocalizations.of(context)!;
 
     if (workspaces.isEmpty) {
       return Center(
@@ -23,7 +25,7 @@ class WorkspacesScreen extends StatelessWidget {
             Icon(Icons.work_outline_rounded, size: 64, color: theme.colorScheme.outline.withValues(alpha: 0.2)),
             const SizedBox(height: 16),
             Text(
-              'No workspaces found.\nCreate one to get started!',
+              l10n.noWorkspaces,
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
             ),

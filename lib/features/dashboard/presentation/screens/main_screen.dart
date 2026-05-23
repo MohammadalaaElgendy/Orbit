@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import '../view_models/dashboard_view_model.dart';
 import '../../../../shared/widgets/glass_card.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -30,10 +31,11 @@ class _MainScreenState extends State<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return ResponsiveScaffold(
       currentIndex: _currentIndex,
       onTabSelected: (index) => setState(() => _currentIndex = index),
-      title: _getTitle(),
+      title: _getTitle(l10n),
       actions: _getActions(context),
       body: IndexedStack(
         index: _currentIndex,
@@ -46,13 +48,13 @@ class _MainScreenState extends State<MainScreen> {
     );
   }
 
-  String _getTitle() {
+  String _getTitle(AppLocalizations l10n) {
     switch (_currentIndex) {
-      case 0: return 'My Dashboard';
-      case 1: return 'Workspaces';
-      case 2: return 'Milestones';
-      case 3: return 'My Profile';
-      default: return 'Orbit';
+      case 0: return l10n.dashboard;
+      case 1: return l10n.workspaces;
+      case 2: return l10n.milestones;
+      case 3: return l10n.myProfile;
+      default: return l10n.appTitle;
     }
   }
 

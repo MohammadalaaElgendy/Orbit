@@ -11,6 +11,7 @@ import 'package:orbit/features/dashboard/presentation/widgets/all_tasks_dialog.d
 import 'package:orbit/features/dashboard/presentation/view_models/dashboard_view_model.dart';
 import 'package:orbit/features/workspace/presentation/widgets/workspace_dialog.dart';
 import 'package:orbit/shared/widgets/top_padding.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class DashboardScreen extends StatelessWidget {
   final bool isTab;
@@ -30,6 +31,7 @@ class DashboardScreen extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final viewModel = context.watch<DashboardViewModel>();
+    final l10n = AppLocalizations.of(context)!;
 
     final workspaces = viewModel.workspaces;
     final milestones = viewModel.recentMilestones;
@@ -45,14 +47,14 @@ class DashboardScreen extends StatelessWidget {
           const DashboardStats(),
           
           const SizedBox(height: AppSpacing.xl),
-          _buildSectionHeader(theme, 'Active Workspaces', '${workspaces.length} total'),
+          _buildSectionHeader(theme, l10n.activeWorkspaces, '${workspaces.length} ${l10n.total}'),
           const SizedBox(height: AppSpacing.md),
 
           workspaces.isEmpty
-              ? const Center(
+              ? Center(
             child: Padding(
-              padding: EdgeInsets.all(AppSpacing.xl),
-              child: Text('No workspaces found'),
+              padding: const EdgeInsets.all(AppSpacing.xl),
+              child: Text(l10n.noWorkspaces),
             ),
           )
               : LayoutBuilder(
@@ -97,7 +99,7 @@ class DashboardScreen extends StatelessWidget {
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
                   itemCount: workspaces.length,
-                  gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
                     maxCrossAxisExtent: 350, // العرض ديناميك
                     mainAxisExtent: 180, // ارتفاع ثابت
                     crossAxisSpacing: AppSpacing.md,
@@ -121,7 +123,7 @@ class DashboardScreen extends StatelessWidget {
 
           if (milestones.isNotEmpty) ...[
             const SizedBox(height: AppSpacing.xl),
-            _buildSectionHeader(theme, 'Priority Milestones', 'Recent'),
+            _buildSectionHeader(theme, l10n.priorityMilestones, l10n.recent),
             const SizedBox(height: AppSpacing.md),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
@@ -138,8 +140,8 @@ class DashboardScreen extends StatelessWidget {
             const SizedBox(height: AppSpacing.xl),
             _buildSectionHeader(
               theme, 
-              'Recent Activity', 
-              'View all', 
+              l10n.recentActivity, 
+              l10n.viewAll, 
               onTap: () => showDialog(
                 context: context,
                 builder: (_) => const AllTasksDialog(),
@@ -164,7 +166,7 @@ class DashboardScreen extends StatelessWidget {
     if (isTab) return body;
 
     return ResponsiveScaffold(
-      title: 'My Dashboard',
+      title: l10n.dashboard,
       actions: [
         // No manual SizedBox needed anymore, Scaffold handles it via Directional Padding
         _buildActionButton(

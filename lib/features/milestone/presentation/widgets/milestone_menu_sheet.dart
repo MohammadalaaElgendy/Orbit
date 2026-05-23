@@ -5,6 +5,7 @@ import '../../../../shared/models/milestone.dart';
 import '../../../../shared/widgets/confirm_dialog.dart';
 import '../view_models/milestone_view_model.dart';
 import 'milestone_dialog.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class MilestoneMenuSheet extends StatelessWidget {
   final Milestone milestone;
@@ -14,13 +15,14 @@ class MilestoneMenuSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.read<MilestoneViewModel>();
+    final l10n = AppLocalizations.of(context)!;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         ListTile(
           leading: const Icon(Icons.edit_rounded),
-          title: const Text('Edit Milestone'),
+          title: Text(l10n.editMilestone),
           onTap: () {
             Navigator.pop(context);
             showDialog(
@@ -41,15 +43,15 @@ class MilestoneMenuSheet extends StatelessWidget {
         ),
         ListTile(
           leading: const Icon(Icons.delete_outline_rounded, color: Colors.red),
-          title: const Text('Delete Milestone', style: TextStyle(color: Colors.red)),
+          title: Text(l10n.deleteMilestone, style: const TextStyle(color: Colors.red)),
           onTap: () {
             Navigator.pop(context);
             showDialog(
               context: context,
               builder: (context) => ConfirmDialog(
-                title: 'Delete Milestone',
-                message: 'Are you sure you want to delete "${milestone.name}"?',
-                confirmLabel: 'Delete',
+                title: l10n.deleteMilestone,
+                message: l10n.deleteMilestoneConfirm(milestone.name),
+                confirmLabel: l10n.delete,
                 confirmColor: Colors.red,
                 onConfirm: () => viewModel.deleteMilestone(milestone.id),
               ),

@@ -8,6 +8,7 @@ import '../view_models/milestone_view_model.dart';
 import '../widgets/milestone_menu_sheet.dart';
 import '../../../dashboard/presentation/widgets/task_dialog.dart';
 import '../../../dashboard/presentation/view_models/task_view_model.dart';
+import '../../../../l10n/app_localizations.dart';
 
 import 'package:intl/intl.dart';
 
@@ -66,6 +67,7 @@ class _MilestoneDetailsScreenState extends State<MilestoneDetailsScreen> {
     final viewModel = context.watch<MilestoneViewModel>();
     final currentMilestone = viewModel.currentMilestone ?? widget.milestone;
     final tasks = viewModel.tasks;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       body: Container(
@@ -154,24 +156,24 @@ class _MilestoneDetailsScreenState extends State<MilestoneDetailsScreen> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: AppSpacing.xl),
-                    _buildStatsRow(theme, currentMilestone),
+                    _buildStatsRow(theme, currentMilestone, l10n),
                     const SizedBox(height: AppSpacing.xl),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Tasks', style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
+                        Text(l10n.tasks, style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
                         TextButton.icon(
                           onPressed: _showAddTaskDialog,
                           icon: const Icon(Icons.add_rounded, size: 18),
-                          label: const Text('Add Task'),
+                          label: Text(l10n.addTask),
                         ),
                       ],
                     ),
                     const SizedBox(height: AppSpacing.md),
                     if (tasks.isEmpty)
-                       const Center(child: Padding(
-                         padding: EdgeInsets.all(20.0),
-                         child: Text('No tasks found for this milestone.'),
+                       Center(child: Padding(
+                         padding: const EdgeInsets.all(20.0),
+                         child: Text(l10n.noTasksForMilestone),
                        ))
                     else
                       ...tasks.map((task) => Padding(
@@ -189,15 +191,15 @@ class _MilestoneDetailsScreenState extends State<MilestoneDetailsScreen> {
     );
   }
 
-  Widget _buildStatsRow(ThemeData theme, model.Milestone milestone) {
+  Widget _buildStatsRow(ThemeData theme, model.Milestone milestone, AppLocalizations l10n) {
     return Column(
       children: [
         _buildStatItem(
           theme, 
-          'Deadline', 
-          milestone.dueDate != null ? DateFormat('MMMM dd, yyyy').format(milestone.dueDate!) : 'No deadline', 
+          l10n.deadline, 
+          milestone.dueDate != null ? DateFormat('MMMM dd, yyyy').format(milestone.dueDate!) : l10n.noDeadline, 
           Icons.calendar_today_rounded,
-          subtitle: _getDeadlineSubtitle(milestone.dueDate),
+          subtitle: _getDeadlineSubtitle(milestone.dueDate, l10n),
           subtitleColor: _getDeadlineColor(milestone.dueDate),
         ),
         const SizedBox(height: AppSpacing.md),
@@ -206,7 +208,7 @@ class _MilestoneDetailsScreenState extends State<MilestoneDetailsScreen> {
             Expanded(
               child: _buildStatItem(
                 theme, 
-                'Progress', 
+                l10n.progressLabel, 
                 '${(milestone.progress * 100).toInt()}%', 
                 Icons.donut_large_rounded
               ),
@@ -215,7 +217,7 @@ class _MilestoneDetailsScreenState extends State<MilestoneDetailsScreen> {
             Expanded(
               child: _buildStatItem(
                 theme, 
-                'Tasks', 
+                l10n.tasks, 
                 '${milestone.completedTasks}/${milestone.totalTasks}',
                 Icons.check_circle_outline_rounded
               ),
@@ -226,13 +228,13 @@ class _MilestoneDetailsScreenState extends State<MilestoneDetailsScreen> {
     );
   }
 
-  String? _getDeadlineSubtitle(DateTime? deadline) {
+  String? _getDeadlineSubtitle(DateTime? deadline, AppLocalizations l10n) {
     if (deadline == null) return null;
     final now = DateTime.now();
     final diff = deadline.difference(now);
-    if (diff.isNegative) return 'Overdue';
-    if (diff.inDays == 0) return '${diff.inHours} hours remaining';
-    return '${diff.inDays} days remaining';
+    if (diff.isNegative) return l10n.overdue;
+    if (diff.inDays == 0) return l10n.hoursRemaining(diff.inHours);
+    return l10n.daysRemaining(diff.inDays);
   }
 
   Color? _getDeadlineColor(DateTime? deadline) {

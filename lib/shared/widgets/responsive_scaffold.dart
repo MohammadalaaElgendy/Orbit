@@ -9,6 +9,8 @@ import 'package:provider/provider.dart';
 
 import 'package:flutter/services.dart';
 
+import '../../l10n/app_localizations.dart';
+
 class ResponsiveScaffold extends StatefulWidget {
 // ... (rest of class)
   final Widget body;
@@ -44,6 +46,7 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
     
     // ستايل افتراضي يتبع الثيم (أيقونات سوداء في الوضع الفاتح، وبيضاء في الداكن)
     final systemOverlayStyle = isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark;
@@ -58,7 +61,7 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
       content = Scaffold(
         body: Row(
           children: [
-            _buildSideNavigation(theme, isDesktop),
+            _buildSideNavigation(theme, isDesktop, l10n),
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
@@ -95,7 +98,7 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
           child: _buildCustomGlassAppBar(theme, topPadding, appBarExtraPadding),
         ),
         body: widget.body,
-        bottomNavigationBar: _buildFloatingGlassBottomNav(theme),
+        bottomNavigationBar: _buildFloatingGlassBottomNav(theme, l10n),
       );
     }
 
@@ -194,7 +197,7 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
     );
   }
 
-  Widget _buildFloatingGlassBottomNav(ThemeData theme) {
+  Widget _buildFloatingGlassBottomNav(ThemeData theme, AppLocalizations l10n) {
     final isDark = theme.brightness == Brightness.dark;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     final bgColor = isDark 
@@ -238,10 +241,10 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
                 unselectedItemColor: theme.colorScheme.onSurface.withValues(alpha: 0.5),
                 showSelectedLabels: false,
                 showUnselectedLabels: false,
-                items: const [
-                  BottomNavigationBarItem(icon: Icon(Icons.dashboard_rounded, size: 26), label: 'Home'),
-                  BottomNavigationBarItem(icon: Icon(Icons.work_rounded, size: 26), label: 'Work'),
-                  BottomNavigationBarItem(icon: Icon(Icons.flag_rounded, size: 26), label: 'Goals'),
+                items: [
+                  BottomNavigationBarItem(icon: const Icon(Icons.dashboard_rounded, size: 26), label: l10n.home),
+                  BottomNavigationBarItem(icon: const Icon(Icons.work_rounded, size: 26), label: l10n.work),
+                  BottomNavigationBarItem(icon: const Icon(Icons.flag_rounded, size: 26), label: l10n.goals),
                 ],
               ),
             ),
@@ -251,7 +254,7 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
     );
   }
 
-  Widget _buildSideNavigation(ThemeData theme, bool isDesktop) {
+  Widget _buildSideNavigation(ThemeData theme, bool isDesktop, AppLocalizations l10n) {
     final topPadding = MediaQuery.of(context).padding.top;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     
@@ -303,9 +306,9 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
                           : const Center(child: OrbitLogo(size: 38)),
                       ),
                       const SizedBox(height: AppSpacing.xxl),
-                      _buildNavItem(Icons.dashboard_rounded, 'Dashboard', 0, isDesktop),
-                      _buildNavItem(Icons.work_rounded, 'Workspaces', 1, isDesktop),
-                      _buildNavItem(Icons.flag_rounded, 'Milestones', 2, isDesktop),
+                      _buildNavItem(Icons.dashboard_rounded, l10n.home, 0, isDesktop),
+                      _buildNavItem(Icons.work_rounded, l10n.work, 1, isDesktop),
+                      _buildNavItem(Icons.flag_rounded, l10n.goals, 2, isDesktop),
                       const Spacer(),
                       if (isDesktop)
                         GestureDetector(

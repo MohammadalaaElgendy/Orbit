@@ -21,6 +21,7 @@ import '../../../dashboard/presentation/widgets/milestone_card.dart';
 import 'dart:async';
 import '../../../../shared/widgets/smart_image.dart';
 import '../../../../shared/widgets/top_padding.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class WorkspaceDetailsScreen extends StatefulWidget {
   final Workspace workspace;
@@ -121,6 +122,7 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
     final currentWorkspace = viewModel.currentWorkspace ?? widget.workspace;
     final projects = viewModel.projects;
     final members = viewModel.members;
+    final l10n = AppLocalizations.of(context)!;
 
     // تثبيت عناصر شريط الإشعارات على اللون الأبيض الناصع (أندرويد + آيفون)
     final overlayStyle = SystemUiOverlayStyle.light.copyWith(
@@ -374,20 +376,20 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: AppSpacing.xl),
-                    _buildSectionHeader(theme, 'Members', onAdd: _showMemberSearchDialog),
+                    _buildSectionHeader(theme, l10n.members, onAdd: _showMemberSearchDialog),
                     const SizedBox(height: AppSpacing.md),
-                    _buildMembersList(members, theme),
+                    _buildMembersList(members, theme, l10n),
                     const SizedBox(height: AppSpacing.xl),
-                    _buildSectionHeader(theme, 'Active Projects', onAdd: () => _showProjectDialog()),
+                    _buildSectionHeader(theme, l10n.activeProjects, onAdd: () => _showProjectDialog()),
                     const SizedBox(height: AppSpacing.md),
                     projects.isEmpty 
-                      ? _buildEmptyProjects(theme)
+                      ? _buildEmptyProjects(theme, l10n)
                       : _buildProjectsGrid(projects, theme),
                     const SizedBox(height: AppSpacing.xl),
-                    _buildSectionHeader(theme, 'Project Milestones', onAdd: selectedProjectId != null ? _showMilestoneDialog : null),
+                    _buildSectionHeader(theme, l10n.projectMilestones, onAdd: selectedProjectId != null ? _showMilestoneDialog : null),
                     const SizedBox(height: AppSpacing.md),
                     if (_milestones.isEmpty)
-                      _buildEmptyMilestones(theme)
+                      _buildEmptyMilestones(theme, l10n)
                     else
                       _buildMilestonesGrid(_milestones, theme),
                     const BottomPadding(),
@@ -430,8 +432,8 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
     );
   }
 
-  Widget _buildMembersList(List<User> members, ThemeData theme) {
-    if (members.isEmpty) return const Text('No members yet');
+  Widget _buildMembersList(List<User> members, ThemeData theme, AppLocalizations l10n) {
+    if (members.isEmpty) return Text(l10n.noMembers);
     return SizedBox(
       height: 40,
       child: ListView.separated(
@@ -451,9 +453,9 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                showDialog(
                 context: context,
                 builder: (context) => ConfirmDialog(
-                  title: 'Remove Member',
-                  message: 'Are you sure you want to remove ${member.name} from this workspace?',
-                  confirmLabel: 'Remove',
+                  title: l10n.removeMember,
+                  message: l10n.removeMemberConfirm(member.name),
+                  confirmLabel: l10n.remove,
                   confirmColor: Colors.red,
                   onConfirm: () => context.read<WorkspaceViewModel>().removeMember(widget.workspace.id, member.id),
                 ),
@@ -537,9 +539,9 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                 clipBehavior: Clip.antiAlias,
                 child: Stack(
                   children: [
-                    Positioned(
+                    PositionedDirectional(
                       top: -15,
-                      right: -15,
+                      end: -15,
                       child: Container(
                         width: 60,
                         height: 60,
@@ -605,9 +607,9 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                     ),
 
                     // Top-right "More" Button
-                    Positioned(
+                    PositionedDirectional(
                       top: 12,
-                      right: 12,
+                      end: 12,
                       child: GestureDetector(
                         onTap: () {
                           showModalBottomSheet(
@@ -639,20 +641,20 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
     );
   }
 
-  Widget _buildEmptyProjects(ThemeData theme) {
+  Widget _buildEmptyProjects(ThemeData theme, AppLocalizations l10n) {
     return Center(
       child: Column(
         children: [
           Icon(Icons.folder_open_rounded, size: 48, color: theme.colorScheme.outline.withValues(alpha: 0.2)),
           const SizedBox(height: AppSpacing.sm),
-          const Text('No projects yet. Create one to get started!'),
-          TextButton(onPressed: () => _showProjectDialog(), child: const Text('Add Project')),
+          Text(l10n.noProjects),
+          TextButton(onPressed: () => _showProjectDialog(), child: Text(l10n.addProject)),
         ],
       ),
     );
   }
 
-  Widget _buildEmptyMilestones(ThemeData theme) {
+  Widget _buildEmptyMilestones(ThemeData theme, AppLocalizations l10n) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxl),
@@ -660,9 +662,9 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
           children: [
             Icon(Icons.auto_awesome_motion_rounded, size: 48, color: theme.colorScheme.outline.withValues(alpha: 0.2)),
             const SizedBox(height: AppSpacing.md),
-            Text(selectedProjectId == null ? 'Select a project to view milestones' : 'No milestones for this project.'),
+            Text(selectedProjectId == null ? l10n.selectProjectToViewMilestones : l10n.noMilestonesForProject),
             if (selectedProjectId != null)
-              TextButton(onPressed: _showMilestoneDialog, child: const Text('Add Milestone')),
+              TextButton(onPressed: _showMilestoneDialog, child: Text(l10n.addMilestone)),
           ],
         ),
       ),

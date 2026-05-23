@@ -10,6 +10,7 @@ import '../view_models/task_view_model.dart';
 import '../widgets/task_dialog.dart';
 import '../widgets/task_menu_sheet.dart';
 import '../../../../shared/widgets/smart_image.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class TaskDetailsScreen extends StatefulWidget {
   final Task task;
@@ -66,6 +67,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     final viewModel = context.watch<TaskViewModel>();
     final currentTask = viewModel.currentTask ?? widget.task;
     final subtasks = viewModel.subtasks;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
@@ -110,11 +112,11 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
               style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w900, letterSpacing: -0.5),
             ),
             const SizedBox(height: AppSpacing.lg),
-            _buildInfoGrid(theme, currentTask, viewModel.workspaceMembers),
+            _buildInfoGrid(theme, currentTask, viewModel.workspaceMembers, l10n),
             const SizedBox(height: AppSpacing.xl),
             
             if (currentTask.description.trim().isNotEmpty) ...[
-              Text('Description', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+              Text(l10n.description, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
               const SizedBox(height: AppSpacing.sm),
               Text(
                 currentTask.description,
@@ -137,7 +139,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                     Icon(Icons.description_outlined, size: 24, color: theme.colorScheme.outline),
                     const SizedBox(height: AppSpacing.xs),
                     Text(
-                      'No description provided yet.',
+                      l10n.noDescription,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                         fontStyle: FontStyle.italic,
@@ -151,7 +153,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Subtasks', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+                Text(l10n.subtasks, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
                 IconButton(
                   icon: const Icon(Icons.add_circle_outline_rounded, size: 20),
                   onPressed: _showAddSubtaskDialog,
@@ -161,7 +163,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             ),
             const SizedBox(height: AppSpacing.sm),
             if (subtasks.isEmpty)
-              _buildEmptySubtasks(theme)
+              _buildEmptySubtasks(theme, l10n)
             else
               ...subtasks.map((st) => Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.sm),
@@ -200,7 +202,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     );
   }
 
-  Widget _buildInfoGrid(ThemeData theme, Task task, List<User> members) {
+  Widget _buildInfoGrid(ThemeData theme, Task task, List<User> members, AppLocalizations l10n) {
     Color priorityColor;
     switch (task.priority) {
       case TaskPriority.low: priorityColor = Colors.blue; break;
@@ -223,9 +225,9 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
       children: [
         Row(
           children: [
-            _buildInfoItem(theme, 'Priority', task.priority.name.toUpperCase(), icon: Icons.priority_high_rounded, color: priorityColor),
+            _buildInfoItem(theme, l10n.priority, task.priority.name.toUpperCase(), icon: Icons.priority_high_rounded, color: priorityColor),
             const SizedBox(width: AppSpacing.md),
-            _buildInfoItem(theme, 'Assignee', assignee?.name ?? 'Unassigned', leading: assigneeLeading),
+            _buildInfoItem(theme, l10n.assignee, assignee?.name ?? l10n.unassigned, leading: assigneeLeading),
           ],
         ),
         if (task.dueDate != null) ...[
@@ -234,7 +236,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             children: [
               _buildInfoItem(
                 theme, 
-                'Due Date', 
+                l10n.dueDate, 
                 DateFormat('MMM dd, yyyy').format(task.dueDate!), 
                 icon: Icons.calendar_today_rounded,
                 color: task.dueDate!.isBefore(DateTime.now()) && task.status != TaskStatus.done ? Colors.red : null,
@@ -277,7 +279,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     );
   }
 
-  Widget _buildEmptySubtasks(ThemeData theme) {
+  Widget _buildEmptySubtasks(ThemeData theme, AppLocalizations l10n) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xl),
@@ -285,7 +287,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
           children: [
             Icon(Icons.checklist_rounded, size: 40, color: theme.colorScheme.outline.withValues(alpha: 0.2)),
             const SizedBox(height: AppSpacing.sm),
-            Text('No subtasks yet', style: theme.textTheme.labelSmall),
+            Text(l10n.noSubtasks, style: theme.textTheme.labelSmall),
           ],
         ),
       ),

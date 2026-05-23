@@ -5,6 +5,7 @@ import '../../../dashboard/presentation/widgets/milestone_card.dart';
 import 'package:orbit/shared/widgets/top_padding.dart';
 import '../../domain/repositories/milestone_repository.dart';
 import '../../../../shared/models/milestone.dart';
+import '../../../../l10n/app_localizations.dart';
 
 enum MilestoneSort { progressAsc, progressDesc, deadlineAsc, deadlineDesc }
 
@@ -29,6 +30,7 @@ class _MilestonesScreenState extends State<MilestonesScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return StreamBuilder<List<Milestone>>(
       stream: _milestonesStream,
@@ -50,7 +52,7 @@ class _MilestonesScreenState extends State<MilestonesScreen> {
                 Icon(Icons.flag_outlined, size: 64, color: theme.colorScheme.outline.withValues(alpha: 0.2)),
                 const SizedBox(height: 16),
                 Text(
-                  'No milestones found.\nBreak down your projects into goals!',
+                  l10n.noMilestonesFound,
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                 ),
@@ -77,13 +79,13 @@ class _MilestonesScreenState extends State<MilestonesScreen> {
                 child: Row(
                   children: [
                     Text(
-                      'Sort by:',
+                      l10n.sortBy,
                       style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                     ),
                     const SizedBox(width: 8),
-                    _buildSortChip('Deadline', MilestoneSort.deadlineAsc, MilestoneSort.deadlineDesc),
+                    _buildSortChip(l10n.deadline, MilestoneSort.deadlineAsc, MilestoneSort.deadlineDesc, l10n),
                     const SizedBox(width: 8),
-                    _buildSortChip('Progress', MilestoneSort.progressAsc, MilestoneSort.progressDesc),
+                    _buildSortChip(l10n.progressLabel, MilestoneSort.progressAsc, MilestoneSort.progressDesc, l10n),
                   ],
                 ),
               ),
@@ -152,11 +154,13 @@ class _MilestonesScreenState extends State<MilestonesScreen> {
     );
   }
 
-  Widget _buildSortChip(String label, MilestoneSort asc, MilestoneSort desc) {
+  Widget _buildSortChip(String label, MilestoneSort asc, MilestoneSort desc, AppLocalizations l10n) {
     final theme = Theme.of(context);
     final isSelected = _currentSort == asc || _currentSort == desc;
     final isAsc = _currentSort == asc;
-    const accentColor = Color(0xFF3525CD); // المرجعي من كارت المساحة
+    final accentColor = theme.brightness == Brightness.light 
+        ? theme.colorScheme.primary 
+        : theme.colorScheme.primaryContainer; // المرجعي من كارت المساحة (اللون المشبع)
 
     return ActionChip(
       label: Row(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../shared/models/user.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../shared/widgets/glass_card.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class MemberDetailsDialog extends StatelessWidget {
   final User user;
@@ -12,6 +13,7 @@ class MemberDetailsDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
     
     final bool isAdmin = user.role?.toLowerCase() == 'admin';
 
@@ -80,7 +82,7 @@ class MemberDetailsDialog extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    isAdmin ? 'Workspace Admin' : 'Member',
+                    isAdmin ? l10n.workspaceAdmin : l10n.member,
                     style: TextStyle(
                       fontWeight: FontWeight.w900,
                       fontSize: 12,
@@ -99,16 +101,16 @@ class MemberDetailsDialog extends StatelessWidget {
               child: ElevatedButton(
                 onPressed: () => Navigator.pop(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF3525CD), // نفس لون كبسولة View Details
-                  foregroundColor: Colors.white,
+                  backgroundColor: theme.colorScheme.primary, // نفس لون كبسولة View Details
+                  foregroundColor: theme.colorScheme.onPrimary,
                   padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                   elevation: 4,
-                  shadowColor: const Color(0xFF3525CD).withValues(alpha: 0.3),
+                  shadowColor: theme.colorScheme.primary.withValues(alpha: 0.3),
                 ),
-                child: const Text(
-                  'CLOSE',
-                  style: TextStyle(fontWeight: FontWeight.w900, letterSpacing: 0.8),
+                child: Text(
+                  l10n.close,
+                  style: const TextStyle(fontWeight: FontWeight.w900, letterSpacing: 0.8),
                 ),
               ),
             ),

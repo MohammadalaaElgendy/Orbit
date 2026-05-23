@@ -6,6 +6,7 @@ import '../../../../shared/widgets/orbit_text_field.dart';
 
 import '../../../../shared/widgets/auth_background.dart';
 import '../../../../shared/widgets/orbit_logo.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -20,6 +21,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return AuthBackground(
       child: Scaffold(
@@ -53,16 +55,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         delay: 200,
                         child: Column(
                           children: [
-                            const Text(
-                              'Join Orbit', 
-                              style: TextStyle(
+                            Text(
+                              l10n.joinOrbit, 
+                              style: const TextStyle(
                                 fontSize: 32,
                                 fontWeight: FontWeight.w800,
                                 letterSpacing: -1.5,
                               ),
                             ),
                             Text(
-                              'Elevate your productivity baseline.',
+                              l10n.elevateProductivity,
                               style: theme.textTheme.bodyMedium?.copyWith(
                                 color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                               ),
@@ -79,19 +81,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const OrbitTextField(
-                                label: 'Full Name',
-                                hint: 'Enter your full name',
+                              OrbitTextField(
+                                label: l10n.fullName,
+                                hint: l10n.enterFullName,
                               ),
                               const SizedBox(height: AppSpacing.md),
-                              const OrbitTextField(
-                                label: 'Email address',
-                                hint: 'Enter your email',
+                              OrbitTextField(
+                                label: l10n.emailAddress,
+                                hint: l10n.emailAddressHint,
                                 keyboardType: TextInputType.emailAddress,
                               ),
                               const SizedBox(height: AppSpacing.md),
                               OrbitTextField(
-                                label: 'Password',
+                                label: l10n.password,
                                 hint: '••••••••',
                                 obscureText: _obscurePassword,
                                 suffixIcon: IconButton(
@@ -111,7 +113,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               ),
                               const SizedBox(height: AppSpacing.lg),
                               OrbitButton(
-                                text: 'Create Account',
+                                text: l10n.createAccount,
                                 onPressed: () {
                                   Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (route) => false);
                                 },
@@ -127,13 +129,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                "Already have an account? ",
+                                l10n.alreadyHaveAccount,
                                 style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
                               ),
                               GestureDetector(
                                 onTap: () => Navigator.pushNamed(context, '/login'),
                                 child: Text(
-                                  'Sign In',
+                                  l10n.signIn,
                                   style: theme.textTheme.bodyMedium?.copyWith(
                                     color: theme.colorScheme.onSurface,
                                     fontWeight: FontWeight.bold,

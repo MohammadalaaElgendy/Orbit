@@ -3,6 +3,8 @@ import '../../../../shared/models/project.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../shared/widgets/glass_card.dart';
 
+import '../../../../l10n/app_localizations.dart';
+
 class ProjectDialog extends StatefulWidget {
   final Project? project;
   final String? workspaceId;
@@ -48,6 +50,7 @@ class _ProjectDialogState extends State<ProjectDialog> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isEdit = widget.project != null;
+    final l10n = AppLocalizations.of(context)!;
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -75,7 +78,7 @@ class _ProjectDialogState extends State<ProjectDialog> {
                         ),
                         const SizedBox(width: AppSpacing.md),
                         Text(
-                          isEdit ? 'Edit Project' : 'New Project',
+                          isEdit ? l10n.editProject : l10n.newProject,
                           style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900, letterSpacing: -0.5),
                         ),
                       ],
@@ -85,12 +88,12 @@ class _ProjectDialogState extends State<ProjectDialog> {
                       controller: _nameController,
                       style: theme.textTheme.bodyLarge,
                       decoration: InputDecoration(
-                        labelText: 'Project Name',
-                        hintText: 'e.g., Mobile App Development',
+                        labelText: l10n.projectName,
+                        hintText: l10n.projectNameHint,
                         prefixIcon: const Icon(Icons.folder_outlined),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                       ),
-                      validator: (v) => v == null || v.isEmpty ? 'Please enter a project name' : null,
+                      validator: (v) => v == null || v.isEmpty ? l10n.pleaseEnterProjectName : null,
                     ),
                     const SizedBox(height: AppSpacing.md),
                     TextFormField(
@@ -98,14 +101,14 @@ class _ProjectDialogState extends State<ProjectDialog> {
                       maxLines: 2,
                       style: theme.textTheme.bodyMedium,
                       decoration: InputDecoration(
-                        labelText: 'Description',
-                        hintText: 'Briefly describe the project goals',
+                        labelText: l10n.descriptionLabel,
+                        hintText: l10n.projectDescriptionHint,
                         prefixIcon: const Icon(Icons.description_outlined),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.lg),
-                    Text('Project Theme Color', style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
+                    Text(l10n.projectThemeColor, style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
                     const SizedBox(height: AppSpacing.md),
                     SizedBox(
                       height: 50,
@@ -145,7 +148,7 @@ class _ProjectDialogState extends State<ProjectDialog> {
                         TextButton(
                           onPressed: () => Navigator.pop(context),
                           style: TextButton.styleFrom(foregroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
-                          child: const Text('Cancel'),
+                          child: Text(l10n.cancel),
                         ),
                         const SizedBox(width: AppSpacing.md),
                         ElevatedButton(
@@ -162,7 +165,7 @@ class _ProjectDialogState extends State<ProjectDialog> {
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                             elevation: 0,
                           ),
-                          child: Text(isEdit ? 'Save Changes' : 'Create Project', style: const TextStyle(fontWeight: FontWeight.bold)),
+                          child: Text(isEdit ? l10n.saveChanges : l10n.newProject, style: const TextStyle(fontWeight: FontWeight.bold)),
                         ),
                       ],
                     ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../shared/models/milestone.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class MilestoneCard extends StatelessWidget {
   final Milestone milestone;
@@ -15,6 +16,7 @@ class MilestoneCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
     
     return GestureDetector(
       onTap: () => Navigator.pushNamed(context, '/milestone-details', arguments: milestone),
@@ -92,7 +94,7 @@ class MilestoneCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 12),
-            _buildDeadlineInfo(milestone.dueDate, theme),
+            _buildDeadlineInfo(milestone.dueDate, theme, l10n),
             const SizedBox(height: 12),
             Text(
               milestone.description, 
@@ -136,7 +138,7 @@ class MilestoneCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '${milestone.completedTasks}/${milestone.totalTasks} Tasks',
+                  l10n.tasksCount('${milestone.completedTasks}/${milestone.totalTasks}'),
                   style: theme.textTheme.labelSmall?.copyWith(
                     fontSize: 11,
                     fontWeight: FontWeight.w800,
@@ -151,7 +153,7 @@ class MilestoneCard extends StatelessWidget {
     );
   }
 
-  Widget _buildDeadlineInfo(DateTime? deadline, ThemeData theme) {
+  Widget _buildDeadlineInfo(DateTime? deadline, ThemeData theme, AppLocalizations l10n) {
     if (deadline == null) return const SizedBox.shrink();
     
     final now = DateTime.now();
@@ -164,13 +166,13 @@ class MilestoneCard extends StatelessWidget {
     
     String text;
     if (isOverdue) {
-      text = 'Overdue';
+      text = l10n.overdue;
     } else if (difference.inDays > 0) {
-      text = '${difference.inDays} days left';
+      text = l10n.daysLeft(difference.inDays);
     } else if (difference.inHours > 0) {
-      text = '${difference.inHours} hours left';
+      text = l10n.hoursLeft(difference.inHours);
     } else {
-      text = 'Due soon';
+      text = l10n.dueSoon;
     }
 
     return Row(

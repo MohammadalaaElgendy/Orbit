@@ -7,6 +7,7 @@ import '../../../../shared/widgets/orbit_pin_field.dart';
 import '../../../../shared/widgets/auth_background.dart';
 import '../../../../shared/widgets/orbit_logo.dart';
 import '../view_models/auth_view_model.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class OtpScreen extends StatelessWidget {
   const OtpScreen({super.key});
@@ -15,6 +16,7 @@ class OtpScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final authViewModel = context.watch<AuthViewModel>();
+    final l10n = AppLocalizations.of(context)!;
 
     return AuthBackground(
       child: Scaffold(
@@ -40,16 +42,16 @@ class OtpScreen extends StatelessWidget {
                     SizedBox(height: MediaQuery.of(context).padding.top + AppSpacing.xl),
                     const OrbitLogo(size: 64),
                     const SizedBox(height: AppSpacing.md),
-                    const Text(
-                      'Verification',
-                      style: TextStyle(
+                    Text(
+                      l10n.verification,
+                      style: const TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.w800,
                         letterSpacing: -1.5,
                       ),
                     ),
                     Text(
-                      'Enter the 6-digit code sent to\n${authViewModel.emailController.text}',
+                      l10n.enterCodeSent(authViewModel.emailController.text),
                       textAlign: TextAlign.center,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
@@ -61,11 +63,11 @@ class OtpScreen extends StatelessWidget {
                       borderColor: Colors.white.withValues(alpha: 0.1),
                       child: Column(
                         children: [
-                          const Align(
-                            alignment: Alignment.centerLeft,
+                          Align(
+                            alignment: AlignmentDirectional.centerStart,
                             child: Text(
-                              'OTP Code',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                              l10n.otpCode,
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                             ),
                           ),
                           const SizedBox(height: AppSpacing.md),
@@ -88,7 +90,7 @@ class OtpScreen extends StatelessWidget {
                               ),
                             ),
                           OrbitButton(
-                            text: 'Verify & Sign In',
+                            text: l10n.verifyAndSignIn,
                             isLoading: authViewModel.isLoading,
                             onPressed: () async {
                               final success = await authViewModel.verifyOtp();

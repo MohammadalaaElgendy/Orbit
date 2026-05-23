@@ -5,6 +5,7 @@ import '../../../../shared/widgets/auth_background.dart';
 import '../../../../shared/widgets/orbit_logo.dart';
 import '../view_models/auth_view_model.dart';
 import '../../domain/repositories/auth_repository.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -39,6 +40,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return AuthBackground(
       child: Center(
@@ -53,7 +55,7 @@ class _SplashScreenState extends State<SplashScreen> {
               Column(
                 children: [
                   Text(
-                    'Orbit',
+                    l10n.appTitle,
                     style: theme.textTheme.displayLarge?.copyWith(
                       fontSize: 64,
                       letterSpacing: -3.0,
@@ -63,7 +65,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Your focus, elevated.',
+                    l10n.focusElevated,
                     style: theme.textTheme.bodyLarge?.copyWith(
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                       letterSpacing: 0.5,

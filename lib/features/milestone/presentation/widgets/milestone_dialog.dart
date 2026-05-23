@@ -3,6 +3,7 @@ import '../../../../shared/models/milestone.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../shared/widgets/glass_card.dart';
 import 'package:intl/intl.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class MilestoneDialog extends StatefulWidget {
   final Milestone? milestone;
@@ -40,6 +41,7 @@ class _MilestoneDialogState extends State<MilestoneDialog> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isEdit = widget.milestone != null;
+    final l10n = AppLocalizations.of(context)!;
 
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -67,7 +69,7 @@ class _MilestoneDialogState extends State<MilestoneDialog> {
                         ),
                         const SizedBox(width: AppSpacing.md),
                         Text(
-                          isEdit ? 'Edit Milestone' : 'New Milestone',
+                          isEdit ? l10n.editMilestone : l10n.newMilestone,
                           style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900, letterSpacing: -0.5),
                         ),
                       ],
@@ -77,12 +79,12 @@ class _MilestoneDialogState extends State<MilestoneDialog> {
                       controller: _nameController,
                       style: theme.textTheme.bodyLarge,
                       decoration: InputDecoration(
-                        labelText: 'Milestone Name',
-                        hintText: 'e.g., MVP Launch',
+                        labelText: l10n.milestoneName,
+                        hintText: l10n.milestoneNameHint,
                         prefixIcon: const Icon(Icons.outlined_flag_rounded),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                       ),
-                      validator: (v) => v == null || v.isEmpty ? 'Please enter a name' : null,
+                      validator: (v) => v == null || v.isEmpty ? l10n.pleaseEnterName : null,
                     ),
                     const SizedBox(height: AppSpacing.md),
                     TextFormField(
@@ -90,8 +92,8 @@ class _MilestoneDialogState extends State<MilestoneDialog> {
                       maxLines: 2,
                       style: theme.textTheme.bodyMedium,
                       decoration: InputDecoration(
-                        labelText: 'Description',
-                        hintText: 'What does this milestone achieve?',
+                        labelText: l10n.description,
+                        hintText: l10n.descriptionHint,
                         prefixIcon: const Icon(Icons.description_outlined),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                       ),
@@ -120,7 +122,7 @@ class _MilestoneDialogState extends State<MilestoneDialog> {
                       },
                       child: InputDecorator(
                         decoration: InputDecoration(
-                          labelText: 'Target Date',
+                          labelText: l10n.targetDate,
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                           prefixIcon: const Icon(Icons.calendar_today_rounded, size: 18),
                           suffixIcon: _selectedDate != null 
@@ -131,7 +133,7 @@ class _MilestoneDialogState extends State<MilestoneDialog> {
                             : null,
                         ),
                         child: Text(
-                          _selectedDate == null ? 'Set a target date' : DateFormat('MMMM dd, yyyy').format(_selectedDate!),
+                          _selectedDate == null ? l10n.setTargetDate : DateFormat('MMMM dd, yyyy').format(_selectedDate!),
                           style: theme.textTheme.bodyMedium?.copyWith(
                             color: _selectedDate == null ? theme.colorScheme.onSurface.withValues(alpha: 0.5) : null,
                           ),
@@ -145,7 +147,7 @@ class _MilestoneDialogState extends State<MilestoneDialog> {
                         TextButton(
                           onPressed: () => Navigator.pop(context),
                           style: TextButton.styleFrom(foregroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
-                          child: const Text('Cancel'),
+                          child: Text(l10n.cancel),
                         ),
                         const SizedBox(width: AppSpacing.md),
                         ElevatedButton(
@@ -162,7 +164,7 @@ class _MilestoneDialogState extends State<MilestoneDialog> {
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                             elevation: 0,
                           ),
-                          child: Text(isEdit ? 'Save Changes' : 'Create Milestone', style: const TextStyle(fontWeight: FontWeight.bold)),
+                          child: Text(isEdit ? l10n.saveChanges : l10n.createMilestone, style: const TextStyle(fontWeight: FontWeight.bold)),
                         ),
                       ],
                     ),

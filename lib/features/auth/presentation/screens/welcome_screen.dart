@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../shared/widgets/orbit_button.dart';
 import '../../../../shared/widgets/orbit_logo.dart';
-
 import '../../../../shared/widgets/auth_background.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -11,6 +11,7 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return AuthBackground(
       child: SafeArea(
@@ -30,7 +31,7 @@ class WelcomeScreen extends StatelessWidget {
                   _buildAnimatedItem(
                     delay: 200,
                     child: Text(
-                      'Orbit',
+                      l10n.appTitle,
                       style: theme.textTheme.displayLarge?.copyWith(
                         fontSize: 64,
                         fontWeight: FontWeight.w800,
@@ -43,7 +44,7 @@ class WelcomeScreen extends StatelessWidget {
                   _buildAnimatedItem(
                     delay: 400,
                     child: Text(
-                      'Your focus, elevated.',
+                      l10n.focusElevated,
                       style: theme.textTheme.bodyLarge?.copyWith(
                         color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                         letterSpacing: 0.5,
@@ -55,7 +56,7 @@ class WelcomeScreen extends StatelessWidget {
                   _buildAnimatedItem(
                     delay: 600,
                     child: OrbitButton(
-                      text: 'Sign In to Orbit',
+                      text: l10n.signInToOrbit,
                       onPressed: () => Navigator.pushReplacementNamed(context, '/login'),
                       icon: const Icon(Icons.arrow_forward, size: 18),
                     ),

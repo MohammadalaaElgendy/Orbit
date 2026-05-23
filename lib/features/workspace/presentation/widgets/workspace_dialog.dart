@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../view_models/workspace_view_model.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../shared/widgets/smart_image.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class WorkspaceDialog extends StatefulWidget {
   final Workspace? workspace;
@@ -79,6 +80,7 @@ class _WorkspaceDialogState extends State<WorkspaceDialog> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isEdit = widget.workspace != null;
+    final l10n = AppLocalizations.of(context)!;
     
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -106,7 +108,7 @@ class _WorkspaceDialogState extends State<WorkspaceDialog> {
                         ),
                         const SizedBox(width: AppSpacing.md),
                         Text(
-                          isEdit ? 'Edit Workspace' : 'New Workspace',
+                          isEdit ? l10n.editWorkspace : l10n.createWorkspace,
                           style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900, letterSpacing: -0.5),
                         ),
                       ],
@@ -116,12 +118,12 @@ class _WorkspaceDialogState extends State<WorkspaceDialog> {
                       controller: _nameController,
                       style: theme.textTheme.bodyLarge,
                       decoration: InputDecoration(
-                        labelText: 'Workspace Name',
-                        hintText: 'e.g., Marketing Team',
+                        labelText: l10n.workspaceName,
+                        hintText: l10n.workspaceNameHint,
                         prefixIcon: const Icon(Icons.business_center_outlined),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                       ),
-                      validator: (v) => v == null || v.isEmpty ? 'Please enter a name' : null,
+                      validator: (v) => v == null || v.isEmpty ? l10n.pleaseEnterName : null,
                     ),
                     const SizedBox(height: AppSpacing.md),
                     TextFormField(
@@ -129,15 +131,15 @@ class _WorkspaceDialogState extends State<WorkspaceDialog> {
                       maxLines: 2,
                       style: theme.textTheme.bodyMedium,
                       decoration: InputDecoration(
-                        labelText: 'Description',
-                        hintText: 'Briefly describe your workspace',
+                        labelText: l10n.descriptionLabel,
+                        hintText: l10n.workspaceNameHint, // Use generic workspace hint
                         prefixIcon: const Icon(Icons.description_outlined),
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.lg),
                     
-                    Text('Workspace Image', style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
+                    Text(l10n.workspaceImage, style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
                     const SizedBox(height: AppSpacing.md),
                     SizedBox(
                       height: 110,
@@ -172,7 +174,7 @@ class _WorkspaceDialogState extends State<WorkspaceDialog> {
                                     children: [
                                       Icon(Icons.add_photo_alternate_rounded, color: theme.colorScheme.primary),
                                       const SizedBox(height: 4),
-                                      Text('Custom', style: theme.textTheme.labelSmall),
+                                      Text(l10n.custom, style: theme.textTheme.labelSmall),
                                     ],
                                   ),
                                 ),
@@ -210,7 +212,7 @@ class _WorkspaceDialogState extends State<WorkspaceDialog> {
                     ),
 
                     const SizedBox(height: AppSpacing.lg),
-                    Text('Team Members', style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
+                    Text(l10n.teamMembers, style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
                     const SizedBox(height: AppSpacing.md),
                     
                     TextFormField(
@@ -219,7 +221,7 @@ class _WorkspaceDialogState extends State<WorkspaceDialog> {
                       textInputAction: TextInputAction.search,
                       keyboardType: TextInputType.emailAddress,
                       decoration: InputDecoration(
-                        hintText: 'Enter exact email address...',
+                        hintText: l10n.enterEmailHint,
                         prefixIcon: const Icon(Icons.email_outlined, size: 20),
                         suffixIcon: IconButton(
                           icon: const Icon(Icons.search),
@@ -274,7 +276,7 @@ class _WorkspaceDialogState extends State<WorkspaceDialog> {
 
                     if (_selectedMembers.isNotEmpty) ...[
                       const SizedBox(height: AppSpacing.md),
-                      Text('Selected Members', style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.primary, fontWeight: FontWeight.bold)),
+                      Text(l10n.selectedMembers, style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.primary, fontWeight: FontWeight.bold)),
                       const SizedBox(height: AppSpacing.xs),
                       Container(
                         decoration: BoxDecoration(
@@ -307,7 +309,7 @@ class _WorkspaceDialogState extends State<WorkspaceDialog> {
                     else if (!isEdit)
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
-                        child: Text('Add members to start collaborating.', style: theme.textTheme.labelSmall?.copyWith(fontStyle: FontStyle.italic)),
+                        child: Text(l10n.addMembersStart, style: theme.textTheme.labelSmall?.copyWith(fontStyle: FontStyle.italic)),
                       ),
 
                     const SizedBox(height: AppSpacing.xxl),
@@ -317,7 +319,7 @@ class _WorkspaceDialogState extends State<WorkspaceDialog> {
                         TextButton(
                           onPressed: () => Navigator.pop(context),
                           style: TextButton.styleFrom(foregroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
-                          child: const Text('Cancel'),
+                          child: Text(l10n.cancel),
                         ),
                         const SizedBox(width: AppSpacing.md),
                         ElevatedButton(
@@ -339,7 +341,7 @@ class _WorkspaceDialogState extends State<WorkspaceDialog> {
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
                             elevation: 0,
                           ),
-                          child: Text(isEdit ? 'Save Changes' : 'Create Workspace', style: const TextStyle(fontWeight: FontWeight.bold)),
+                          child: Text(isEdit ? l10n.saveChanges : l10n.createWorkspace, style: const TextStyle(fontWeight: FontWeight.bold)),
                         ),
                       ],
                     ),

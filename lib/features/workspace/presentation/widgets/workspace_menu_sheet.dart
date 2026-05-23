@@ -5,6 +5,7 @@ import '../../../../shared/models/workspace.dart';
 import '../../../../shared/widgets/confirm_dialog.dart';
 import '../view_models/workspace_view_model.dart';
 import 'workspace_dialog.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class WorkspaceMenuSheet extends StatelessWidget {
   final Workspace workspace;
@@ -19,13 +20,14 @@ class WorkspaceMenuSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.read<WorkspaceViewModel>();
+    final l10n = AppLocalizations.of(context)!;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         ListTile(
           leading: const Icon(Icons.edit_rounded),
-          title: const Text('Edit Workspace'),
+          title: Text(l10n.editWorkspace),
           onTap: () async {
             Navigator.pop(context);
             final members = await viewModel.getWorkspaceMembers(workspace.id);
@@ -45,15 +47,15 @@ class WorkspaceMenuSheet extends StatelessWidget {
         ),
         ListTile(
           leading: const Icon(Icons.delete_outline_rounded, color: Colors.red),
-          title: const Text('Delete Workspace', style: TextStyle(color: Colors.red)),
+          title: Text(l10n.deleteWorkspace, style: const TextStyle(color: Colors.red)),
           onTap: () {
             Navigator.pop(context);
             showDialog(
               context: context,
               builder: (context) => ConfirmDialog(
-                title: 'Delete Workspace',
-                message: 'Are you sure you want to delete "${workspace.name}"? This action will hide it from your dashboard.',
-                confirmLabel: 'Delete',
+                title: l10n.deleteWorkspace,
+                message: l10n.deleteWorkspaceConfirm(workspace.name),
+                confirmLabel: l10n.delete,
                 confirmColor: Colors.red,
                 onConfirm: () {
                   viewModel.deleteWorkspace(workspace.id);

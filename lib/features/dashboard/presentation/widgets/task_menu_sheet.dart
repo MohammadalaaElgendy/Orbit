@@ -5,6 +5,7 @@ import '../../../../shared/models/task.dart';
 import '../../../../shared/widgets/confirm_dialog.dart';
 import '../view_models/task_view_model.dart';
 import 'task_dialog.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class TaskMenuSheet extends StatelessWidget {
   final Task task;
@@ -14,13 +15,14 @@ class TaskMenuSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.read<TaskViewModel>();
+    final l10n = AppLocalizations.of(context)!;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         ListTile(
           leading: const Icon(Icons.edit_rounded),
-          title: const Text('Edit Task'),
+          title: Text(l10n.editTaskLabel),
           onTap: () {
             Navigator.pop(context);
             showDialog(
@@ -45,15 +47,15 @@ class TaskMenuSheet extends StatelessWidget {
         ),
         ListTile(
           leading: const Icon(Icons.delete_outline_rounded, color: Colors.red),
-          title: const Text('Delete Task', style: TextStyle(color: Colors.red)),
+          title: Text(l10n.deleteTask, style: const TextStyle(color: Colors.red)),
           onTap: () {
             Navigator.pop(context);
             showDialog(
               context: context,
               builder: (context) => ConfirmDialog(
-                title: 'Delete Task',
-                message: 'Are you sure you want to delete "${task.title}"?',
-                confirmLabel: 'Delete',
+                title: l10n.deleteTask,
+                message: l10n.deleteTaskConfirm(task.title),
+                confirmLabel: l10n.delete,
                 confirmColor: Colors.red,
                 onConfirm: () => viewModel.deleteTask(task.id),
               ),
