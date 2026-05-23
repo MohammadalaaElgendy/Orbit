@@ -5,8 +5,9 @@ import '../../../../shared/widgets/glass_card.dart';
 import '../../../../shared/models/user.dart';
 import 'package:provider/provider.dart';
 import '../view_models/workspace_view_model.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
 import '../../../../shared/widgets/smart_image.dart';
+import '../../../../shared/widgets/orbit_avatar.dart';
 import '../../../../l10n/app_localizations.dart';
 
 class WorkspaceDialog extends StatefulWidget {
@@ -31,6 +32,7 @@ class _WorkspaceDialogState extends State<WorkspaceDialog> {
   late TextEditingController _searchController;
   late ScrollController _imageScrollController;
   String? _selectedImageUrl;
+  String? _currentCustomImageUrl;
   final List<User> _selectedMembers = [];
   List<User> _searchResults = [];
   bool _isSearching = false;
@@ -44,6 +46,11 @@ class _WorkspaceDialogState extends State<WorkspaceDialog> {
     _searchController = TextEditingController();
     _imageScrollController = ScrollController();
     _selectedImageUrl = widget.workspace?.imageUrl ?? AppPresetImages.images[0];
+
+    // التحقق مما إذا كانت الصورة الحالية هي صورة مخصصة (ليست من الـ presets)
+    if (widget.workspace?.imageUrl != null && !AppPresetImages.images.contains(widget.workspace!.imageUrl)) {
+      _currentCustomImageUrl = widget.workspace!.imageUrl;
+    }
     
     if (widget.currentMembers != null) {
       _selectedMembers.addAll(widget.currentMembers!);
@@ -57,6 +64,68 @@ class _WorkspaceDialogState extends State<WorkspaceDialog> {
     _searchController.dispose();
     _imageScrollController.dispose();
     super.dispose();
+  }
+
+  Widget _buildAddCustomButton(ThemeData theme, AppLocalizations l10n) {
+    return GestureDetector(
+      onTap: () async {
+        // استخدام FilePicker بدلاً من ImagePicker لضمان الاستقرار على الكمبيوتر
+        final result = await FilePicker.platform.pickFiles(
+          type: FileType.image,
+          allowMultiple: false,
+        );
+        
+        if (result != null && result.files.single.path != null) {
+          setState(() {
+            _selectedImageUrl = result.files.single.path!;
+            _currentCustomImageUrl = result.files.single.path!; // تحديث المعاينة المخصصة فوراً
+          });
+        }
+      },
+      child: Container(
+        width: 100,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          border: Border.all(color: theme.colorScheme.outlineVariant, width: 2),
+          color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.add_photo_alternate_rounded, color: theme.colorScheme.primary),
+            const SizedBox(height: 4),
+            Text(l10n.custom, style: theme.textTheme.labelSmall),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImageItem(String imageUrl, ThemeData theme) {
+    final isSelected = _selectedImageUrl == imageUrl;
+    return GestureDetector(
+      onTap: () => setState(() => _selectedImageUrl = imageUrl),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        width: 100,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          border: isSelected ? Border.all(color: theme.colorScheme.primary, width: 3) : null,
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            SmartImage(imageUrl: imageUrl),
+            if (isSelected)
+              Container(
+                color: theme.colorScheme.primary.withValues(alpha: 0.3),
+                child: const Center(child: Icon(Icons.check_circle, color: Colors.white)),
+              ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _onSearch(String query) async {
@@ -81,6 +150,9 @@ class _WorkspaceDialogState extends State<WorkspaceDialog> {
     final theme = Theme.of(context);
     final isEdit = widget.workspace != null;
     final l10n = AppLocalizations.of(context)!;
+    
+    // عدد العناصر الإضافية قبل قائمة الصور الجاهزة (زر الإضافة + الصورة المخصصة الحالية إن وجدت)
+    final int indexOffset = _currentCustomImageUrl != null ? 2 : 1;
     
     return Dialog(
       backgroundColor: Colors.transparent,
@@ -150,62 +222,22 @@ class _WorkspaceDialogState extends State<WorkspaceDialog> {
                           controller: _imageScrollController,
                           padding: const EdgeInsets.only(bottom: 15),
                           scrollDirection: Axis.horizontal,
-                          itemCount: AppPresetImages.images.length + 1,
+                          itemCount: AppPresetImages.images.length + (indexOffset),
                           separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.sm),
                           itemBuilder: (context, index) {
+                            // الزر الخاص برفع صورة جديدة
                             if (index == 0) {
-                              return GestureDetector(
-                                onTap: () async {
-                                  final picker = ImagePicker();
-                                  final image = await picker.pickImage(source: ImageSource.gallery);
-                                  if (image != null) {
-                                    setState(() => _selectedImageUrl = image.path);
-                                  }
-                                },
-                                child: Container(
-                                  width: 100,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(AppRadius.md),
-                                    border: Border.all(color: theme.colorScheme.outlineVariant, width: 2),
-                                    color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(Icons.add_photo_alternate_rounded, color: theme.colorScheme.primary),
-                                      const SizedBox(height: 4),
-                                      Text(l10n.custom, style: theme.textTheme.labelSmall),
-                                    ],
-                                  ),
-                                ),
-                              );
+                              return _buildAddCustomButton(theme, l10n);
                             }
 
-                            final imageUrl = AppPresetImages.images[index - 1];
-                            final isSelected = _selectedImageUrl == imageUrl;
-                            return GestureDetector(
-                              onTap: () => setState(() => _selectedImageUrl = imageUrl),
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 200),
-                                width: 100,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(AppRadius.md),
-                                  border: isSelected ? Border.all(color: theme.colorScheme.primary, width: 3) : null,
-                                ),
-                                clipBehavior: Clip.antiAlias,
-                                child: Stack(
-                                  fit: StackFit.expand,
-                                  children: [
-                                    SmartImage(imageUrl: imageUrl),
-                                    if (isSelected)
-                                      Container(
-                                        color: theme.colorScheme.primary.withValues(alpha: 0.3),
-                                        child: const Center(child: Icon(Icons.check_circle, color: Colors.white)),
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            );
+                            // عرض الصورة المخصصة الحالية إن وجدت لكي تظهر أول واحدة بعد زر الإضافة
+                            if (_currentCustomImageUrl != null && index == 1) {
+                              return _buildImageItem(_currentCustomImageUrl!, theme);
+                            }
+
+                            final presetIndex = index - indexOffset;
+                            final imageUrl = AppPresetImages.images[presetIndex];
+                            return _buildImageItem(imageUrl, theme);
                           },
                         ),
                       ),
@@ -250,10 +282,9 @@ class _WorkspaceDialogState extends State<WorkspaceDialog> {
                                 final user = _searchResults[index];
                                 final isAdded = _selectedMembers.any((m) => m.id == user.id);
                                 return ListTile(
-                                  leading: CircleAvatar(
+                                  leading: OrbitAvatar(
                                     radius: 14,
-                                    backgroundImage: user.avatarUrl != null ? NetworkImage(user.avatarUrl!) : null,
-                                    child: user.avatarUrl == null ? const Icon(Icons.person, size: 14) : null,
+                                    imageUrl: user.avatarUrl,
                                   ),
                                   title: Text(user.name, style: theme.textTheme.bodyMedium),
                                   subtitle: Text(user.email, style: theme.textTheme.labelSmall),
@@ -292,10 +323,9 @@ class _WorkspaceDialogState extends State<WorkspaceDialog> {
                                   setState(() => _selectedMembers.removeWhere((m) => m.id == user.id));
                                 }
                               },
-                              secondary: CircleAvatar(
+                              secondary: OrbitAvatar(
                                 radius: 16,
-                                backgroundImage: user.avatarUrl != null ? NetworkImage(user.avatarUrl!) : null,
-                                child: user.avatarUrl == null ? const Icon(Icons.person, size: 16) : null,
+                                imageUrl: user.avatarUrl,
                               ),
                               title: Text(user.name, style: theme.textTheme.bodyMedium),
                               subtitle: Text(user.email, style: theme.textTheme.labelSmall),

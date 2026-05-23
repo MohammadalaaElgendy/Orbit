@@ -25,6 +25,9 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<TaskViewModel>().loadTaskDetails(widget.task);
+    });
   }
 
   void _showTaskMenu() {

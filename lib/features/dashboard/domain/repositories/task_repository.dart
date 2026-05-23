@@ -99,7 +99,7 @@ class TaskRepository {
 
   Future<List<model.Task>> getTaskTreeByMilestone(String milestoneId) async {
     final allTasksRows = await (_taskDao.select(_taskDao.tasks)
-          ..where((t) => t.milestoneId.equals(milestoneId) & t.deletedAt.isNull())).get();
+          ..where((t) => t.milestoneId.equals(milestoneId))).get();
 
     final allTasks = allTasksRows.map(_mapToDomain).toList();
     return _buildTree(allTasks, null);

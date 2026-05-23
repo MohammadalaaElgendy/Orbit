@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:powersync/powersync.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:path/path.dart' as p;
 
 /// Connector to sync data between PowerSync and Supabase
 class SupabaseConnector extends PowerSyncBackendConnector {
@@ -21,7 +23,6 @@ class SupabaseConnector extends PowerSyncBackendConnector {
         return null;
       }
 
-      // If token is same as last one, it's likely rejected. Try manual refresh.
       if (_lastReturnedToken != null && _lastReturnedToken == session.accessToken) {
         debugPrint('SupabaseConnector: Token was rejected. Refreshing session manually...');
         try {
@@ -29,7 +30,6 @@ class SupabaseConnector extends PowerSyncBackendConnector {
            session = response.session;
         } catch (e) {
            debugPrint('SupabaseConnector: Manual refresh failed: $e');
-           // If manual refresh fails, wait a bit for SDK auto-refresh
            await Future.delayed(const Duration(seconds: 5));
            session = supabase.auth.currentSession;
         }
@@ -50,6 +50,59 @@ class SupabaseConnector extends PowerSyncBackendConnector {
     }
   }
 
+  Future<String?> _uploadFileIfNeeded(String table, String id, Map<String, dynamic> data) async {
+    if (table != 'workspaces' || data['image_url'] == null) return null;
+
+    final String path = data['image_url'];
+    if (path.startsWith('http') || path.startsWith('assets/')) return null;
+
+    try {
+      final File file = File(path);
+      if (!file.existsSync()) return null;
+
+      final String fileName = '${id}_${DateTime.now().millisecondsSinceEpoch}${p.extension(path)}';
+      // الرفع داخل مجلد workspace_images داخل الـ bucket
+      final String storagePath = 'workspace_images/$fileName';
+      
+      await supabase.storage.from('workspaces').upload(storagePath, file);
+      
+      final String publicUrl = supabase.storage.from('workspaces').getPublicUrl(storagePath);
+      return publicUrl;
+    } catch (e) {
+      debugPrint('SupabaseConnector: Error uploading file: $e');
+      // لا نرجع null هنا، بل نعيد رمي الخطأ لكي يقوم باور سينك بإعادة المحاولة لاحقاً
+      rethrow;
+    }
+  }
+
+  Future<void> _deleteFileFromStorage(String? imageUrl) async {
+    // التأكد أن الرابط هو رابط ويب وليس مسار محلي أو أصل من أصول التطبيق
+    if (imageUrl == null || !imageUrl.startsWith('http')) return;
+    
+    try {
+      final uri = Uri.parse(imageUrl);
+      final segments = uri.pathSegments;
+      
+      // نبحث عن اسم الـ bucket في المسار لنعرف بداية مسار الملف الحقيقي
+      final int bucketIndex = segments.indexOf('workspaces');
+      
+      if (bucketIndex != -1 && segments.length > bucketIndex + 1) {
+        // نستخرج المسار الكامل للملف (مثلاً: workspace_images/file.jpg)
+        final String storagePath = segments.sublist(bucketIndex + 1).join('/');
+        
+        // التحقق من أن المسار يشير لملف وليس مجلد (يحتوي على نقطة للامتداد)
+        if (storagePath.contains('.')) {
+          await supabase.storage.from('workspaces').remove([storagePath]);
+          debugPrint('SupabaseConnector: [SAFE DELETE] Removed specific file: $storagePath');
+        } else {
+          debugPrint('SupabaseConnector: [SAFETY BLOCK] Prevented folder deletion attempt: $storagePath');
+        }
+      }
+    } catch (e) {
+      debugPrint('SupabaseConnector: Error deleting file from storage: $e');
+    }
+  }
+
   @override
   Future<void> uploadData(PowerSyncDatabase db) async {
     final batch = await db.getCrudBatch();
@@ -63,6 +116,31 @@ class SupabaseConnector extends PowerSyncBackendConnector {
         final Map<String, dynamic> data = Map.from(row.opData ?? {});
         data['id'] = row.id;
 
+        if (row.op == UpdateType.put || row.op == UpdateType.patch) {
+          // الرفع عند الإضافة أو التعديل
+          final remoteUrl = await _uploadFileIfNeeded(row.table, row.id, data);
+          if (remoteUrl != null) {
+            data['image_url'] = remoteUrl;
+            await db.execute('UPDATE workspaces SET image_url = ? WHERE id = ?', [remoteUrl, row.id]);
+          }
+
+          // الحذف من الاستورج في حالة الـ Soft Delete (تحديث deleted_at)
+          if (row.table == 'workspaces' && data.containsKey('deleted_at') && data['deleted_at'] != null) {
+            final result = await db.execute('SELECT image_url FROM workspaces WHERE id = ?', [row.id]);
+            if (result.isNotEmpty) {
+              final String? imageUrl = result.first['image_url'];
+              await _deleteFileFromStorage(imageUrl);
+            }
+          }
+        } else if (row.op == UpdateType.delete) {
+          // الحذف من الاستورج في حالة الـ Hard Delete
+          if (row.table == 'workspaces') {
+             // ملاحظة: هنا قد لا نجد السطر في القاعدة المحلية لأنه حُذف بالفعل، 
+             // لذا يفضل الاعتماد على الـ Soft Delete كما هو متبع في تطبيقك حالياً.
+          }
+        }
+
+        // تحويل التواريخ
         for (var key in data.keys.toList()) {
           var value = data[key];
           if (value is int && (key.endsWith('_at') || key.endsWith('_date'))) {
@@ -73,9 +151,7 @@ class SupabaseConnector extends PowerSyncBackendConnector {
 
         data.forEach((key, value) {
           if (value is String && value.startsWith('[') && value.endsWith(']')) {
-            try {
-              data[key] = jsonDecode(value);
-            } catch (_) {}
+            try { data[key] = jsonDecode(value); } catch (_) {}
           }
         });
 

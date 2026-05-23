@@ -166,5 +166,8 @@
   "deleteMilestoneConfirm": "Are you sure you want to delete milestone \"{name}\"?",
   "home": "Home",
   "work": "Work",
-  "goals": "Goals"
+  "goals": "Goals",
+  "addPhoto": "Add Photo",
+  "changePhoto": "Change Photo",
+  "removePhoto": "Remove Photo"
 }

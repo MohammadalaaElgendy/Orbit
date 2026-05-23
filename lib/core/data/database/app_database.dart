@@ -17,9 +17,8 @@ class Users extends Table {
   TextColumn get avatarUrl => text().nullable()();
   BoolColumn get isVerified => boolean().withDefault(const Constant(false))();
   TextColumn get authProvider => text().nullable()();
-  TextColumn get createdAt => text()(); // Changed to text
-  TextColumn get updatedAt => text()(); // Changed to text
-  TextColumn get deletedAt => text().nullable()(); // Changed to text
+  TextColumn get createdAt => text()();
+  TextColumn get updatedAt => text()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -32,9 +31,8 @@ class Workspaces extends Table {
   TextColumn get imageUrl => text().nullable()();
   TextColumn get ownerId => text().references(Users, #id, onUpdate: KeyAction.cascade, onDelete: KeyAction.cascade)();
   TextColumn get createdBy => text().references(Users, #id, onUpdate: KeyAction.cascade, onDelete: KeyAction.cascade)();
-  TextColumn get createdAt => text()(); // Changed to text
-  TextColumn get updatedAt => text()(); // Changed to text
-  TextColumn get deletedAt => text().nullable()(); // Changed to text
+  TextColumn get createdAt => text()();
+  TextColumn get updatedAt => text()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -47,7 +45,6 @@ class WorkspaceMembers extends Table {
   TextColumn get role => text()(); 
   TextColumn get createdAt => text()(); 
   TextColumn get updatedAt => text()(); 
-  TextColumn get deletedAt => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -61,7 +58,6 @@ class Projects extends Table {
   TextColumn get color => text().nullable()();
   TextColumn get createdAt => text()();
   TextColumn get updatedAt => text()();
-  TextColumn get deletedAt => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -73,10 +69,9 @@ class Milestones extends Table {
   TextColumn get projectId => text().references(Projects, #id, onUpdate: KeyAction.cascade, onDelete: KeyAction.cascade)();
   TextColumn get name => text()();
   TextColumn get description => text()();
-  TextColumn get dueDate => text().nullable()(); // Changed to text
+  TextColumn get dueDate => text().nullable()();
   TextColumn get createdAt => text()();
   TextColumn get updatedAt => text()();
-  TextColumn get deletedAt => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -93,11 +88,10 @@ class Tasks extends Table {
   TextColumn get createdBy => text().references(Users, #id, onUpdate: KeyAction.cascade, onDelete: KeyAction.cascade)();
   TextColumn get priority => text()(); 
   TextColumn get status => text()(); 
-  TextColumn get startDate => text().nullable()(); // Changed to text
-  TextColumn get dueDate => text().nullable()(); // Changed to text
+  TextColumn get startDate => text().nullable()();
+  TextColumn get dueDate => text().nullable()();
   TextColumn get createdAt => text()();
   TextColumn get updatedAt => text()();
-  TextColumn get deletedAt => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -132,8 +126,6 @@ class SeedControl extends Table {
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase(PowerSyncDatabase powersync) : super(SqliteAsyncDriftConnection(powersync)) {
-    // مهم جداً: إخبار Drift عند حدوث أي تحديث في PowerSync
-    // لكي تقوم الـ Streams بتحديث الواجهة تلقائياً
     powersync.updates.listen((update) {
       final updatedTables = update.tables.map((t) => TableUpdate(t)).toSet();
       notifyUpdates(updatedTables);

@@ -13,14 +13,12 @@ class UserDao extends DatabaseAccessor<AppDatabase> with _$UserDaoMixin {
 
   Future<bool> updateEntry(UsersCompanion user) => update(users).replace(user);
 
-  Future<int> softDelete(String id) {
-    return (update(users)..where((t) => t.id.equals(id))).write(
-      UsersCompanion(deletedAt: Value(DateTime.now().toUtc().toIso8601String())),
-    );
+  Future<int> deleteUser(String id) {
+    return (delete(users)..where((t) => t.id.equals(id))).go();
   }
 
   Stream<List<User>> watchAll() {
-    return (select(users)..where((t) => t.deletedAt.isNull())).watch();
+    return select(users).watch();
   }
 
   Future<User?> getById(String id) {
@@ -34,8 +32,7 @@ class UserDao extends DatabaseAccessor<AppDatabase> with _$UserDaoMixin {
   Future<List<User>> searchUsers(String query) {
     return (select(users)
           ..where((t) =>
-              t.deletedAt.isNull() &
-              (t.name.contains(query) | t.email.contains(query))))
+              t.name.contains(query) | t.email.contains(query)))
         .get();
   }
 }

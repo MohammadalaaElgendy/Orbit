@@ -535,4 +535,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get goals => 'الأهداف';
+
+  @override
+  String get addPhoto => 'إضافة صورة';
+
+  @override
+  String get changePhoto => 'تغيير الصورة';
+
+  @override
+  String get removePhoto => 'إزالة الصورة';
 }

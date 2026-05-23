@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../shared/models/user.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../shared/widgets/glass_card.dart';
+import '../../../../shared/widgets/orbit_avatar.dart';
 import '../../../../l10n/app_localizations.dart';
 
 class MemberDetailsDialog extends StatelessWidget {
@@ -35,10 +36,9 @@ class MemberDetailsDialog extends StatelessWidget {
                   width: 3,
                 ),
               ),
-              child: CircleAvatar(
+              child: OrbitAvatar(
                 radius: 50,
-                backgroundImage: user.avatarUrl != null ? NetworkImage(user.avatarUrl!) : null,
-                child: user.avatarUrl == null ? const Icon(Icons.person, size: 50) : null,
+                imageUrl: user.avatarUrl,
               ),
             ),
             const SizedBox(height: AppSpacing.lg),

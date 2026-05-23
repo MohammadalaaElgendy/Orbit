@@ -74,7 +74,7 @@ void main() async {
   final supabaseAuthService = SupabaseAuthService();
   final userRepo = UserRepository(database.userDao);
   final authRepo = AuthRepository(supabaseAuthService, userRepo);
-  final workspaceRepo = WorkspaceRepository(database.workspaceDao);
+  final workspaceRepo = WorkspaceRepository(database.workspaceDao, database.projectDao, database.milestoneDao, database.taskDao);
   final projectRepo = ProjectRepository(database.projectDao);
   final milestoneRepo = MilestoneRepository(database.milestoneDao);
   final taskRepo = TaskRepository(database.taskDao);
@@ -167,7 +167,18 @@ class OrbitApp extends StatelessWidget {
                   return MaterialPageRoute(builder: (_) => MilestoneDetailsScreen(milestone: milestone));
                 case '/task-details':
                   final task = settings.arguments as Task;
-                  return MaterialPageRoute(builder: (_) => TaskDetailsScreen(task: task));
+                  return MaterialPageRoute(
+                    builder: (context) => ChangeNotifierProvider(
+                      create: (context) => TaskViewModel(
+                        taskRepository: context.read<TaskRepository>(),
+                        milestoneRepository: context.read<MilestoneRepository>(),
+                        projectRepository: context.read<ProjectRepository>(),
+                        workspaceRepository: context.read<WorkspaceRepository>(),
+                        authRepository: context.read<AuthRepository>(),
+                      ),
+                      child: TaskDetailsScreen(task: task),
+                    ),
+                  );
                 default: return MaterialPageRoute(builder: (_) => const SplashScreen());
               }
             },

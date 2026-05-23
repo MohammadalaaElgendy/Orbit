@@ -39,6 +39,7 @@ dependencies:
   flutter_local_notifications: 17.2.3
   timezone: 0.9.4
   shared_preferences: ^2.5.5
+  cached_network_image: ^3.4.1
 
 dev_dependencies:
   flutter_test:

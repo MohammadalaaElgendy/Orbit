@@ -534,4 +534,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get goals => 'Goals';
+
+  @override
+  String get addPhoto => 'Add Photo';
+
+  @override
+  String get changePhoto => 'Change Photo';
+
+  @override
+  String get removePhoto => 'Remove Photo';
 }

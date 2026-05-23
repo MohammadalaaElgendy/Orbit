@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../shared/widgets/glass_card.dart';
 import '../view_models/auth_view_model.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class AvatarOptionsSheet extends StatelessWidget {
   const AvatarOptionsSheet({super.key});
@@ -10,6 +11,7 @@ class AvatarOptionsSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authViewModel = context.read<AuthViewModel>();
+    final l10n = AppLocalizations.of(context)!;
 
     return GlassCard(
       padding: const EdgeInsets.all(AppSpacing.lg),
@@ -19,7 +21,7 @@ class AvatarOptionsSheet extends StatelessWidget {
         children: [
           ListTile(
             leading: const Icon(Icons.photo_library_outlined),
-            title: Text(authViewModel.user?.avatarUrl == null ? 'Add Photo' : 'Change Photo'),
+            title: Text(authViewModel.user?.avatarUrl == null ? l10n.addPhoto : l10n.changePhoto),
             onTap: () {
               Navigator.pop(context);
               authViewModel.updateProfileAvatar();
@@ -28,7 +30,7 @@ class AvatarOptionsSheet extends StatelessWidget {
           if (authViewModel.user?.avatarUrl != null)
             ListTile(
               leading: const Icon(Icons.delete_outline, color: Colors.redAccent),
-              title: const Text('Remove Photo', style: TextStyle(color: Colors.redAccent)),
+              title: Text(l10n.removePhoto, style: const TextStyle(color: Colors.redAccent)),
               onTap: () {
                 Navigator.pop(context);
                 authViewModel.deleteProfileAvatar();

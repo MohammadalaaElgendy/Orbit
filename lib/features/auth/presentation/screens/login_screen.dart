@@ -147,15 +147,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                             width: 2,
                                           ),
                                         ),
-                                        child: CircleAvatar(
-                                          radius: 38,
-                                          backgroundColor: theme.colorScheme.surface,
-                                          backgroundImage: authViewModel.pickedAvatarBytes != null
-                                              ? MemoryImage(authViewModel.pickedAvatarBytes!)
-                                              : null,
-                                          child: authViewModel.pickedAvatarBytes == null
-                                              ? Icon(Icons.add_a_photo_outlined, color: theme.colorScheme.primary)
-                                              : null,
+                                        child: ClipOval(
+                                          child: authViewModel.pickedAvatarBytes != null
+                                              ? Image.memory(
+                                                  authViewModel.pickedAvatarBytes!,
+                                                  fit: BoxFit.cover,
+                                                  width: 76,
+                                                  height: 76,
+                                                )
+                                              : Icon(Icons.add_a_photo_outlined, color: theme.colorScheme.primary),
                                         ),
                                       ),
                                       if (authViewModel.pickedAvatarBytes != null)

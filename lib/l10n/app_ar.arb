@@ -166,5 +166,8 @@
   "deleteMilestoneConfirm": "هل أنت متأكد من حذف المرحلة \"{name}\"؟",
   "home": "الرئيسية",
   "work": "الأعمال",
-  "goals": "الأهداف"
+  "goals": "الأهداف",
+  "addPhoto": "إضافة صورة",
+  "changePhoto": "تغيير الصورة",
+  "removePhoto": "إزالة الصورة"
 }

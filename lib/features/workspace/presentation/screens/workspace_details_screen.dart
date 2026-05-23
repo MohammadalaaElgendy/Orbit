@@ -21,6 +21,7 @@ import '../../../dashboard/presentation/widgets/milestone_card.dart';
 import 'dart:async';
 import '../../../../shared/widgets/smart_image.dart';
 import '../../../../shared/widgets/top_padding.dart';
+import '../../../../shared/widgets/orbit_avatar.dart';
 import '../../../../l10n/app_localizations.dart';
 
 class WorkspaceDetailsScreen extends StatefulWidget {
@@ -461,10 +462,9 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                 ),
               );
             },
-            child: CircleAvatar(
+            child: OrbitAvatar(
               radius: 20,
-              backgroundImage: member.avatarUrl != null ? NetworkImage(member.avatarUrl!) : null,
-              child: member.avatarUrl == null ? const Icon(Icons.person, size: 20) : null,
+              imageUrl: member.avatarUrl,
             ),
           );
         },

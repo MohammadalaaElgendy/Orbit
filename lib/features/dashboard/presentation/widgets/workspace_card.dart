@@ -4,6 +4,7 @@ import 'package:orbit/shared/models/workspace.dart';
 import 'package:orbit/shared/models/user.dart';
 import 'package:orbit/features/workspace/presentation/widgets/workspace_menu_sheet.dart';
 import 'package:orbit/shared/widgets/smart_image.dart';
+import 'package:orbit/shared/widgets/orbit_avatar.dart';
 import '../../../../l10n/app_localizations.dart';
 
 class WorkspaceCard extends StatelessWidget {
@@ -152,10 +153,9 @@ class WorkspaceCard extends StatelessWidget {
               shape: BoxShape.circle,
               border: Border.all(color: Colors.white.withValues(alpha: 0.4), width: 1.5),
             ),
-            child: CircleAvatar(
+            child: OrbitAvatar(
               radius: 10,
-              backgroundImage: displayMembers[i].avatarUrl != null ? NetworkImage(displayMembers[i].avatarUrl!) : null,
-              child: displayMembers[i].avatarUrl == null ? const Icon(Icons.person, size: 10) : null,
+              imageUrl: displayMembers[i].avatarUrl,
             ),
           ),
         )),

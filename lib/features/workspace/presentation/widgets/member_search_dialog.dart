@@ -5,6 +5,7 @@ import '../../../../shared/models/user.dart';
 import '../view_models/workspace_view_model.dart';
 import '../../../../shared/widgets/glass_card.dart';
 import '../../../../shared/widgets/orbit_button.dart';
+import '../../../../shared/widgets/orbit_avatar.dart';
 import '../../../../l10n/app_localizations.dart';
 
 class MemberSearchDialog extends StatefulWidget {
@@ -188,13 +189,9 @@ class _MemberSearchDialogState extends State<MemberSearchDialog> {
               ),
               child: Row(
                 children: [
-                  CircleAvatar(
+                  OrbitAvatar(
                     radius: 24,
-                    backgroundImage: _foundUser!.avatarUrl != null ? NetworkImage(_foundUser!.avatarUrl!) : null,
-                    backgroundColor: theme.colorScheme.primaryContainer,
-                    child: _foundUser!.avatarUrl == null 
-                      ? Icon(Icons.person_rounded, color: theme.colorScheme.onPrimaryContainer) 
-                      : null,
+                    imageUrl: _foundUser!.avatarUrl,
                   ),
                   const SizedBox(width: AppSpacing.md),
                   Expanded(

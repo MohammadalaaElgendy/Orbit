@@ -24,18 +24,16 @@ class TaskDao extends DatabaseAccessor<AppDatabase> with _$TaskDaoMixin {
   Future<bool> updateEntry(TasksCompanion task) => update(tasks).replace(task);
 
   Future<int> softDelete(String id) {
-    return (update(tasks)..where((t) => t.id.equals(id))).write(
-      TasksCompanion(deletedAt: Value(DateTime.now().toUtc().toIso8601String())),
-    );
+    return (delete(tasks)..where((t) => t.id.equals(id))).go();
   }
 
   Stream<List<Task>> watchAll() {
-    return (select(tasks)..where((t) => t.deletedAt.isNull())).watch();
+    return (select(tasks)).watch();
   }
 
   Stream<List<Task>> watchByMilestone(String milestoneId) {
     return (select(tasks)
-          ..where((t) => t.milestoneId.equals(milestoneId) & t.deletedAt.isNull()))
+          ..where((t) => t.milestoneId.equals(milestoneId)))
         .watch();
   }
 
@@ -48,11 +46,11 @@ class TaskDao extends DatabaseAccessor<AppDatabase> with _$TaskDaoMixin {
     final query = select(tasks).join([
       leftOuterJoin(
         subtasksTable,
-        subtasksTable.parentTaskId.equalsExp(tasks.id) & subtasksTable.deletedAt.isNull(),
+        subtasksTable.parentTaskId.equalsExp(tasks.id),
       ),
     ]);
 
-    query.where(tasks.parentTaskId.equals(parentId) & tasks.deletedAt.isNull());
+    query.where(tasks.parentTaskId.equals(parentId));
     query.groupBy([tasks.id]);
     query.addColumns([subtaskCount, completedSubtasks]);
 
@@ -76,11 +74,11 @@ class TaskDao extends DatabaseAccessor<AppDatabase> with _$TaskDaoMixin {
     final query = select(tasks).join([
       leftOuterJoin(
         subtasksTable,
-        subtasksTable.parentTaskId.equalsExp(tasks.id) & subtasksTable.deletedAt.isNull(),
+        subtasksTable.parentTaskId.equalsExp(tasks.id),
       ),
     ]);
 
-    query.where(tasks.milestoneId.equals(milestoneId) & tasks.parentTaskId.isNull() & tasks.deletedAt.isNull());
+    query.where(tasks.milestoneId.equals(milestoneId) & tasks.parentTaskId.isNull());
     query.groupBy([tasks.id]);
     query.addColumns([subtaskCount, completedSubtasks]);
 
@@ -100,6 +98,10 @@ class TaskDao extends DatabaseAccessor<AppDatabase> with _$TaskDaoMixin {
   }
 
   Stream<Task?> watchById(String id) {
-    return (select(tasks)..where((t) => t.id.equals(id) & t.deletedAt.isNull())).watchSingleOrNull();
+    return (select(tasks)..where((t) => t.id.equals(id))).watchSingleOrNull();
+  }
+
+  Future<int> softDeleteByWorkspace(String workspaceId) {
+    return (delete(tasks)..where((t) => t.workspaceId.equals(workspaceId))).go();
   }
 }

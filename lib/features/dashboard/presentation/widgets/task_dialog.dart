@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import '../../../../shared/models/task.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../shared/widgets/glass_card.dart';
-import '../../../../shared/widgets/smart_image.dart';
 import 'package:intl/intl.dart';
 
 import '../../../../shared/models/user.dart';
-
+import '../../../../shared/widgets/orbit_avatar.dart';
 import '../../../../l10n/app_localizations.dart';
 
 class TaskDialog extends StatefulWidget {
@@ -143,18 +142,14 @@ class _TaskDialogState extends State<TaskDialog> {
                             child: Row(
                               children: [
                                 if (u.avatarUrl != null)
-                                  ClipOval(
-                                    child: SmartImage(
-                                      imageUrl: u.avatarUrl!,
-                                      width: 24,
-                                      height: 24,
-                                    ),
+                                  OrbitAvatar(
+                                    radius: 12,
+                                    imageUrl: u.avatarUrl,
                                   )
                                 else
-                                  CircleAvatar(
+                                  OrbitAvatar(
                                     radius: 12,
                                     backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
-                                    child: Icon(Icons.person, size: 14, color: theme.colorScheme.primary),
                                   ),
                                 const SizedBox(width: AppSpacing.sm),
                                 Text(u.name),

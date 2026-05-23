@@ -9,7 +9,6 @@ const schema = Schema([
     Column.text('auth_provider'),
     Column.text('created_at'),
     Column.text('updated_at'),
-    Column.text('deleted_at'),
   ]),
   Table('workspaces', [
     Column.text('name'),
@@ -19,7 +18,6 @@ const schema = Schema([
     Column.text('created_by'),
     Column.text('created_at'),
     Column.text('updated_at'),
-    Column.text('deleted_at'),
   ]),
   Table('workspace_members', [
     Column.text('workspace_id'),
@@ -27,7 +25,6 @@ const schema = Schema([
     Column.text('role'),
     Column.text('created_at'),
     Column.text('updated_at'),
-    Column.text('deleted_at'),
   ]),
   Table('projects', [
     Column.text('workspace_id'),
@@ -36,20 +33,18 @@ const schema = Schema([
     Column.text('color'),
     Column.text('created_at'),
     Column.text('updated_at'),
-    Column.text('deleted_at'),
   ]),
   Table('milestones', [
-    Column.text('workspace_id'), // تم الإضافة هنا
+    Column.text('workspace_id'),
     Column.text('project_id'),
     Column.text('name'),
     Column.text('description'),
     Column.text('due_date'),
     Column.text('created_at'),
     Column.text('updated_at'),
-    Column.text('deleted_at'),
   ]),
   Table('tasks', [
-    Column.text('workspace_id'), // تم الإضافة هنا
+    Column.text('workspace_id'),
     Column.text('milestone_id'),
     Column.text('parent_task_id'),
     Column.text('title'),
@@ -62,6 +57,5 @@ const schema = Schema([
     Column.text('due_date'),
     Column.text('created_at'),
     Column.text('updated_at'),
-    Column.text('deleted_at'),
   ]),
 ]);

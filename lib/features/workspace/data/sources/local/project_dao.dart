@@ -12,22 +12,24 @@ class ProjectDao extends DatabaseAccessor<AppDatabase> with _$ProjectDaoMixin {
   Future<bool> updateEntry(ProjectsCompanion project) => update(projects).replace(project);
 
   Future<int> softDelete(String id) {
-    return (update(projects)..where((t) => t.id.equals(id))).write(
-      ProjectsCompanion(deletedAt: Value(DateTime.now().toUtc().toIso8601String())),
-    );
+    return (delete(projects)..where((t) => t.id.equals(id))).go();
   }
 
   Stream<List<Project>> watchAll() {
-    return (select(projects)..where((t) => t.deletedAt.isNull())).watch();
+    return (select(projects)).watch();
   }
 
   Stream<List<Project>> watchByWorkspace(String workspaceId) {
     return (select(projects)
-          ..where((t) => t.workspaceId.equals(workspaceId) & t.deletedAt.isNull()))
+          ..where((t) => t.workspaceId.equals(workspaceId)))
         .watch();
   }
 
   Future<Project?> getById(String id) {
     return (select(projects)..where((t) => t.id.equals(id))).getSingleOrNull();
+  }
+
+  Future<int> softDeleteByWorkspace(String workspaceId) {
+    return (delete(projects)..where((t) => t.workspaceId.equals(workspaceId))).go();
   }
 }

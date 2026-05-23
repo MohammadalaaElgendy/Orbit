@@ -12,13 +12,11 @@ class WorkspaceDao extends DatabaseAccessor<AppDatabase> with _$WorkspaceDaoMixi
   Future<bool> updateEntry(WorkspacesCompanion workspace) => update(workspaces).replace(workspace);
 
   Future<int> softDelete(String id) {
-    return (update(workspaces)..where((t) => t.id.equals(id))).write(
-      WorkspacesCompanion(deletedAt: Value(DateTime.now().toUtc().toIso8601String())),
-    );
+    return (delete(workspaces)..where((t) => t.id.equals(id))).go();
   }
 
   Stream<List<Workspace>> watchAll() {
-    return (select(workspaces)..where((t) => t.deletedAt.isNull())).watch();
+    return (select(workspaces)).watch();
   }
 
   /// Get all workspaces where the user is a member (Many-to-Many)
@@ -26,7 +24,7 @@ class WorkspaceDao extends DatabaseAccessor<AppDatabase> with _$WorkspaceDaoMixi
     final query = select(workspaces).join([
       innerJoin(workspaceMembers, workspaceMembers.workspaceId.equalsExp(workspaces.id)),
     ])
-      ..where(workspaceMembers.userId.equals(userId) & workspaces.deletedAt.isNull());
+      ..where(workspaceMembers.userId.equals(userId));
 
     return query.watch().map((rows) => rows.map((row) => row.readTable(workspaces)).toList());
   }
@@ -49,6 +47,12 @@ class WorkspaceDao extends DatabaseAccessor<AppDatabase> with _$WorkspaceDaoMixi
   Future<int> removeMember(String workspaceId, String userId) {
     return (delete(workspaceMembers)
           ..where((t) => t.workspaceId.equals(workspaceId) & t.userId.equals(userId)))
+        .go();
+  }
+
+  Future<int> removeAllMembers(String workspaceId) {
+    return (delete(workspaceMembers)
+          ..where((t) => t.workspaceId.equals(workspaceId)))
         .go();
   }
 

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class SmartImage extends StatelessWidget {
   final String imageUrl;
@@ -25,15 +26,17 @@ class SmartImage extends StatelessWidget {
         height: height,
       );
     } else if (imageUrl.startsWith('http')) {
-      return Image.network(
-        imageUrl,
+      // استخدام الكاش للروابط الويب لضمان وجود الصورة أوفلاين بعد أول تحميل
+      return CachedNetworkImage(
+        imageUrl: imageUrl,
         fit: fit,
         width: width,
         height: height,
-        errorBuilder: (context, error, stackTrace) => _buildPlaceholder(),
+        placeholder: (context, url) => _buildLoadingPlaceholder(),
+        errorWidget: (context, url, error) => _buildPlaceholder(),
       );
     } else {
-      // Assume local file path
+      // التعامل مع المسارات المحلية (التي يتم إنشاؤها أوفلاين)
       final file = File(imageUrl);
       if (file.existsSync()) {
         return Image.file(
@@ -46,6 +49,21 @@ class SmartImage extends StatelessWidget {
         return _buildPlaceholder();
       }
     }
+  }
+
+  Widget _buildLoadingPlaceholder() {
+    return Container(
+      width: width,
+      height: height,
+      color: Colors.grey.withValues(alpha: 0.05),
+      child: const Center(
+        child: SizedBox(
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator(strokeWidth: 2),
+        ),
+      ),
+    );
   }
 
   Widget _buildPlaceholder() {

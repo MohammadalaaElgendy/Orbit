@@ -1,3 +1,6 @@
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide User;
 import '../../../../shared/models/workspace.dart';
@@ -94,16 +97,42 @@ class WorkspaceViewModel extends ChangeNotifier {
     }
   }
 
+  Future<String?> _saveImageLocally(String originalPath) async {
+    try {
+      // إذا كانت الصورة أصلاً من الـ assets لا نفعل شيء
+      if (originalPath.startsWith('assets/')) return originalPath;
+      
+      final File imageFile = File(originalPath);
+      if (!imageFile.existsSync()) return originalPath;
+
+      final directory = await getApplicationDocumentsDirectory();
+      final String fileName = 'ws_${DateTime.now().millisecondsSinceEpoch}${p.extension(originalPath)}';
+      final String localPath = p.join(directory.path, fileName);
+      
+      await imageFile.copy(localPath);
+      return localPath;
+    } catch (e) {
+      debugPrint('Error saving image locally: $e');
+      return originalPath;
+    }
+  }
+
   Future<void> createWorkspace(String name, String description, String? imageUrl, List<String> memberIds) async {
     final currentUser = _authRepository.currentUser;
     if (currentUser == null) return;
+
+    // حفظ الصورة محلياً أولاً لضمان وجودها أوفلاين
+    String? finalImageUrl = imageUrl;
+    if (imageUrl != null && !imageUrl.startsWith('assets/')) {
+      finalImageUrl = await _saveImageLocally(imageUrl);
+    }
 
     final workspaceId = const Uuid().v4();
     final workspace = Workspace(
       id: workspaceId,
       name: name,
       description: description,
-      imageUrl: imageUrl,
+      imageUrl: finalImageUrl,
       ownerId: currentUser.id,
       createdBy: currentUser.id,
       createdAt: DateTime.now(),

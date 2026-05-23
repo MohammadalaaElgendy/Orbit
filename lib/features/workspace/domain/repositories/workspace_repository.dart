@@ -1,14 +1,21 @@
+import 'package:flutter/foundation.dart';
 import '../../../../shared/models/workspace.dart' as model;
 import '../../../../shared/models/user.dart' as model;
 import '../../data/sources/local/workspace_dao.dart';
+import '../../data/sources/local/project_dao.dart';
+import '../../../milestone/data/sources/local/milestone_dao.dart';
+import '../../../dashboard/data/sources/local/task_dao.dart';
 import '../../../../core/data/database/app_database.dart' as db;
 import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
 class WorkspaceRepository {
   final WorkspaceDao _workspaceDao;
+  final ProjectDao _projectDao;
+  final MilestoneDao _milestoneDao;
+  final TaskDao _taskDao;
 
-  WorkspaceRepository(this._workspaceDao);
+  WorkspaceRepository(this._workspaceDao, this._projectDao, this._milestoneDao, this._taskDao);
 
   Future<void> createWorkspace(model.Workspace workspace) async {
     await _workspaceDao.create(db.WorkspacesCompanion(
@@ -70,7 +77,19 @@ class WorkspaceRepository {
   }
 
   Future<void> deleteWorkspace(String id) async {
+    // 1. حذف مساحة العمل (Soft Delete)
     await _workspaceDao.softDelete(id);
+    
+    // 2. حذف تتابعي (Cascading Soft Delete) لكل المحتويات المرتبطة
+    // لضمان عدم ظهورها في لوحة التحكم أو الحسابات الأخرى
+    await _projectDao.softDeleteByWorkspace(id);
+    await _milestoneDao.softDeleteByWorkspace(id);
+    await _taskDao.softDeleteByWorkspace(id);
+    
+    // 3. حذف الأعضاء تماماً (لأنهم جدول وسيط)
+    await _workspaceDao.removeAllMembers(id);
+    
+    debugPrint('WorkspaceRepository: Full cascading delete completed for workspace $id');
   }
 
   Future<void> addMemberToWorkspace(String workspaceId, String userId, String role) async {

@@ -8,6 +8,7 @@ import '../../../../main.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../view_models/auth_view_model.dart';
 import 'avatar_options_sheet.dart';
+import '../../../../shared/widgets/orbit_avatar.dart';
 
 class UserProfileSheet extends StatefulWidget {
   const UserProfileSheet({super.key});
@@ -66,11 +67,9 @@ class _UserProfileSheetState extends State<UserProfileSheet> {
                     children: [
                       Opacity(
                         opacity: isLoading ? 0.5 : 1.0,
-                        child: CircleAvatar(
+                        child: OrbitAvatar(
                           radius: 35,
-                          backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
-                          backgroundImage: user?.avatarUrl != null ? NetworkImage(user!.avatarUrl!) : null,
-                          child: user?.avatarUrl == null ? Icon(Icons.person, size: 35, color: theme.colorScheme.primary) : null,
+                          imageUrl: user?.avatarUrl,
                         ),
                       ),
                       if (isLoading)

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'orbit_logo.dart';
 import 'glass_card.dart';
 import '../../core/constants/app_constants.dart';
+import 'orbit_avatar.dart';
 import '../../features/auth/presentation/view_models/auth_view_model.dart';
 import '../../features/auth/presentation/widgets/user_profile_sheet.dart';
 import 'package:provider/provider.dart';
@@ -176,16 +177,9 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
                       shape: BoxShape.circle,
                       border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.2), width: 1.5),
                     ),
-                    child: CircleAvatar(
+                    child: OrbitAvatar(
                       radius: 16,
-                      backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
-                      backgroundImage: context.watch<AuthViewModel>().user?.avatarUrl != null
-                          ? NetworkImage(context.watch<AuthViewModel>().user!.avatarUrl!)
-                          : null,
-                      onBackgroundImageError: context.watch<AuthViewModel>().user?.avatarUrl != null ? (e, s) => debugPrint("Load error") : null,
-                      child: context.watch<AuthViewModel>().user?.avatarUrl == null
-                          ? Icon(Icons.person, size: 16, color: theme.colorScheme.primary)
-                          : null,
+                      imageUrl: context.watch<AuthViewModel>().user?.avatarUrl,
                     ),
                   ),
                 ),
@@ -318,16 +312,9 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
                             borderRadius: AppRadius.xl,
                             child: Row(
                               children: [
-                                CircleAvatar(
+                                OrbitAvatar(
                                   radius: 18,
-                                  backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
-                                  backgroundImage: context.watch<AuthViewModel>().user?.avatarUrl != null
-                                      ? NetworkImage(context.watch<AuthViewModel>().user!.avatarUrl!)
-                                      : null,
-                                  onBackgroundImageError: context.watch<AuthViewModel>().user?.avatarUrl != null ? (e, s) => debugPrint("Load error") : null,
-                                  child: context.watch<AuthViewModel>().user?.avatarUrl == null
-                                      ? Icon(Icons.person, size: 18, color: theme.colorScheme.primary)
-                                      : null,
+                                  imageUrl: context.watch<AuthViewModel>().user?.avatarUrl,
                                 ),
                                 const SizedBox(width: AppSpacing.sm),
                                 Expanded(
@@ -348,16 +335,9 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
                       else
                         GestureDetector(
                           onTap: () => _showUserMenu(context),
-                          child: CircleAvatar(
+                          child: OrbitAvatar(
                             radius: 20,
-                            backgroundColor: theme.colorScheme.primary.withValues(alpha: 0.1),
-                            backgroundImage: context.watch<AuthViewModel>().user?.avatarUrl != null
-                                ? NetworkImage(context.watch<AuthViewModel>().user!.avatarUrl!)
-                                : null,
-                            onBackgroundImageError: context.watch<AuthViewModel>().user?.avatarUrl != null ? (e, s) => debugPrint("Load error") : null,
-                            child: context.watch<AuthViewModel>().user?.avatarUrl == null
-                                ? Icon(Icons.person, size: 20, color: theme.colorScheme.primary)
-                                : null,
+                            imageUrl: context.watch<AuthViewModel>().user?.avatarUrl,
                           ),
                         ),
                     ],
