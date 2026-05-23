@@ -4,6 +4,7 @@ import '../../../../core/constants/app_constants.dart';
 import '../../../dashboard/presentation/view_models/dashboard_view_model.dart';
 import '../../../dashboard/presentation/widgets/workspace_card.dart';
 import 'package:orbit/shared/widgets/top_padding.dart';
+import '../../../../shared/models/user.dart' as model_user;
 import '../../../../l10n/app_localizations.dart';
 
 class WorkspacesScreen extends StatelessWidget {
@@ -54,7 +55,7 @@ class WorkspacesScreen extends StatelessWidget {
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
                     final ws = workspaces[index];
-                    final members = viewModel.workspaceMembersMap[ws.id] ?? [];
+                    final List<model_user.User> members = viewModel.workspaceMembersMap[ws.id] ?? [];
                     return WorkspaceCard(
                       ws: ws,
                       isDark: isDark,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide User;
 import '../../../../shared/models/workspace.dart';
 import '../../../../shared/models/project.dart';
 import '../../../../shared/models/user.dart';
@@ -40,10 +41,32 @@ class WorkspaceViewModel extends ChangeNotifier {
         _projectRepository = projectRepository,
         _userRepository = userRepository,
         _authRepository = authRepository {
-    _init();
+    _listenToAuthChanges();
+  }
+
+  void _listenToAuthChanges() {
+    Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+      if (data.session != null) {
+        _init();
+      } else {
+        _clearData();
+      }
+    });
+  }
+
+  void _clearData() {
+    _projectSub?.cancel();
+    _memberSub?.cancel();
+    _userSub?.cancel();
+    _currentWorkspace = null;
+    _projects = [];
+    _members = [];
+    _allUsers = [];
+    notifyListeners();
   }
 
   void _init() {
+    _clearData();
     _userSub = _userRepository.watchUsers().listen((data) {
       _allUsers = data;
       notifyListeners();

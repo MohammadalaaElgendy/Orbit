@@ -28,8 +28,10 @@ class OrbitButton extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
     
     // Premium adaptive colors
-    final primaryBg = theme.colorScheme.primary;
-    final primaryText = theme.colorScheme.onPrimary;
+    // In Dark mode, we want a White button with the Saturated Brand Color (primaryContainer) as text.
+    // In Light mode, we keep the Saturated Brand Color (primary) as background with White text (onPrimary).
+    final primaryBg = isDark ? Colors.white : theme.colorScheme.primary;
+    final primaryText = isDark ? theme.colorScheme.primaryContainer : theme.colorScheme.onPrimary;
 
     Widget buttonChild = Row(
       mainAxisSize: MainAxisSize.min,

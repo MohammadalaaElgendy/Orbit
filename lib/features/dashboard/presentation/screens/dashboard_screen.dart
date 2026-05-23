@@ -11,6 +11,7 @@ import 'package:orbit/features/dashboard/presentation/widgets/all_tasks_dialog.d
 import 'package:orbit/features/dashboard/presentation/view_models/dashboard_view_model.dart';
 import 'package:orbit/features/workspace/presentation/widgets/workspace_dialog.dart';
 import 'package:orbit/shared/widgets/top_padding.dart';
+import '../../../../shared/models/user.dart' as model_user;
 import '../../../../l10n/app_localizations.dart';
 
 class DashboardScreen extends StatelessWidget {
@@ -77,7 +78,7 @@ class DashboardScreen extends StatelessWidget {
                     const SizedBox(width: AppSpacing.md),
                     itemBuilder: (context, index) {
                       final ws = workspaces[index];
-                      final members =
+                      final List<model_user.User> members =
                           viewModel.workspaceMembersMap[ws.id] ?? [];
 
                       return WorkspaceCard(
@@ -107,7 +108,7 @@ class DashboardScreen extends StatelessWidget {
                   ),
                   itemBuilder: (context, index) {
                     final ws = workspaces[index];
-                    final members =
+                    final List<model_user.User> members =
                         viewModel.workspaceMembersMap[ws.id] ?? [];
 
                     return WorkspaceCard(

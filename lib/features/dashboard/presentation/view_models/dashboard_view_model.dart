@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide User;
 import '../../../../shared/models/workspace.dart';
 import '../../../../shared/models/milestone.dart';
 import '../../../../shared/models/task.dart';
@@ -60,10 +61,37 @@ class DashboardViewModel extends ChangeNotifier {
         _milestoneRepository = milestoneRepository,
         _taskRepository = taskRepository,
         _authRepository = authRepository {
-    _init();
+    _listenToAuthChanges();
+  }
+
+  void _listenToAuthChanges() {
+    // إعادة التهيئة عند تغيير المستخدم
+    Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+      if (data.session != null) {
+        _init();
+      } else {
+        _clearData();
+      }
+    });
+  }
+
+  void _clearData() {
+    _workspaceSub?.cancel();
+    _milestoneSub?.cancel();
+    _taskSub?.cancel();
+    _workspaces = [];
+    _workspaceMembersMap.clear();
+    _recentMilestones = [];
+    _allMilestones = [];
+    _recentTasks = [];
+    _allTasks = [];
+    _overallProgress = 0.0;
+    notifyListeners();
   }
 
   void _init() {
+    _clearData(); // مسح أي بيانات قديمة قبل الاشتراك الجديد
+
     final currentUser = _authRepository.currentUser;
     if (currentUser == null) return;
 

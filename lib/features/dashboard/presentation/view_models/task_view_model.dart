@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide User;
 import '../../../../core/services/notification_service.dart';
 import '../../../../shared/models/task.dart';
 import '../../../../shared/models/user.dart';
@@ -40,7 +41,27 @@ class TaskViewModel extends ChangeNotifier {
         _milestoneRepository = milestoneRepository,
         _projectRepository = projectRepository,
         _workspaceRepository = workspaceRepository,
-        _authRepository = authRepository;
+        _authRepository = authRepository {
+    _listenToAuthChanges();
+  }
+
+  void _listenToAuthChanges() {
+    Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+      if (data.session == null) {
+        _clearData();
+      }
+    });
+  }
+
+  void _clearData() {
+    _taskSub?.cancel();
+    _subtaskSub?.cancel();
+    _memberSub?.cancel();
+    _currentTask = null;
+    _subtasks = [];
+    _workspaceMembers = [];
+    notifyListeners();
+  }
 
   void loadTaskDetails(Task task) async {
     _currentTask = task;

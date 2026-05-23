@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide User;
 import '../../../../shared/models/task.dart';
 import '../../../../shared/models/milestone.dart';
 import '../../../../shared/models/user.dart';
@@ -37,7 +38,27 @@ class MilestoneViewModel extends ChangeNotifier {
   })  : _milestoneRepository = milestoneRepository,
         _projectRepository = projectRepository,
         _workspaceRepository = workspaceRepository,
-        _taskRepository = taskRepository;
+        _taskRepository = taskRepository {
+    _listenToAuthChanges();
+  }
+
+  void _listenToAuthChanges() {
+    Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+      if (data.session == null) {
+        _clearData();
+      }
+    });
+  }
+
+  void _clearData() {
+    _taskSub?.cancel();
+    _memberSub?.cancel();
+    _milestoneSub?.cancel();
+    _tasks = [];
+    _currentMilestone = null;
+    _workspaceMembers = [];
+    notifyListeners();
+  }
 
   void loadMilestoneData(String milestoneId) async {
     _taskSub?.cancel();
