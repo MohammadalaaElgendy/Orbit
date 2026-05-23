@@ -7,13 +7,13 @@ part 'workspace_dao.g.dart';
 class WorkspaceDao extends DatabaseAccessor<AppDatabase> with _$WorkspaceDaoMixin {
   WorkspaceDao(super.db);
 
-  Future<int> create(WorkspacesCompanion workspace) => into(workspaces).insert(workspace);
+  Future<int> create(WorkspacesCompanion workspace) => into(workspaces).insert(workspace, mode: InsertMode.insertOrReplace);
 
   Future<bool> updateEntry(WorkspacesCompanion workspace) => update(workspaces).replace(workspace);
 
   Future<int> softDelete(String id) {
     return (update(workspaces)..where((t) => t.id.equals(id))).write(
-      WorkspacesCompanion(deletedAt: Value(DateTime.now())),
+      WorkspacesCompanion(deletedAt: Value(DateTime.now().toUtc().toIso8601String())),
     );
   }
 

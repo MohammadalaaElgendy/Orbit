@@ -6,7 +6,9 @@ import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:protocol_handler/protocol_handler.dart';
 import 'core/theme/app_theme.dart';
-import 'core/data/database/app_database.dart';
+import 'core/data/database/app_database.dart' hide Workspace, Milestone, Task;
+import 'core/services/sync_service.dart';
+import 'core/services/notification_service.dart';
 
 import 'features/auth/presentation/screens/splash_screen.dart';
 import 'features/auth/presentation/screens/welcome_screen.dart';
@@ -15,6 +17,12 @@ import 'features/auth/presentation/screens/register_screen.dart';
 import 'features/auth/presentation/screens/forgot_password_screen.dart';
 import 'features/auth/presentation/screens/otp_screen.dart';
 import 'features/dashboard/presentation/screens/main_screen.dart';
+import 'features/workspace/presentation/screens/workspace_details_screen.dart';
+import 'features/milestone/presentation/screens/milestone_details_screen.dart';
+import 'features/dashboard/presentation/screens/task_details_screen.dart';
+import 'shared/models/workspace.dart';
+import 'shared/models/milestone.dart';
+import 'shared/models/task.dart';
 
 import 'features/auth/domain/repositories/user_repository.dart';
 import 'features/auth/data/sources/remote/supabase_auth_service.dart';
@@ -52,7 +60,12 @@ void main() async {
     debug: true,
   );
 
-  final database = AppDatabase();
+  final syncService = SyncService();
+  await syncService.initialize();
+
+  await NotificationService().init();
+
+  final database = AppDatabase(syncService.db);
   final supabaseAuthService = SupabaseAuthService();
   final userRepo = UserRepository(database.userDao);
   final authRepo = AuthRepository(supabaseAuthService, userRepo);
@@ -63,6 +76,7 @@ void main() async {
 
   runApp(OrbitApp(
     database: database,
+    syncService: syncService,
     userRepo: userRepo,
     authRepo: authRepo,
     workspaceRepo: workspaceRepo,
@@ -74,6 +88,7 @@ void main() async {
 
 class OrbitApp extends StatelessWidget {
   final AppDatabase database;
+  final SyncService syncService;
   final UserRepository userRepo;
   final AuthRepository authRepo;
   final WorkspaceRepository workspaceRepo;
@@ -84,6 +99,7 @@ class OrbitApp extends StatelessWidget {
   const OrbitApp({
     super.key,
     required this.database,
+    required this.syncService,
     required this.userRepo,
     required this.authRepo,
     required this.workspaceRepo,
@@ -97,6 +113,7 @@ class OrbitApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         Provider.value(value: database),
+        Provider.value(value: syncService),
         Provider.value(value: userRepo),
         Provider.value(value: authRepo),
         Provider.value(value: workspaceRepo),
@@ -104,7 +121,7 @@ class OrbitApp extends StatelessWidget {
         Provider.value(value: milestoneRepo),
         Provider.value(value: taskRepo),
         ChangeNotifierProvider(create: (_) => ThemeModel()),
-        ChangeNotifierProvider(create: (context) => AuthViewModel(authRepository: authRepo)),
+        ChangeNotifierProvider(create: (context) => AuthViewModel(authRepository: authRepo, syncService: syncService)),
         ChangeNotifierProvider(create: (context) => DashboardViewModel(workspaceRepository: workspaceRepo, milestoneRepository: milestoneRepo, taskRepository: taskRepo, authRepository: authRepo)),
         ChangeNotifierProvider(create: (context) => WorkspaceViewModel(workspaceRepository: workspaceRepo, projectRepository: projectRepo, userRepository: userRepo, authRepository: authRepo)),
         ChangeNotifierProvider(create: (context) => MilestoneViewModel(milestoneRepository: milestoneRepo, projectRepository: projectRepo, workspaceRepository: workspaceRepo, taskRepository: taskRepo)),
@@ -131,6 +148,15 @@ class OrbitApp extends StatelessWidget {
                 case '/forgot-password': return MaterialPageRoute(builder: (_) => const ForgotPasswordScreen());
                 case '/otp': return MaterialPageRoute(builder: (_) => const OtpScreen());
                 case '/dashboard': return MaterialPageRoute(builder: (_) => const MainScreen());
+                case '/workspace-details': 
+                  final workspace = settings.arguments as Workspace;
+                  return MaterialPageRoute(builder: (_) => WorkspaceDetailsScreen(workspace: workspace));
+                case '/milestone-details':
+                  final milestone = settings.arguments as Milestone;
+                  return MaterialPageRoute(builder: (_) => MilestoneDetailsScreen(milestone: milestone));
+                case '/task-details':
+                  final task = settings.arguments as Task;
+                  return MaterialPageRoute(builder: (_) => TaskDetailsScreen(task: task));
                 default: return MaterialPageRoute(builder: (_) => const SplashScreen());
               }
             },

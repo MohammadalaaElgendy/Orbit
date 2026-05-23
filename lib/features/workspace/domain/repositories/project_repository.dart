@@ -15,8 +15,8 @@ class ProjectRepository {
       name: Value(project.name),
       description: Value(project.description),
       color: Value(project.color),
-      createdAt: Value(project.createdAt),
-      updatedAt: Value(project.updatedAt),
+      createdAt: Value(project.createdAt.toIso8601String()),
+      updatedAt: Value(project.updatedAt.toIso8601String()),
     ));
   }
 
@@ -28,8 +28,8 @@ class ProjectRepository {
               name: row.name,
               description: row.description,
               color: row.color,
-              createdAt: row.createdAt,
-              updatedAt: row.updatedAt,
+              createdAt: DateTime.parse(row.createdAt),
+              updatedAt: DateTime.parse(row.updatedAt),
             ))
         .toList());
   }
@@ -41,8 +41,8 @@ class ProjectRepository {
       name: Value(project.name),
       description: Value(project.description),
       color: Value(project.color),
-      createdAt: Value(project.createdAt),
-      updatedAt: Value(DateTime.now()),
+      createdAt: Value(project.createdAt.toIso8601String()),
+      updatedAt: Value(DateTime.now().toIso8601String()),
     ));
   }
 
@@ -59,8 +59,8 @@ class ProjectRepository {
       name: row.name,
       description: row.description,
       color: row.color,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
+      createdAt: DateTime.parse(row.createdAt),
+      updatedAt: DateTime.parse(row.updatedAt),
     );
   }
 }

@@ -1,0 +1,67 @@
+import 'package:powersync/powersync.dart';
+
+const schema = Schema([
+  Table('users', [
+    Column.text('name'),
+    Column.text('email'),
+    Column.text('avatar_url'),
+    Column.integer('is_verified'),
+    Column.text('auth_provider'),
+    Column.text('created_at'),
+    Column.text('updated_at'),
+    Column.text('deleted_at'),
+  ]),
+  Table('workspaces', [
+    Column.text('name'),
+    Column.text('description'),
+    Column.text('image_url'),
+    Column.text('owner_id'),
+    Column.text('created_by'),
+    Column.text('created_at'),
+    Column.text('updated_at'),
+    Column.text('deleted_at'),
+  ]),
+  Table('workspace_members', [
+    Column.text('workspace_id'),
+    Column.text('user_id'),
+    Column.text('role'),
+    Column.text('created_at'),
+    Column.text('updated_at'),
+    Column.text('deleted_at'),
+  ]),
+  Table('projects', [
+    Column.text('workspace_id'),
+    Column.text('name'),
+    Column.text('description'),
+    Column.text('color'),
+    Column.text('created_at'),
+    Column.text('updated_at'),
+    Column.text('deleted_at'),
+  ]),
+  Table('milestones', [
+    Column.text('workspace_id'), // تم الإضافة هنا
+    Column.text('project_id'),
+    Column.text('name'),
+    Column.text('description'),
+    Column.text('due_date'),
+    Column.text('created_at'),
+    Column.text('updated_at'),
+    Column.text('deleted_at'),
+  ]),
+  Table('tasks', [
+    Column.text('workspace_id'), // تم الإضافة هنا
+    Column.text('milestone_id'),
+    Column.text('parent_task_id'),
+    Column.text('title'),
+    Column.text('description'),
+    Column.text('assignee_id'),
+    Column.text('created_by'),
+    Column.text('priority'),
+    Column.text('status'),
+    Column.text('start_date'),
+    Column.text('due_date'),
+    Column.text('created_at'),
+    Column.text('updated_at'),
+    Column.text('deleted_at'),
+  ]),
+]);

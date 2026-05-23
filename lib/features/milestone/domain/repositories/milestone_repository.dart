@@ -8,15 +8,16 @@ class MilestoneRepository {
 
   MilestoneRepository(this._milestoneDao);
 
-  Future<void> createMilestone(model.Milestone milestone) async {
+  Future<void> createMilestone(model.Milestone milestone, String workspaceId) async {
     await _milestoneDao.create(db.MilestonesCompanion(
       id: Value(milestone.id),
+      workspaceId: Value(workspaceId),
       projectId: Value(milestone.projectId),
       name: Value(milestone.name),
       description: Value(milestone.description),
-      dueDate: Value(milestone.dueDate),
-      createdAt: Value(milestone.createdAt),
-      updatedAt: Value(milestone.updatedAt),
+      dueDate: Value(milestone.dueDate?.toIso8601String()),
+      createdAt: Value(milestone.createdAt.toIso8601String()),
+      updatedAt: Value(milestone.updatedAt.toIso8601String()),
     ));
   }
 
@@ -42,14 +43,15 @@ class MilestoneRepository {
   model.Milestone _mapWithCountsToDomain(MilestoneWithTaskCounts row) {
     return model.Milestone(
       id: row.milestone.id,
+      workspaceId: row.milestone.workspaceId, // تم الربط هنا
       projectId: row.milestone.projectId,
       projectName: row.projectName,
       workspaceName: row.workspaceName,
       name: row.milestone.name,
       description: row.milestone.description,
-      dueDate: row.milestone.dueDate,
-      createdAt: row.milestone.createdAt,
-      updatedAt: row.milestone.updatedAt,
+      dueDate: row.milestone.dueDate != null ? DateTime.parse(row.milestone.dueDate!) : null,
+      createdAt: DateTime.parse(row.milestone.createdAt),
+      updatedAt: DateTime.parse(row.milestone.updatedAt),
       totalTasks: row.totalTasks,
       completedTasks: row.completedTasks,
       progress: row.totalTasks > 0 ? row.completedTasks / row.totalTasks : 0.0,
@@ -59,12 +61,13 @@ class MilestoneRepository {
   Future<void> updateMilestone(model.Milestone milestone) async {
     await _milestoneDao.updateEntry(db.MilestonesCompanion(
       id: Value(milestone.id),
+      workspaceId: Value(milestone.workspaceId), 
       projectId: Value(milestone.projectId),
       name: Value(milestone.name),
       description: Value(milestone.description),
-      dueDate: Value(milestone.dueDate),
-      createdAt: Value(milestone.createdAt),
-      updatedAt: Value(DateTime.now()),
+      dueDate: Value(milestone.dueDate?.toIso8601String()),
+      createdAt: Value(milestone.createdAt.toIso8601String()),
+      updatedAt: Value(DateTime.now().toUtc().toIso8601String()),
     ));
   }
 
@@ -77,12 +80,13 @@ class MilestoneRepository {
     if (row == null) return null;
     return model.Milestone(
       id: row.id,
+      workspaceId: row.workspaceId, // تم الربط هنا
       projectId: row.projectId,
       name: row.name,
       description: row.description,
-      dueDate: row.dueDate,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
+      dueDate: row.dueDate != null ? DateTime.parse(row.dueDate!) : null,
+      createdAt: DateTime.parse(row.createdAt),
+      updatedAt: DateTime.parse(row.updatedAt),
     );
   }
 }

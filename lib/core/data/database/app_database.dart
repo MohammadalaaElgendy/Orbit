@@ -1,8 +1,6 @@
-import 'dart:io';
 import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as p;
+import 'package:drift_sqlite_async/drift_sqlite_async.dart';
+import 'package:powersync/powersync.dart' show PowerSyncDatabase;
 
 import '../../../features/auth/data/sources/local/user_dao.dart';
 import '../../../features/workspace/data/sources/local/workspace_dao.dart';
@@ -12,8 +10,6 @@ import '../../../features/dashboard/data/sources/local/task_dao.dart';
 
 part 'app_database.g.dart';
 
-// --- Tables ---
-
 class Users extends Table {
   TextColumn get id => text()();
   TextColumn get name => text()();
@@ -21,9 +17,9 @@ class Users extends Table {
   TextColumn get avatarUrl => text().nullable()();
   BoolColumn get isVerified => boolean().withDefault(const Constant(false))();
   TextColumn get authProvider => text().nullable()();
-  DateTimeColumn get createdAt => dateTime()();
-  DateTimeColumn get updatedAt => dateTime()();
-  DateTimeColumn get deletedAt => dateTime().nullable()();
+  TextColumn get createdAt => text()(); // Changed to text
+  TextColumn get updatedAt => text()(); // Changed to text
+  TextColumn get deletedAt => text().nullable()(); // Changed to text
 
   @override
   Set<Column> get primaryKey => {id};
@@ -34,10 +30,11 @@ class Workspaces extends Table {
   TextColumn get name => text()();
   TextColumn get description => text()();
   TextColumn get imageUrl => text().nullable()();
+  TextColumn get ownerId => text().references(Users, #id, onUpdate: KeyAction.cascade, onDelete: KeyAction.cascade)();
   TextColumn get createdBy => text().references(Users, #id, onUpdate: KeyAction.cascade, onDelete: KeyAction.cascade)();
-  DateTimeColumn get createdAt => dateTime()();
-  DateTimeColumn get updatedAt => dateTime()();
-  DateTimeColumn get deletedAt => dateTime().nullable()();
+  TextColumn get createdAt => text()(); // Changed to text
+  TextColumn get updatedAt => text()(); // Changed to text
+  TextColumn get deletedAt => text().nullable()(); // Changed to text
 
   @override
   Set<Column> get primaryKey => {id};
@@ -47,10 +44,10 @@ class WorkspaceMembers extends Table {
   TextColumn get id => text()();
   TextColumn get workspaceId => text().references(Workspaces, #id, onUpdate: KeyAction.cascade, onDelete: KeyAction.cascade)();
   TextColumn get userId => text().references(Users, #id, onUpdate: KeyAction.cascade, onDelete: KeyAction.cascade)();
-  TextColumn get role => text()(); // String enum
-  DateTimeColumn get createdAt => dateTime()();
-  DateTimeColumn get updatedAt => dateTime()();
-  DateTimeColumn get deletedAt => dateTime().nullable()();
+  TextColumn get role => text()(); 
+  TextColumn get createdAt => text()(); 
+  TextColumn get updatedAt => text()(); 
+  TextColumn get deletedAt => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -62,9 +59,9 @@ class Projects extends Table {
   TextColumn get name => text()();
   TextColumn get description => text()();
   TextColumn get color => text().nullable()();
-  DateTimeColumn get createdAt => dateTime()();
-  DateTimeColumn get updatedAt => dateTime()();
-  DateTimeColumn get deletedAt => dateTime().nullable()();
+  TextColumn get createdAt => text()();
+  TextColumn get updatedAt => text()();
+  TextColumn get deletedAt => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -72,13 +69,14 @@ class Projects extends Table {
 
 class Milestones extends Table {
   TextColumn get id => text()();
+  TextColumn get workspaceId => text().references(Workspaces, #id, onUpdate: KeyAction.cascade, onDelete: KeyAction.cascade)();
   TextColumn get projectId => text().references(Projects, #id, onUpdate: KeyAction.cascade, onDelete: KeyAction.cascade)();
   TextColumn get name => text()();
   TextColumn get description => text()();
-  DateTimeColumn get dueDate => dateTime().nullable()();
-  DateTimeColumn get createdAt => dateTime()();
-  DateTimeColumn get updatedAt => dateTime()();
-  DateTimeColumn get deletedAt => dateTime().nullable()();
+  TextColumn get dueDate => text().nullable()(); // Changed to text
+  TextColumn get createdAt => text()();
+  TextColumn get updatedAt => text()();
+  TextColumn get deletedAt => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -86,19 +84,20 @@ class Milestones extends Table {
 
 class Tasks extends Table {
   TextColumn get id => text()();
+  TextColumn get workspaceId => text().references(Workspaces, #id, onUpdate: KeyAction.cascade, onDelete: KeyAction.cascade)();
   TextColumn get milestoneId => text().references(Milestones, #id, onUpdate: KeyAction.cascade, onDelete: KeyAction.cascade)();
   TextColumn get parentTaskId => text().nullable().references(Tasks, #id, onUpdate: KeyAction.cascade, onDelete: KeyAction.cascade)();
   TextColumn get title => text()();
   TextColumn get description => text()();
   TextColumn get assigneeId => text().nullable().references(Users, #id, onUpdate: KeyAction.cascade, onDelete: KeyAction.setNull)();
   TextColumn get createdBy => text().references(Users, #id, onUpdate: KeyAction.cascade, onDelete: KeyAction.cascade)();
-  TextColumn get priority => text()(); // String enum
-  TextColumn get status => text()(); // String enum
-  DateTimeColumn get startDate => dateTime().nullable()();
-  DateTimeColumn get dueDate => dateTime().nullable()();
-  DateTimeColumn get createdAt => dateTime()();
-  DateTimeColumn get updatedAt => dateTime()();
-  DateTimeColumn get deletedAt => dateTime().nullable()();
+  TextColumn get priority => text()(); 
+  TextColumn get status => text()(); 
+  TextColumn get startDate => text().nullable()(); // Changed to text
+  TextColumn get dueDate => text().nullable()(); // Changed to text
+  TextColumn get createdAt => text()();
+  TextColumn get updatedAt => text()();
+  TextColumn get deletedAt => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -107,7 +106,7 @@ class Tasks extends Table {
 class SeedControl extends Table {
   TextColumn get id => text().withDefault(const Constant('main'))();
   BoolColumn get isSeeded => boolean().withDefault(const Constant(false))();
-  DateTimeColumn get seededAt => dateTime().nullable()();
+  TextColumn get seededAt => text().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -132,25 +131,22 @@ class SeedControl extends Table {
   ],
 )
 class AppDatabase extends _$AppDatabase {
-  AppDatabase() : super(_openConnection());
+  AppDatabase(PowerSyncDatabase powersync) : super(SqliteAsyncDriftConnection(powersync)) {
+    // مهم جداً: إخبار Drift عند حدوث أي تحديث في PowerSync
+    // لكي تقوم الـ Streams بتحديث الواجهة تلقائياً
+    powersync.updates.listen((update) {
+      final updatedTables = update.tables.map((t) => TableUpdate(t)).toSet();
+      notifyUpdates(updatedTables);
+    });
+  }
 
   @override
   int get schemaVersion => 1;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onUpgrade: (m, from, to) async {
-          // إذا حدث أي اختلاف في النسخ (ترقية أو تراجع)
-          // نقوم بمسح الجداول وإعادة بنائها لضمان التوافق في مرحلة التطوير
-          for (final table in allTables) {
-            try {
-              await m.deleteTable(table.actualTableName);
-            } catch (_) {}
-            await m.createTable(table);
-          }
-        },
         beforeOpen: (details) async {
-          await customStatement('PRAGMA foreign_keys = ON');
+          // PowerSync handles schema
         },
       );
 
@@ -171,16 +167,7 @@ class AppDatabase extends _$AppDatabase {
     await into(seedControl).insertOnConflictUpdate(SeedControlCompanion(
       id: const Value('main'),
       isSeeded: const Value(true),
-      seededAt: Value(DateTime.now()),
+      seededAt: Value(DateTime.now().toUtc().toIso8601String()),
     ));
   }
-}
-
-LazyDatabase _openConnection() {
-  return LazyDatabase(() async {
-    final dbFolder = await getApplicationSupportDirectory();
-    final file = File(p.join(dbFolder.path, 'orbit.db'));
-    
-    return NativeDatabase.createInBackground(file);
-  });
 }

@@ -49,6 +49,7 @@ class DatabaseSeeder {
       name: 'Orbit Development',
       description: 'Main workspace for Orbit project tracking.',
       imageUrl: 'assets/images/workspaces/ws_1.webp',
+      ownerId: userId,
       createdBy: userId,
       createdAt: now,
       updatedAt: now,
@@ -56,7 +57,7 @@ class DatabaseSeeder {
 
     // 3. Create Project
     final projectId = uuid.v4();
-    await projectRepo.createProject(model.Project(
+    final project = model.Project(
       id: projectId,
       workspaceId: wsId,
       name: 'Mobile App',
@@ -64,24 +65,27 @@ class DatabaseSeeder {
       color: '#6366F1',
       createdAt: now,
       updatedAt: now,
-    ));
+    );
+    await projectRepo.createProject(project);
 
     // 4. Create Milestone
     final milestoneId = uuid.v4();
     await milestoneRepo.createMilestone(model.Milestone(
       id: milestoneId,
+      workspaceId: wsId,
       projectId: projectId,
       name: 'Phase 2: Full CRUD',
       description: 'Implementing full CRUD functionality and workspace members.',
       dueDate: now.add(const Duration(days: 14)),
       createdAt: now,
       updatedAt: now,
-    ));
+    ), wsId);
 
     // 5. Create Root Task
     final taskId = uuid.v4();
     await taskRepo.createTask(model.Task(
       id: taskId,
+      workspaceId: wsId,
       milestoneId: milestoneId,
       title: 'Database & Repository Updates',
       description: 'Update Drift schema and implement repository methods.',
@@ -91,11 +95,12 @@ class DatabaseSeeder {
       priority: model.TaskPriority.high,
       createdAt: now,
       updatedAt: now,
-    ));
+    ), wsId);
 
     // 6. Create Subtasks
     await taskRepo.createTask(model.Task(
       id: uuid.v4(),
+      workspaceId: wsId,
       milestoneId: milestoneId,
       parentTaskId: taskId,
       title: 'Add SeedControl Table',
@@ -105,10 +110,11 @@ class DatabaseSeeder {
       priority: model.TaskPriority.medium,
       createdAt: now,
       updatedAt: now,
-    ));
+    ), wsId);
 
     await taskRepo.createTask(model.Task(
       id: uuid.v4(),
+      workspaceId: wsId,
       milestoneId: milestoneId,
       parentTaskId: taskId,
       title: 'Update Repositories',
@@ -118,7 +124,7 @@ class DatabaseSeeder {
       priority: model.TaskPriority.medium,
       createdAt: now,
       updatedAt: now,
-    ));
+    ), wsId);
 
     // Add another workspace
     await workspaceRepo.createWorkspace(model.Workspace(
@@ -126,6 +132,7 @@ class DatabaseSeeder {
       name: 'Marketing',
       description: 'Growth strategies and global campaigns.',
       imageUrl: 'assets/images/workspaces/ws_2.webp',
+      ownerId: userId,
       createdBy: userId,
       createdAt: now,
       updatedAt: now,

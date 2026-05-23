@@ -8,10 +8,13 @@ import '../../../../shared/models/project.dart';
 import '../../../../shared/models/milestone.dart' as model;
 import '../../../../shared/models/user.dart';
 import '../../../../shared/widgets/glass_card.dart';
+import '../../../../shared/widgets/confirm_dialog.dart';
 import '../view_models/workspace_view_model.dart';
 import '../widgets/project_dialog.dart';
-import '../widgets/workspace_dialog.dart';
 import '../widgets/member_search_dialog.dart';
+import '../widgets/member_details_dialog.dart';
+import '../widgets/workspace_menu_sheet.dart';
+import '../widgets/project_menu_sheet.dart';
 import '../../../milestone/presentation/view_models/milestone_view_model.dart';
 import '../../../milestone/presentation/widgets/milestone_dialog.dart';
 import '../../../dashboard/presentation/widgets/milestone_card.dart';
@@ -36,6 +39,9 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<WorkspaceViewModel>().loadWorkspace(widget.workspace.id);
+    });
   }
 
   @override
@@ -64,13 +70,10 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
         workspaceId: widget.workspace.id,
         onSave: (name, desc, color) {
           if (project != null) {
-            context.read<WorkspaceViewModel>().updateProject(Project(
-              id: project.id,
-              workspaceId: project.workspaceId,
+            context.read<WorkspaceViewModel>().updateProject(project.copyWith(
               name: name,
               description: desc,
               color: color,
-              createdAt: project.createdAt,
               updatedAt: DateTime.now(),
             ));
           } else {
@@ -95,41 +98,11 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
   }
 
   void _showWorkspaceMenu() {
-    final viewModel = context.read<WorkspaceViewModel>();
     showModalBottomSheet(
       context: context,
-      builder: (_) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ListTile(
-            leading: const Icon(Icons.edit_rounded),
-            title: const Text('Edit Workspace'),
-            onTap: () async {
-              Navigator.pop(context);
-              final members = await viewModel.getWorkspaceMembers(widget.workspace.id);
-              if (!mounted) return;
-              
-              showDialog(
-                context: context,
-                builder: (_) => WorkspaceDialog(
-                  workspace: widget.workspace,
-                  currentMembers: members,
-                  onSave: (name, desc, imageUrl, memberIds) => viewModel.updateWorkspace(widget.workspace.id, name, desc, imageUrl, memberIds),
-                ),
-              );
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.delete_outline_rounded, color: Colors.red),
-            title: const Text('Delete Workspace', style: TextStyle(color: Colors.red)),
-            onTap: () {
-              Navigator.pop(context);
-              viewModel.deleteWorkspace(widget.workspace.id);
-              Navigator.pop(context);
-            },
-          ),
-          const SizedBox(height: AppSpacing.lg),
-        ],
+      builder: (_) => WorkspaceMenuSheet(
+        workspace: widget.workspace,
+        onDelete: () => Navigator.pop(context),
       ),
     );
   }
@@ -149,10 +122,15 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
     final projects = viewModel.projects;
     final members = viewModel.members;
 
-    final isDark = theme.brightness == Brightness.dark;
+    // تثبيت عناصر شريط الإشعارات على اللون الأبيض الناصع (أندرويد + آيفون)
+    final overlayStyle = SystemUiOverlayStyle.light.copyWith(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.light, // أيقونات بيضاء للأندرويد
+      statusBarBrightness: Brightness.dark, // أيقونات بيضاء للآيفون
+    );
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+      value: overlayStyle,
       child: Scaffold(
         body: Container(
         width: double.infinity,
@@ -177,6 +155,7 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                 pinned: true,
                 backgroundColor: theme.scaffoldBackgroundColor,
                 elevation: 0,
+                systemOverlayStyle: overlayStyle, // فرض اللون الأبيض هنا أيضاً
                 leadingWidth: 70,
                 leading: Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -295,6 +274,24 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                             SmartImage(
                               imageUrl: currentWorkspace.imageUrl!,
                             ),
+                          
+                          // شادو علوي قوي لضمان رؤية أيقونات الساعة والبطارية البيضاء
+                          Positioned.fill(
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.center,
+                                  colors: [
+                                    Colors.black.withValues(alpha: 0.7),
+                                    Colors.transparent,
+                                  ],
+                                  stops: const [0.0, 0.4],
+                                ),
+                              ),
+                            ),
+                          ),
+
                           // Always blur background on large screens to hide pixelation
                           if (!isMobile)
                             ClipRect(
@@ -444,22 +441,21 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
         itemBuilder: (context, index) {
           final member = members[index];
           return GestureDetector(
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) => MemberDetailsDialog(user: member),
+              );
+            },
             onLongPress: () {
                showDialog(
                 context: context,
-                builder: (context) => AlertDialog(
-                  title: const Text('Remove Member'),
-                  content: Text('Are you sure you want to remove ${member.name} from this workspace?'),
-                  actions: [
-                    TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-                    TextButton(
-                      onPressed: () {
-                        context.read<WorkspaceViewModel>().removeMember(widget.workspace.id, member.id);
-                        Navigator.pop(context);
-                      }, 
-                      child: const Text('Remove', style: TextStyle(color: Colors.red))
-                    ),
-                  ],
+                builder: (context) => ConfirmDialog(
+                  title: 'Remove Member',
+                  message: 'Are you sure you want to remove ${member.name} from this workspace?',
+                  confirmLabel: 'Remove',
+                  confirmColor: Colors.red,
+                  onConfirm: () => context.read<WorkspaceViewModel>().removeMember(widget.workspace.id, member.id),
                 ),
               );
             },
@@ -510,28 +506,7 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
               onLongPress: () {
                 showModalBottomSheet(
                   context: context,
-                  builder: (_) => Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ListTile(
-                        leading: const Icon(Icons.edit_rounded),
-                        title: const Text('Edit Project'),
-                        onTap: () {
-                          Navigator.pop(context);
-                          _showProjectDialog(project: project);
-                        },
-                      ),
-                      ListTile(
-                        leading: const Icon(Icons.delete_outline_rounded, color: Colors.red),
-                        title: const Text('Delete Project', style: TextStyle(color: Colors.red)),
-                        onTap: () {
-                          Navigator.pop(context);
-                          context.read<WorkspaceViewModel>().deleteProject(project.id);
-                        },
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
-                    ],
-                  ),
+                  builder: (_) => ProjectMenuSheet(project: project),
                 );
               },
               onTap: () => _onProjectSelected(isSelected ? null : project.id),
@@ -598,29 +573,60 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                             ),
                           ),
                           const Spacer(),
-                            Text(
-                              project.name, 
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w900, 
-                                fontSize: 16,
-                                color: isDark ? Colors.white : Colors.black87,
-                                letterSpacing: -0.2,
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                project.name, 
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.w900, 
+                                  fontSize: 16,
+                                  color: isDark ? Colors.white : Colors.black87,
+                                  letterSpacing: -0.2,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              project.description,
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                fontSize: 12,
-                                color: isDark ? Colors.white60 : Colors.black54,
-                                height: 1.2,
+                              const SizedBox(height: 2),
+                              Text(
+                                project.description,
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  fontSize: 12,
+                                  color: isDark ? Colors.white60 : Colors.black54,
+                                  height: 1.2,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
+                            ],
+                          ),
                         ],
+                      ),
+                    ),
+
+                    // Top-right "More" Button
+                    Positioned(
+                      top: 12,
+                      right: 12,
+                      child: GestureDetector(
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (_) => ProjectMenuSheet(project: project),
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: (isDark ? Colors.white : Colors.black).withValues(alpha: 0.1), 
+                            shape: BoxShape.circle
+                          ),
+                          child: Icon(
+                            Icons.more_horiz_rounded, 
+                            size: 16, 
+                            color: isDark ? Colors.white70 : Colors.black45
+                          ),
+                        ),
                       ),
                     ),
                   ],

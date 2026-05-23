@@ -51,20 +51,24 @@ class WorkspaceViewModel extends ChangeNotifier {
   }
 
   void loadWorkspace(String id) async {
-    _currentWorkspace = await _workspaceRepository.getWorkspaceById(id);
-    _projectSub?.cancel();
-    _projectSub = _projectRepository.watchProjectsByWorkspace(id).listen((data) {
-      _projects = data;
+    try {
+      _currentWorkspace = await _workspaceRepository.getWorkspaceById(id);
+      _projectSub?.cancel();
+      _projectSub = _projectRepository.watchProjectsByWorkspace(id).listen((data) {
+        _projects = data;
+        notifyListeners();
+      });
+      
+      _memberSub?.cancel();
+      _memberSub = _workspaceRepository.watchWorkspaceMembers(id).listen((data) {
+        _members = data;
+        notifyListeners();
+      });
+      
       notifyListeners();
-    });
-    
-    _memberSub?.cancel();
-    _memberSub = _workspaceRepository.watchWorkspaceMembers(id).listen((data) {
-      _members = data;
-      notifyListeners();
-    });
-    
-    notifyListeners();
+    } catch (e) {
+      debugPrint('Error loading workspace: $e');
+    }
   }
 
   Future<void> createWorkspace(String name, String description, String? imageUrl, List<String> memberIds) async {
@@ -77,6 +81,7 @@ class WorkspaceViewModel extends ChangeNotifier {
       name: name,
       description: description,
       imageUrl: imageUrl,
+      ownerId: currentUser.id,
       createdBy: currentUser.id,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
@@ -99,34 +104,41 @@ class WorkspaceViewModel extends ChangeNotifier {
       name: name,
       description: description,
       imageUrl: imageUrl ?? ws.imageUrl,
+      ownerId: ws.ownerId,
       createdBy: ws.createdBy,
       createdAt: ws.createdAt,
       updatedAt: DateTime.now(),
     );
-    await _workspaceRepository.updateWorkspace(updated);
 
-    // Sync Members
-    final currentMemberIds = _members.map((m) => m.id).toSet();
-    final newMemberIds = memberIds.toSet();
-
-    // Remove users no longer in the list
-    for (final mId in currentMemberIds) {
-      if (!newMemberIds.contains(mId)) {
-        await _workspaceRepository.removeMemberFromWorkspace(id, mId);
-      }
-    }
-
-    // Add new users
-    for (final mId in newMemberIds) {
-      if (!currentMemberIds.contains(mId)) {
-        await _workspaceRepository.addMemberToWorkspace(id, mId, 'member');
-      }
-    }
-
+    // 1. تحديث الحالة في الذاكرة فوراً لسرعة الـ UI
     if (_currentWorkspace?.id == id) {
       _currentWorkspace = updated;
+      notifyListeners();
     }
-    notifyListeners();
+
+    try {
+      // 2. الحفظ في قاعدة البيانات
+      await _workspaceRepository.updateWorkspace(updated);
+
+      // Sync Members
+      final currentMembersList = await _workspaceRepository.watchWorkspaceMembers(id).first;
+      final currentMemberIds = currentMembersList.map((m) => m.id).toSet();
+      final newMemberIds = memberIds.toSet();
+
+      for (final mId in currentMemberIds) {
+        if (!newMemberIds.contains(mId)) {
+          await _workspaceRepository.removeMemberFromWorkspace(id, mId);
+        }
+      }
+
+      for (final mId in newMemberIds) {
+        if (!currentMemberIds.contains(mId)) {
+          await _workspaceRepository.addMemberToWorkspace(id, mId, 'member');
+        }
+      }
+    } catch (e) {
+      debugPrint('Error updating workspace: $e');
+    }
   }
 
   Future<void> deleteWorkspace(String id) async {
@@ -147,7 +159,18 @@ class WorkspaceViewModel extends ChangeNotifier {
   }
 
   Future<void> updateProject(Project project) async {
-    await _projectRepository.updateProject(project);
+    try {
+      // تحديث فوري في قائمة المشاريع المعروضة
+      final index = _projects.indexWhere((p) => p.id == project.id);
+      if (index != -1) {
+        _projects[index] = project;
+        notifyListeners();
+      }
+
+      await _projectRepository.updateProject(project);
+    } catch (e) {
+      debugPrint('Error updating project: $e');
+    }
   }
 
   Future<void> deleteProject(String id) async {
@@ -163,7 +186,15 @@ class WorkspaceViewModel extends ChangeNotifier {
   }
 
   Future<User?> searchUserByEmail(String email) async {
-    return _userRepository.getUserByEmail(email);
+    final localUser = await _userRepository.getUserByEmail(email);
+    if (localUser != null) return localUser;
+
+    final remoteResults = await _userRepository.searchUsers(email);
+    if (remoteResults.isNotEmpty) {
+      return remoteResults.first;
+    }
+    
+    return null;
   }
 
   Future<List<User>> searchUsers(String query) async {

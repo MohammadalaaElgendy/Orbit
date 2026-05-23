@@ -7,13 +7,15 @@ part 'user_dao.g.dart';
 class UserDao extends DatabaseAccessor<AppDatabase> with _$UserDaoMixin {
   UserDao(super.db);
 
-  Future<void> upsert(UsersCompanion user) => into(users).insertOnConflictUpdate(user);
+  Future<void> upsert(UsersCompanion user) async {
+    await into(users).insert(user, mode: InsertMode.insertOrReplace);
+  }
 
   Future<bool> updateEntry(UsersCompanion user) => update(users).replace(user);
 
   Future<int> softDelete(String id) {
     return (update(users)..where((t) => t.id.equals(id))).write(
-      UsersCompanion(deletedAt: Value(DateTime.now())),
+      UsersCompanion(deletedAt: Value(DateTime.now().toUtc().toIso8601String())),
     );
   }
 

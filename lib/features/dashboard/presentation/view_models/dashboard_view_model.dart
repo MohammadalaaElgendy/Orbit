@@ -31,6 +31,9 @@ class DashboardViewModel extends ChangeNotifier {
   List<Task> _recentTasks = [];
   List<Task> get recentTasks => _recentTasks;
 
+  List<Task> _allTasks = [];
+  List<Task> get allTasks => _allTasks;
+
   // Stats
   double _overallProgress = 0.0;
   double get overallProgress => _overallProgress;
@@ -77,7 +80,17 @@ class DashboardViewModel extends ChangeNotifier {
     // Watch ALL Milestones - Ensure this is robust
     _milestoneSub = _milestoneRepository.watchAllMilestones().listen((data) {
       _allMilestones = data;
-      _recentMilestones = data.take(5).toList();
+      
+      // Priority Milestones = Active milestones (progress < 100%) sorted by nearest deadline
+      final activeMilestones = data.where((m) => m.progress < 1.0).toList();
+      activeMilestones.sort((a, b) {
+        if (a.dueDate == null && b.dueDate == null) return 0;
+        if (a.dueDate == null) return 1; // الأهداف بدون تاريخ تأتي في الآخر
+        if (b.dueDate == null) return -1; // الأهداف التي لها تاريخ تسبق التي ليس لها تاريخ
+        return a.dueDate!.compareTo(b.dueDate!); // الأقرب موعداً أولاً
+      });
+
+      _recentMilestones = activeMilestones.take(5).toList();
       _totalMilestones = data.length;
       _completedMilestones = data.where((m) => m.progress >= 1.0).length;
       
@@ -89,7 +102,8 @@ class DashboardViewModel extends ChangeNotifier {
     });
 
     _taskSub = _taskRepository.watchAllTasks().listen((data) {
-      _recentTasks = data.take(10).toList();
+      _allTasks = data;
+      _recentTasks = data.take(5).toList();
       
       if (data.isEmpty) {
         _overallProgress = 0.0;
@@ -112,6 +126,7 @@ class DashboardViewModel extends ChangeNotifier {
       name: name,
       description: description,
       imageUrl: imageUrl,
+      ownerId: currentUser.id,
       createdBy: currentUser.id,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
@@ -134,6 +149,7 @@ class DashboardViewModel extends ChangeNotifier {
       name: name,
       description: description,
       imageUrl: imageUrl ?? ws.imageUrl,
+      ownerId: ws.ownerId,
       createdBy: ws.createdBy,
       createdAt: ws.createdAt,
       updatedAt: DateTime.now(),

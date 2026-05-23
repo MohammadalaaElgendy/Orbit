@@ -8,9 +8,11 @@ import 'package:image/image.dart' as img;
 import 'package:flutter/services.dart';
 import '../../../../shared/models/user.dart' as model;
 import '../../domain/repositories/auth_repository.dart';
+import '../../../../core/services/sync_service.dart';
 
 class AuthViewModel extends ChangeNotifier {
   final AuthRepository authRepository;
+  final SyncService _syncService;
   final _appLinks = AppLinks();
   StreamSubscription? _linkSubscription;
   static const _channel = MethodChannel('com.orbit.app/deep_link');
@@ -32,7 +34,7 @@ class AuthViewModel extends ChangeNotifier {
 
   final _supabase = Supabase.instance.client;
 
-  AuthViewModel({required this.authRepository}) {
+  AuthViewModel({required this.authRepository, required SyncService syncService}) : _syncService = syncService {
     _init();
     _setupDeepLinks();
     _setupNativeChannel();
@@ -55,9 +57,13 @@ class AuthViewModel extends ChangeNotifier {
     _supabase.auth.onAuthStateChange.listen((data) {
       if (data.session != null) {
         user = authRepository.currentUser;
+        _syncService.connect();
         isLoading = false;
         _loginSuccessController.add(true);
         notifyListeners();
+      } else {
+        user = null;
+        _syncService.disconnect();
       }
     });
   }
@@ -280,6 +286,7 @@ class AuthViewModel extends ChangeNotifier {
 
   Future<void> logout() async {
     await _supabase.auth.signOut();
+    await _syncService.disconnectAndClear();
     user = null;
     emailController.clear();
     nameController.clear();

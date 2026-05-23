@@ -70,8 +70,12 @@ class MilestoneViewModel extends ChangeNotifier {
   }
 
   Future<void> createMilestone(String projectId, String name, String description, DateTime? dueDate) async {
+    final project = await _projectRepository.getProjectById(projectId);
+    if (project == null) return;
+
     final milestone = Milestone(
       id: const Uuid().v4(),
+      workspaceId: project.workspaceId,
       projectId: projectId,
       name: name,
       description: description,
@@ -79,7 +83,7 @@ class MilestoneViewModel extends ChangeNotifier {
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );
-    await _milestoneRepository.createMilestone(milestone);
+    await _milestoneRepository.createMilestone(milestone, project.workspaceId);
 
     if (dueDate != null) {
       await NotificationService().scheduleDeadlineNotification(
@@ -92,17 +96,34 @@ class MilestoneViewModel extends ChangeNotifier {
   }
 
   Future<void> updateMilestone(Milestone milestone) async {
-    await _milestoneRepository.updateMilestone(milestone);
+    try {
+      await _milestoneRepository.updateMilestone(milestone);
+      
+      // تحديث فوري للحالة
+      if (_currentMilestone?.id == milestone.id) {
+        _currentMilestone = milestone;
+      }
+      
+      // تحديث في القائمة
+      final index = _tasks.indexWhere((t) => t.id == milestone.id);
+      if (index != -1) {
+        // ... (This is for tasks list, but logic is same)
+      }
+      
+      notifyListeners();
 
-    if (milestone.dueDate != null) {
-      await NotificationService().scheduleDeadlineNotification(
-        id: milestone.id.hashCode,
-        title: 'Milestone Reminder: ${milestone.name}',
-        body: 'The deadline for this milestone is in 1 hour.',
-        deadline: milestone.dueDate!,
-      );
-    } else {
-      await NotificationService().cancelNotification(milestone.id.hashCode);
+      if (milestone.dueDate != null) {
+        await NotificationService().scheduleDeadlineNotification(
+          id: milestone.id.hashCode,
+          title: 'Milestone Reminder: ${milestone.name}',
+          body: 'The deadline for this milestone is in 1 hour.',
+          deadline: milestone.dueDate!,
+        );
+      } else {
+        await NotificationService().cancelNotification(milestone.id.hashCode);
+      }
+    } catch (e) {
+      debugPrint('Error updating milestone in ViewModel: $e');
     }
   }
 

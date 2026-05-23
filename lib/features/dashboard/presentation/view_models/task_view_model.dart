@@ -86,8 +86,15 @@ class TaskViewModel extends ChangeNotifier {
     final currentUser = _authRepository.currentUser;
     if (currentUser == null) return;
 
+    final milestone = await _milestoneRepository.getMilestoneById(milestoneId);
+    if (milestone == null) return;
+
+    final project = await _projectRepository.getProjectById(milestone.projectId);
+    if (project == null) return;
+
     final task = Task(
       id: const Uuid().v4(),
+      workspaceId: project.workspaceId,
       milestoneId: milestoneId,
       parentTaskId: parentTaskId,
       title: title,
@@ -100,7 +107,7 @@ class TaskViewModel extends ChangeNotifier {
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );
-    await _taskRepository.createTask(task);
+    await _taskRepository.createTask(task, project.workspaceId);
 
     if (dueDate != null) {
       await NotificationService().scheduleDeadlineNotification(
@@ -113,23 +120,37 @@ class TaskViewModel extends ChangeNotifier {
   }
 
   Future<void> updateTask(Task task) async {
-    await _taskRepository.updateTask(task);
+    try {
+      // 1. تحديث قاعدة البيانات محلياً (Offline-First)
+      await _taskRepository.updateTask(task);
 
-    if (task.dueDate != null) {
-      await NotificationService().scheduleDeadlineNotification(
-        id: task.id.hashCode,
-        title: 'Task Reminder: ${task.title}',
-        body: 'The deadline for this task is in 1 hour.',
-        deadline: task.dueDate!,
-      );
-    } else {
-      await NotificationService().cancelNotification(task.id.hashCode);
-    }
+      // 2. تحديث الحالة في الـ ViewModel فوراً لضمان سرعة الواجهة
+      if (_currentTask?.id == task.id) {
+        _currentTask = task;
+      }
+      
+      // تحديث المهمة في قائمة الـ subtasks إذا كانت موجودة
+      final index = _subtasks.indexWhere((st) => st.id == task.id);
+      if (index != -1) {
+        _subtasks[index] = task;
+      }
 
-    if (_currentTask?.id == task.id) {
-      _currentTask = task;
+      notifyListeners();
+
+      // 3. جدولة التنبيهات في الخلفية
+      if (task.dueDate != null) {
+        await NotificationService().scheduleDeadlineNotification(
+          id: task.id.hashCode,
+          title: 'Task Reminder: ${task.title}',
+          body: 'The deadline for this task is in 1 hour.',
+          deadline: task.dueDate!,
+        );
+      } else {
+        await NotificationService().cancelNotification(task.id.hashCode);
+      }
+    } catch (e) {
+      debugPrint('Error updating task in ViewModel: $e');
     }
-    notifyListeners();
   }
 
   Future<void> deleteTask(String id) async {

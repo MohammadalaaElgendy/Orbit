@@ -8,9 +8,10 @@ class TaskRepository {
 
   TaskRepository(this._taskDao);
 
-  Future<void> createTask(model.Task task) async {
+  Future<void> createTask(model.Task task, String workspaceId) async {
     await _taskDao.create(db.TasksCompanion(
       id: Value(task.id),
+      workspaceId: Value(workspaceId),
       milestoneId: Value(task.milestoneId),
       parentTaskId: Value(task.parentTaskId),
       title: Value(task.title),
@@ -19,10 +20,10 @@ class TaskRepository {
       createdBy: Value(task.createdBy),
       priority: Value(task.priority.name),
       status: Value(task.status.name),
-      startDate: Value(task.startDate),
-      dueDate: Value(task.dueDate),
-      createdAt: Value(task.createdAt),
-      updatedAt: Value(task.updatedAt),
+      startDate: Value(task.startDate?.toIso8601String()),
+      dueDate: Value(task.dueDate?.toIso8601String()),
+      createdAt: Value(task.createdAt.toIso8601String()),
+      updatedAt: Value(task.updatedAt.toIso8601String()),
     ));
   }
 
@@ -32,51 +33,45 @@ class TaskRepository {
 
   Stream<List<model.Task>> watchRootTasksByMilestone(String milestoneId) {
     return _taskDao.watchRootTasksByMilestoneWithCounts(milestoneId).map((rows) => rows
-        .map((row) => model.Task(
-              id: row.task.id,
-              milestoneId: row.task.milestoneId,
-              parentTaskId: row.task.parentTaskId,
-              title: row.task.title,
-              description: row.task.description,
-              assigneeId: row.task.assigneeId,
-              createdBy: row.task.createdBy,
-              status: model.TaskStatus.values.byName(row.task.status),
-              priority: model.TaskPriority.values.byName(row.task.priority),
-              startDate: row.task.startDate,
-              dueDate: row.task.dueDate,
-              createdAt: row.task.createdAt,
-              updatedAt: row.task.updatedAt,
-              subtaskCount: row.subtaskCount,
-              completedSubtasks: row.completedSubtasks,
-            ))
+        .map((row) => _mapToDomain(row.task, subtaskCount: row.subtaskCount, completedSubtasks: row.completedSubtasks))
         .toList());
   }
 
   Stream<List<model.Task>> watchSubtasks(String parentId) {
     return _taskDao.watchSubtasksWithCounts(parentId).map((rows) => rows
-        .map((row) => model.Task(
-              id: row.task.id,
-              milestoneId: row.task.milestoneId,
-              parentTaskId: row.task.parentTaskId,
-              title: row.task.title,
-              description: row.task.description,
-              assigneeId: row.task.assigneeId,
-              createdBy: row.task.createdBy,
-              status: model.TaskStatus.values.byName(row.task.status),
-              priority: model.TaskPriority.values.byName(row.task.priority),
-              startDate: row.task.startDate,
-              dueDate: row.task.dueDate,
-              createdAt: row.task.createdAt,
-              updatedAt: row.task.updatedAt,
-              subtaskCount: row.subtaskCount,
-              completedSubtasks: row.completedSubtasks,
-            ))
+        .map((row) => _mapToDomain(row.task, subtaskCount: row.subtaskCount, completedSubtasks: row.completedSubtasks))
         .toList());
+  }
+
+  Stream<model.Task?> watchTaskById(String id) {
+    return _taskDao.watchById(id).map((row) => row != null ? _mapToDomain(row) : null);
+  }
+
+  model.Task _mapToDomain(db.Task row, {int subtaskCount = 0, int completedSubtasks = 0}) {
+    return model.Task(
+      id: row.id,
+      workspaceId: row.workspaceId, // تم الربط هنا
+      milestoneId: row.milestoneId,
+      parentTaskId: row.parentTaskId,
+      title: row.title,
+      description: row.description,
+      assigneeId: row.assigneeId,
+      createdBy: row.createdBy,
+      status: model.TaskStatus.values.byName(row.status),
+      priority: model.TaskPriority.values.byName(row.priority),
+      startDate: row.startDate != null ? DateTime.parse(row.startDate!) : null,
+      dueDate: row.dueDate != null ? DateTime.parse(row.dueDate!) : null,
+      createdAt: DateTime.parse(row.createdAt),
+      updatedAt: DateTime.parse(row.updatedAt),
+      subtaskCount: subtaskCount,
+      completedSubtasks: completedSubtasks,
+    );
   }
 
   Future<void> updateTask(model.Task task) async {
     await _taskDao.updateEntry(db.TasksCompanion(
       id: Value(task.id),
+      workspaceId: Value(task.workspaceId),
       milestoneId: Value(task.milestoneId),
       parentTaskId: Value(task.parentTaskId),
       title: Value(task.title),
@@ -85,10 +80,10 @@ class TaskRepository {
       createdBy: Value(task.createdBy),
       priority: Value(task.priority.name),
       status: Value(task.status.name),
-      startDate: Value(task.startDate),
-      dueDate: Value(task.dueDate),
-      createdAt: Value(task.createdAt),
-      updatedAt: Value(DateTime.now()),
+      startDate: Value(task.startDate?.toIso8601String()),
+      dueDate: Value(task.dueDate?.toIso8601String()),
+      createdAt: Value(task.createdAt.toIso8601String()),
+      updatedAt: Value(DateTime.now().toUtc().toIso8601String()),
     ));
   }
 
@@ -102,32 +97,9 @@ class TaskRepository {
     return _mapToDomain(row);
   }
 
-  Stream<model.Task?> watchTaskById(String id) {
-    return _taskDao.watchById(id).map((row) => row != null ? _mapToDomain(row) : null);
-  }
-
-  model.Task _mapToDomain(db.Task row) {
-    return model.Task(
-      id: row.id,
-      milestoneId: row.milestoneId,
-      parentTaskId: row.parentTaskId,
-      title: row.title,
-      description: row.description,
-      assigneeId: row.assigneeId,
-      createdBy: row.createdBy,
-      status: model.TaskStatus.values.byName(row.status),
-      priority: model.TaskPriority.values.byName(row.priority),
-      startDate: row.startDate,
-      dueDate: row.dueDate,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
-    );
-  }
-
   Future<List<model.Task>> getTaskTreeByMilestone(String milestoneId) async {
-    final query = _taskDao.select(_taskDao.tasks)
-          ..where((t) => t.milestoneId.equals(milestoneId) & t.deletedAt.isNull());
-    final allTasksRows = await query.get();
+    final allTasksRows = await (_taskDao.select(_taskDao.tasks)
+          ..where((t) => t.milestoneId.equals(milestoneId) & t.deletedAt.isNull())).get();
 
     final allTasks = allTasksRows.map(_mapToDomain).toList();
     return _buildTree(allTasks, null);
@@ -136,23 +108,8 @@ class TaskRepository {
   List<model.Task> _buildTree(List<model.Task> allTasks, String? parentId) {
     return allTasks
         .where((t) => t.parentTaskId == parentId)
-        .map((t) => model.Task(
-              id: t.id,
-              milestoneId: t.milestoneId,
-              parentTaskId: t.parentTaskId,
-              title: t.title,
-              description: t.description,
-              assigneeId: t.assigneeId,
-              createdBy: t.createdBy,
-              status: t.status,
-              priority: t.priority,
-              startDate: t.startDate,
-              dueDate: t.dueDate,
-              createdAt: t.createdAt,
-              updatedAt: t.updatedAt,
+        .map((t) => t.copyWith(
               subtasks: _buildTree(allTasks, t.id),
-              subtaskCount: allTasks.where((st) => st.parentTaskId == t.id).length,
-              completedSubtasks: allTasks.where((st) => st.parentTaskId == t.id && st.status == model.TaskStatus.done).length,
             ))
         .toList();
   }

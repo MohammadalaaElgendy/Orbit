@@ -5,6 +5,8 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   app_links
   file_selector_windows
+  flutter_timezone
+  powersync_flutter_libs
   protocol_handler_windows
   sqlite3_flutter_libs
   url_launcher_windows

@@ -18,8 +18,8 @@ class UserRepository {
       avatarUrl: Value(user.avatarUrl),
       isVerified: Value(user.isVerified),
       authProvider: Value(user.authProvider),
-      createdAt: Value(DateTime.now()),
-      updatedAt: Value(DateTime.now()),
+      createdAt: Value(DateTime.now().toUtc().toIso8601String()),
+      updatedAt: Value(DateTime.now().toUtc().toIso8601String()),
     ));
   }
 
@@ -68,27 +68,30 @@ class UserRepository {
     // إذا كان الاستعلام ليس إيميلاً صالحاً، لا تبحث أصلاً حفاظاً على الخصوصية
     if (!query.contains('@') || !query.contains('.')) return [];
 
-    // البحث في سوبابيس عن إيميل مطابق تماماً
+    // البحث في سوبابيس عن إيميل مطابق تماماً في الجدول العام
     try {
       final response = await Supabase.instance.client
-          .from('profiles')
+          .from('users') // تم التحديث من profiles إلى users
           .select()
-          .eq('email', query.trim()) // بحث دقيق (Exact Match)
-          .neq('id', currentUserId ?? '') // منع البحث عن النفس
+          .eq('email', query.trim()) 
+          .neq('id', currentUserId ?? '') 
           .limit(1);
 
       if ((response as List).isEmpty) return [];
 
       final data = response.first;
-      return [
-        model.User(
-          id: data['id'],
-          name: data['full_name'] ?? 'User',
-          email: data['email'] ?? '',
-          avatarUrl: data['avatar_url'],
-          isVerified: true,
-        )
-      ];
+      final foundUser = model.User(
+        id: data['id'],
+        name: data['name'] ?? 'User', 
+        email: data['email'] ?? '',
+        avatarUrl: data['avatar_url'],
+        isVerified: data['is_verified'] ?? true,
+      );
+
+      // --- الخطوة الأهم: حفظ المستخدم محلياً فوراً لمنع تعارض الـ Foreign Key ---
+      await createUser(foundUser);
+
+      return [foundUser];
     } catch (e) {
       debugPrint('Remote search failed: $e');
       return [];

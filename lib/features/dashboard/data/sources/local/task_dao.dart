@@ -25,7 +25,7 @@ class TaskDao extends DatabaseAccessor<AppDatabase> with _$TaskDaoMixin {
 
   Future<int> softDelete(String id) {
     return (update(tasks)..where((t) => t.id.equals(id))).write(
-      TasksCompanion(deletedAt: Value(DateTime.now())),
+      TasksCompanion(deletedAt: Value(DateTime.now().toUtc().toIso8601String())),
     );
   }
 

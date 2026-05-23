@@ -13,7 +13,7 @@ class ProjectDao extends DatabaseAccessor<AppDatabase> with _$ProjectDaoMixin {
 
   Future<int> softDelete(String id) {
     return (update(projects)..where((t) => t.id.equals(id))).write(
-      ProjectsCompanion(deletedAt: Value(DateTime.now())),
+      ProjectsCompanion(deletedAt: Value(DateTime.now().toUtc().toIso8601String())),
     );
   }
 

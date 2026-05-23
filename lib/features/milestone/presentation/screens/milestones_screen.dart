@@ -17,20 +17,29 @@ class MilestonesScreen extends StatefulWidget {
 
 class _MilestonesScreenState extends State<MilestonesScreen> {
   MilestoneSort _currentSort = MilestoneSort.deadlineAsc;
+  late Stream<List<Milestone>> _milestonesStream;
+
+  @override
+  void initState() {
+    super.initState();
+    // تعريف الـ Stream مرة واحدة فقط عند فتح الشاشة لمنع الرعشة
+    _milestonesStream = context.read<MilestoneRepository>().watchAllMilestones();
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final repo = context.read<MilestoneRepository>();
 
     return StreamBuilder<List<Milestone>>(
-      stream: repo.watchAllMilestones(),
+      stream: _milestonesStream,
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
+        // لا تظهر علامة التحميل إلا في المرة الأولى فقط
+        if (!snapshot.hasData && snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
 
-        List<Milestone> milestones = snapshot.data ?? [];
+        // استخدام نسخة من البيانات للفرز
+        List<Milestone> milestones = List.from(snapshot.data ?? []);
         _sortMilestones(milestones);
 
         if (milestones.isEmpty) {
@@ -147,6 +156,7 @@ class _MilestonesScreenState extends State<MilestonesScreen> {
     final theme = Theme.of(context);
     final isSelected = _currentSort == asc || _currentSort == desc;
     final isAsc = _currentSort == asc;
+    const accentColor = Color(0xFF3525CD); // المرجعي من كارت المساحة
 
     return ActionChip(
       label: Row(
@@ -158,7 +168,7 @@ class _MilestonesScreenState extends State<MilestonesScreen> {
             Icon(
               isAsc ? Icons.arrow_upward : Icons.arrow_downward, 
               size: 14, 
-              color: isSelected ? Colors.white : null, // Set arrow color to white when selected
+              color: isSelected ? Colors.white : null,
             ),
           ],
         ],
@@ -172,15 +182,20 @@ class _MilestonesScreenState extends State<MilestonesScreen> {
           }
         });
       },
-      backgroundColor: isSelected ? theme.colorScheme.primary : null, // Switched from primaryContainer to primary
+      backgroundColor: isSelected ? accentColor : (theme.brightness == Brightness.dark ? Colors.white.withValues(alpha: 0.05) : Colors.white),
       labelStyle: TextStyle(
-        color: isSelected ? Colors.white : theme.colorScheme.onSurface, // Text white when selected
+        color: isSelected ? Colors.white : theme.colorScheme.onSurface,
         fontSize: 12,
         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
       ),
       padding: EdgeInsets.zero,
       visualDensity: VisualDensity.compact,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        side: BorderSide(
+          color: isSelected ? accentColor : theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+        ),
+      ),
     );
   }
 

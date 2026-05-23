@@ -25,7 +25,7 @@ class MilestoneDao extends DatabaseAccessor<AppDatabase> with _$MilestoneDaoMixi
 
   Future<int> create(MilestonesCompanion milestone) => into(milestones).insert(milestone);
   Future<bool> updateEntry(MilestonesCompanion milestone) => update(milestones).replace(milestone);
-  Future<int> softDelete(String id) => (update(milestones)..where((t) => t.id.equals(id))).write(MilestonesCompanion(deletedAt: Value(DateTime.now())));
+  Future<int> softDelete(String id) => (update(milestones)..where((t) => t.id.equals(id))).write(MilestonesCompanion(deletedAt: Value(DateTime.now().toUtc().toIso8601String())));
 
   Stream<List<MilestoneWithTaskCounts>> watchAllWithCounts() {
     return (select(milestones).join([
