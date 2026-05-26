@@ -11,6 +11,7 @@ import 'package:orbit/features/dashboard/presentation/widgets/all_tasks_dialog.d
 import 'package:orbit/features/dashboard/presentation/view_models/dashboard_view_model.dart';
 import 'package:orbit/features/workspace/presentation/widgets/workspace_dialog.dart';
 import 'package:orbit/shared/widgets/top_padding.dart';
+import 'package:orbit/shared/widgets/global_search_overlay.dart';
 import '../../../../shared/models/user.dart' as model_user;
 import '../../../../l10n/app_localizations.dart';
 
@@ -178,7 +179,7 @@ class DashboardScreen extends StatelessWidget {
         _buildActionButton(
           context, 
           icon: Icons.search, 
-          onTap: () {},
+          onTap: () => GlobalSearchOverlay.show(context),
         ),
       ],
       body: body,

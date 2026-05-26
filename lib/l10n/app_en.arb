@@ -169,5 +169,11 @@
   "goals": "Goals",
   "addPhoto": "Add Photo",
   "changePhoto": "Change Photo",
-  "removePhoto": "Remove Photo"
+  "removePhoto": "Remove Photo",
+  "searchAnything": "Search anything...",
+  "searchSuggestions": "Search for workspaces, milestones, and tasks",
+  "noResultsFound": "No results found",
+  "workspace": "Workspace",
+  "milestone": "Milestone",
+  "task": "Task"
 }

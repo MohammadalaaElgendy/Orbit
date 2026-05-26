@@ -1117,6 +1117,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remove Photo'**
   String get removePhoto;
+
+  /// No description provided for @searchAnything.
+  ///
+  /// In en, this message translates to:
+  /// **'Search anything...'**
+  String get searchAnything;
+
+  /// No description provided for @searchSuggestions.
+  ///
+  /// In en, this message translates to:
+  /// **'Search for workspaces, milestones, and tasks'**
+  String get searchSuggestions;
+
+  /// No description provided for @noResultsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No results found'**
+  String get noResultsFound;
+
+  /// No description provided for @workspace.
+  ///
+  /// In en, this message translates to:
+  /// **'Workspace'**
+  String get workspace;
+
+  /// No description provided for @milestone.
+  ///
+  /// In en, this message translates to:
+  /// **'Milestone'**
+  String get milestone;
+
+  /// No description provided for @task.
+  ///
+  /// In en, this message translates to:
+  /// **'Task'**
+  String get task;
 }
 
 class _AppLocalizationsDelegate

@@ -169,5 +169,11 @@
   "goals": "الأهداف",
   "addPhoto": "إضافة صورة",
   "changePhoto": "تغيير الصورة",
-  "removePhoto": "إزالة الصورة"
+  "removePhoto": "إزالة الصورة",
+  "searchAnything": "ابحث عن أي شيء...",
+  "searchSuggestions": "ابحث عن مساحات العمل، والمراحل، والمهام",
+  "noResultsFound": "لم يتم العثور على نتائج",
+  "workspace": "مساحة عمل",
+  "milestone": "مرحلة",
+  "task": "مهمة"
 }

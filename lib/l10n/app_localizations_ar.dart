@@ -544,4 +544,22 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get removePhoto => 'إزالة الصورة';
+
+  @override
+  String get searchAnything => 'ابحث عن أي شيء...';
+
+  @override
+  String get searchSuggestions => 'ابحث عن مساحات العمل، والمراحل، والمهام';
+
+  @override
+  String get noResultsFound => 'لم يتم العثور على نتائج';
+
+  @override
+  String get workspace => 'مساحة عمل';
+
+  @override
+  String get milestone => 'مرحلة';
+
+  @override
+  String get task => 'مهمة';
 }

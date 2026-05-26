@@ -543,4 +543,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get removePhoto => 'Remove Photo';
+
+  @override
+  String get searchAnything => 'Search anything...';
+
+  @override
+  String get searchSuggestions =>
+      'Search for workspaces, milestones, and tasks';
+
+  @override
+  String get noResultsFound => 'No results found';
+
+  @override
+  String get workspace => 'Workspace';
+
+  @override
+  String get milestone => 'Milestone';
+
+  @override
+  String get task => 'Task';
 }

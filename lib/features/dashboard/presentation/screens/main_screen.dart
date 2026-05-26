@@ -7,6 +7,7 @@ import 'package:orbit/features/workspace/presentation/widgets/workspace_dialog.d
 import 'package:provider/provider.dart';
 import '../view_models/dashboard_view_model.dart';
 import '../../../../shared/widgets/glass_card.dart';
+import '../../../../shared/widgets/global_search_overlay.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../l10n/app_localizations.dart';
 
@@ -85,7 +86,7 @@ class _MainScreenState extends State<MainScreen> {
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: () {},
+              onTap: () => GlobalSearchOverlay.show(context),
               borderRadius: BorderRadius.circular(AppRadius.md),
               child: const Padding(
                 padding: EdgeInsets.all(AppSpacing.sm),
