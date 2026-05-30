@@ -41,9 +41,9 @@ class WorkspaceCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppRadius.xxl),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.05),
-              blurRadius: 15,
-              offset: const Offset(0, 8),
+              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03), // Reduced from 0.3 / 0.05
+              blurRadius: 12, // Reduced from 15
+              offset: const Offset(0, 6), // Reduced from 8
             )
           ],
         ),

@@ -1153,6 +1153,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Task'**
   String get task;
+
+  /// No description provided for @taskDeadlineReminderDayOf.
+  ///
+  /// In en, this message translates to:
+  /// **'Task Deadline Today: {title}'**
+  String taskDeadlineReminderDayOf(Object title);
+
+  /// No description provided for @taskDeadlineReminderDayBefore.
+  ///
+  /// In en, this message translates to:
+  /// **'Task Deadline Tomorrow: {title}'**
+  String taskDeadlineReminderDayBefore(Object title);
+
+  /// No description provided for @milestoneDeadlineReminderDayOf.
+  ///
+  /// In en, this message translates to:
+  /// **'Milestone Deadline Today: {title}'**
+  String milestoneDeadlineReminderDayOf(Object title);
+
+  /// No description provided for @milestoneDeadlineReminderDayBefore.
+  ///
+  /// In en, this message translates to:
+  /// **'Milestone Deadline Tomorrow: {title}'**
+  String milestoneDeadlineReminderDayBefore(Object title);
 }
 
 class _AppLocalizationsDelegate

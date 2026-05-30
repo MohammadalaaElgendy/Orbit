@@ -10,6 +10,7 @@ import '../../../dashboard/domain/repositories/task_repository.dart';
 import 'dart:async';
 import 'package:uuid/uuid.dart';
 import '../../../../core/services/notification_service.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class MilestoneViewModel extends ChangeNotifier {
   final MilestoneRepository _milestoneRepository;
@@ -90,12 +91,12 @@ class MilestoneViewModel extends ChangeNotifier {
     return _milestoneRepository.watchMilestonesByProject(projectId);
   }
 
-  Future<void> createMilestone(String projectId, String name, String description, DateTime? dueDate) async {
+  Future<void> createMilestone(BuildContext context, String projectId, String name, String description, DateTime? dueDate) async {
     final project = await _projectRepository.getProjectById(projectId);
     if (project == null) return;
 
     final milestone = Milestone(
-      id: const Uuid().v4(),
+      id: Uuid().v4(),
       workspaceId: project.workspaceId,
       projectId: projectId,
       name: name,
@@ -106,17 +107,19 @@ class MilestoneViewModel extends ChangeNotifier {
     );
     await _milestoneRepository.createMilestone(milestone, project.workspaceId);
 
-    if (dueDate != null) {
-      await NotificationService().scheduleDeadlineNotification(
-        id: milestone.id.hashCode,
-        title: 'Milestone Reminder: $name',
-        body: 'The deadline for this milestone is in 1 hour.',
+    if (dueDate != null && context.mounted) {
+      final l10n = AppLocalizations.of(context)!;
+      await NotificationService().scheduleDeadlineReminders(
+        id: milestone.id,
+        title: name,
+        dayOfBody: l10n.milestoneDeadlineReminderDayOf(name),
+        dayBeforeBody: l10n.milestoneDeadlineReminderDayBefore(name),
         deadline: dueDate,
       );
     }
   }
 
-  Future<void> updateMilestone(Milestone milestone) async {
+  Future<void> updateMilestone(BuildContext context, Milestone milestone) async {
     try {
       await _milestoneRepository.updateMilestone(milestone);
       
@@ -125,23 +128,19 @@ class MilestoneViewModel extends ChangeNotifier {
         _currentMilestone = milestone;
       }
       
-      // تحديث في القائمة
-      final index = _tasks.indexWhere((t) => t.id == milestone.id);
-      if (index != -1) {
-        // ... (This is for tasks list, but logic is same)
-      }
-      
       notifyListeners();
 
-      if (milestone.dueDate != null) {
-        await NotificationService().scheduleDeadlineNotification(
-          id: milestone.id.hashCode,
-          title: 'Milestone Reminder: ${milestone.name}',
-          body: 'The deadline for this milestone is in 1 hour.',
+      if (milestone.dueDate != null && context.mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        await NotificationService().scheduleDeadlineReminders(
+          id: milestone.id,
+          title: milestone.name,
+          dayOfBody: l10n.milestoneDeadlineReminderDayOf(milestone.name),
+          dayBeforeBody: l10n.milestoneDeadlineReminderDayBefore(milestone.name),
           deadline: milestone.dueDate!,
         );
       } else {
-        await NotificationService().cancelNotification(milestone.id.hashCode);
+        await NotificationService().cancelReminders(milestone.id);
       }
     } catch (e) {
       debugPrint('Error updating milestone in ViewModel: $e');

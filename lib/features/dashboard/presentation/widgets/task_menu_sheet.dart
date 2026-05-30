@@ -31,7 +31,7 @@ class TaskMenuSheet extends StatelessWidget {
                 task: task,
                 workspaceMembers: viewModel.workspaceMembers,
                 onSave: ({required description, required priority, required status, required title, assigneeId, dueDate}) {
-                  viewModel.updateTask(task.copyWith(
+                  viewModel.updateTask(context, task.copyWith(
                     title: title,
                     description: description,
                     status: status,

@@ -10,6 +10,7 @@ import '../../../workspace/domain/repositories/workspace_repository.dart';
 import '../../../auth/domain/repositories/auth_repository.dart';
 import 'dart:async';
 import 'package:uuid/uuid.dart';
+import '../../../../l10n/app_localizations.dart';
 
 class TaskViewModel extends ChangeNotifier {
   final TaskRepository _taskRepository;
@@ -95,6 +96,7 @@ class TaskViewModel extends ChangeNotifier {
   }
 
   Future<void> createTask({
+    required BuildContext context,
     required String milestoneId,
     String? parentTaskId,
     required String title,
@@ -114,7 +116,7 @@ class TaskViewModel extends ChangeNotifier {
     if (project == null) return;
 
     final task = Task(
-      id: const Uuid().v4(),
+      id: Uuid().v4(),
       workspaceId: project.workspaceId,
       milestoneId: milestoneId,
       parentTaskId: parentTaskId,
@@ -130,17 +132,19 @@ class TaskViewModel extends ChangeNotifier {
     );
     await _taskRepository.createTask(task, project.workspaceId);
 
-    if (dueDate != null) {
-      await NotificationService().scheduleDeadlineNotification(
-        id: task.id.hashCode,
-        title: 'Task Reminder: $title',
-        body: 'The deadline for this task is in 1 hour.',
+    if (dueDate != null && context.mounted) {
+      final l10n = AppLocalizations.of(context)!;
+      await NotificationService().scheduleDeadlineReminders(
+        id: task.id,
+        title: title,
+        dayOfBody: l10n.taskDeadlineReminderDayOf(title),
+        dayBeforeBody: l10n.taskDeadlineReminderDayBefore(title),
         deadline: dueDate,
       );
     }
   }
 
-  Future<void> updateTask(Task task) async {
+  Future<void> updateTask(BuildContext context, Task task) async {
     try {
       // 1. تحديث قاعدة البيانات محلياً (Offline-First)
       await _taskRepository.updateTask(task);
@@ -159,15 +163,17 @@ class TaskViewModel extends ChangeNotifier {
       notifyListeners();
 
       // 3. جدولة التنبيهات في الخلفية
-      if (task.dueDate != null) {
-        await NotificationService().scheduleDeadlineNotification(
-          id: task.id.hashCode,
-          title: 'Task Reminder: ${task.title}',
-          body: 'The deadline for this task is in 1 hour.',
+      if (task.dueDate != null && context.mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        await NotificationService().scheduleDeadlineReminders(
+          id: task.id,
+          title: task.title,
+          dayOfBody: l10n.taskDeadlineReminderDayOf(task.title),
+          dayBeforeBody: l10n.taskDeadlineReminderDayBefore(task.title),
           deadline: task.dueDate!,
         );
       } else {
-        await NotificationService().cancelNotification(task.id.hashCode);
+        await NotificationService().cancelReminders(task.id);
       }
     } catch (e) {
       debugPrint('Error updating task in ViewModel: $e');

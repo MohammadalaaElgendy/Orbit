@@ -36,122 +36,127 @@ class _RegisterScreenState extends State<RegisterScreen> {
             onPressed: () => Navigator.of(context).pop(),
           ),
         ),
-        body: SingleChildScrollView(
+        body: CustomScrollView(
           physics: const BouncingScrollPhysics(),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 500),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.containerMargin),
-                child: Column(
-                  children: [
-                    SizedBox(height: MediaQuery.of(context).padding.top + AppSpacing.xl),
-                    _buildAnimatedItem(
-                      delay: 0,
-                      child: const OrbitLogo(size: 64),
-                    ),
-                      const SizedBox(height: AppSpacing.md),
-                      _buildAnimatedItem(
-                        delay: 200,
-                        child: Column(
-                          children: [
-                            Text(
-                              l10n.joinOrbit, 
-                              style: const TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: -1.5,
-                              ),
-                            ),
-                            Text(
-                              l10n.elevateProductivity,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.xl),
-                      _buildAnimatedItem(
-                        delay: 400,
-                        child: GlassCard(
-                          opacity: 0.1,
-                          borderColor: Colors.white.withValues(alpha: 0.1),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              OrbitTextField(
-                                label: l10n.fullName,
-                                hint: l10n.enterFullName,
-                              ),
-                              const SizedBox(height: AppSpacing.md),
-                              OrbitTextField(
-                                label: l10n.emailAddress,
-                                hint: l10n.emailAddressHint,
-                                keyboardType: TextInputType.emailAddress,
-                              ),
-                              const SizedBox(height: AppSpacing.md),
-                              OrbitTextField(
-                                label: l10n.password,
-                                hint: '••••••••',
-                                obscureText: _obscurePassword,
-                                suffixIcon: IconButton(
-                                  icon: Icon(
-                                    _obscurePassword 
-                                        ? Icons.visibility_off_outlined 
-                                        : Icons.visibility_outlined,
-                                    color: theme.colorScheme.onSurfaceVariant,
-                                    size: 20,
-                                  ),
-                                  onPressed: () {
-                                    setState(() {
-                                      _obscurePassword = !_obscurePassword;
-                                    });
-                                  },
-                                ),
-                              ),
-                              const SizedBox(height: AppSpacing.lg),
-                              OrbitButton(
-                                text: l10n.createAccount,
-                                onPressed: () {
-                                  Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (route) => false);
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.lg),
+          slivers: [
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 500),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.containerMargin),
+                    child: Column(
+                      children: [
+                        SizedBox(height: MediaQuery.of(context).padding.top + AppSpacing.xl),
                         _buildAnimatedItem(
-                          delay: 600,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                l10n.alreadyHaveAccount,
-                                style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
-                              ),
-                              GestureDetector(
-                                onTap: () => Navigator.pushNamed(context, '/login'),
-                                child: Text(
-                                  l10n.signIn,
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    color: theme.colorScheme.onSurface,
-                                    fontWeight: FontWeight.bold,
+                          delay: 0,
+                          child: const OrbitLogo(size: 64),
+                        ),
+                          const SizedBox(height: AppSpacing.md),
+                          _buildAnimatedItem(
+                            delay: 200,
+                            child: Column(
+                              children: [
+                                Text(
+                                  l10n.joinOrbit, 
+                                  style: const TextStyle(
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: -1.5,
                                   ),
                                 ),
-                              ),
-                            ],
+                                Text(
+                                  l10n.elevateProductivity,
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      const SizedBox(height: AppSpacing.xxl),
-                    ],
+                          const SizedBox(height: AppSpacing.xl),
+                          _buildAnimatedItem(
+                            delay: 400,
+                            child: GlassCard(
+                              opacity: 0.1,
+                              borderColor: Colors.white.withValues(alpha: 0.1),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  OrbitTextField(
+                                    label: l10n.fullName,
+                                    hint: l10n.enterFullName,
+                                  ),
+                                  const SizedBox(height: AppSpacing.md),
+                                  OrbitTextField(
+                                    label: l10n.emailAddress,
+                                    hint: l10n.emailAddressHint,
+                                    keyboardType: TextInputType.emailAddress,
+                                  ),
+                                  const SizedBox(height: AppSpacing.md),
+                                  OrbitTextField(
+                                    label: l10n.password,
+                                    hint: '••••••••',
+                                    obscureText: _obscurePassword,
+                                    suffixIcon: IconButton(
+                                      icon: Icon(
+                                        _obscurePassword 
+                                            ? Icons.visibility_off_outlined 
+                                            : Icons.visibility_outlined,
+                                        color: theme.colorScheme.onSurfaceVariant,
+                                        size: 20,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          _obscurePassword = !_obscurePassword;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  const SizedBox(height: AppSpacing.lg),
+                                  OrbitButton(
+                                    text: l10n.createAccount,
+                                    onPressed: () {
+                                      Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (route) => false);
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.lg),
+                            _buildAnimatedItem(
+                              delay: 600,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    l10n.alreadyHaveAccount,
+                                    style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.7)),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () => Navigator.pushNamed(context, '/login'),
+                                    child: Text(
+                                      l10n.signIn,
+                                      style: theme.textTheme.bodyMedium?.copyWith(
+                                        color: theme.colorScheme.onSurface,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          const SizedBox(height: AppSpacing.xxl),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-              ),
             ),
-          ),
+          ],
+        ),
         ),
     );
   }

@@ -92,7 +92,7 @@ void main() async {
   ));
 }
 
-class OrbitApp extends StatelessWidget {
+class OrbitApp extends StatefulWidget {
   final AppDatabase database;
   final SyncService syncService;
   final UserRepository userRepo;
@@ -117,29 +117,66 @@ class OrbitApp extends StatelessWidget {
   });
 
   @override
+  State<OrbitApp> createState() => _OrbitAppState();
+}
+
+class _OrbitAppState extends State<OrbitApp> {
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+
+  @override
+  void initState() {
+    super.initState();
+    _listenToNotifications();
+  }
+
+  void _listenToNotifications() {
+    NotificationService().onNotificationClick.listen((payload) async {
+      if (payload != null) {
+        debugPrint('Notification clicked with payload: $payload');
+        
+        // Try to find if it's a task or milestone
+        // First check tasks
+        final task = await widget.taskRepo.watchTaskById(payload).first;
+        if (task != null) {
+          _navigatorKey.currentState?.pushNamed('/task-details', arguments: task);
+          return;
+        }
+
+        // Then check milestones
+        final milestone = await widget.milestoneRepo.watchMilestoneById(payload).first;
+        if (milestone != null) {
+          _navigatorKey.currentState?.pushNamed('/milestone-details', arguments: milestone);
+          return;
+        }
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        Provider.value(value: database),
-        Provider.value(value: syncService),
-        Provider.value(value: userRepo),
-        Provider.value(value: authRepo),
-        Provider.value(value: workspaceRepo),
-        Provider.value(value: projectRepo),
-        Provider.value(value: milestoneRepo),
-        Provider.value(value: taskRepo),
-        Provider.value(value: settingsService),
-        ChangeNotifierProvider(create: (_) => ThemeModel(settingsService)),
-        ChangeNotifierProvider(create: (_) => LocaleModel(settingsService)),
-        ChangeNotifierProvider(create: (context) => AuthViewModel(authRepository: authRepo, syncService: syncService)),
-        ChangeNotifierProvider(create: (context) => DashboardViewModel(workspaceRepository: workspaceRepo, milestoneRepository: milestoneRepo, taskRepository: taskRepo, authRepository: authRepo)),
-        ChangeNotifierProvider(create: (context) => WorkspaceViewModel(workspaceRepository: workspaceRepo, projectRepository: projectRepo, userRepository: userRepo, authRepository: authRepo)),
-        ChangeNotifierProvider(create: (context) => MilestoneViewModel(milestoneRepository: milestoneRepo, projectRepository: projectRepo, workspaceRepository: workspaceRepo, taskRepository: taskRepo)),
-        ChangeNotifierProvider(create: (context) => TaskViewModel(taskRepository: taskRepo, milestoneRepository: milestoneRepo, projectRepository: projectRepo, workspaceRepository: workspaceRepo, authRepository: authRepo)),
+        Provider.value(value: widget.database),
+        Provider.value(value: widget.syncService),
+        Provider.value(value: widget.userRepo),
+        Provider.value(value: widget.authRepo),
+        Provider.value(value: widget.workspaceRepo),
+        Provider.value(value: widget.projectRepo),
+        Provider.value(value: widget.milestoneRepo),
+        Provider.value(value: widget.taskRepo),
+        Provider.value(value: widget.settingsService),
+        ChangeNotifierProvider(create: (_) => ThemeModel(widget.settingsService)),
+        ChangeNotifierProvider(create: (_) => LocaleModel(widget.settingsService)),
+        ChangeNotifierProvider(create: (context) => AuthViewModel(authRepository: widget.authRepo, syncService: widget.syncService)),
+        ChangeNotifierProvider(create: (context) => DashboardViewModel(workspaceRepository: widget.workspaceRepo, milestoneRepository: widget.milestoneRepo, taskRepository: widget.taskRepo, authRepository: widget.authRepo)),
+        ChangeNotifierProvider(create: (context) => WorkspaceViewModel(workspaceRepository: widget.workspaceRepo, projectRepository: widget.projectRepo, userRepository: widget.userRepo, authRepository: widget.authRepo)),
+        ChangeNotifierProvider(create: (context) => MilestoneViewModel(milestoneRepository: widget.milestoneRepo, projectRepository: widget.projectRepo, workspaceRepository: widget.workspaceRepo, taskRepository: widget.taskRepo)),
+        ChangeNotifierProvider(create: (context) => TaskViewModel(taskRepository: widget.taskRepo, milestoneRepository: widget.milestoneRepo, projectRepository: widget.projectRepo, workspaceRepository: widget.workspaceRepo, authRepository: widget.authRepo)),
       ],
       child: Consumer2<ThemeModel, LocaleModel>(
         builder: (context, themeModel, localeModel, child) {
           return MaterialApp(
+            navigatorKey: _navigatorKey,
             title: 'Orbit',
             debugShowCheckedModeBanner: false,
             scrollBehavior: const AppScrollBehavior(),

@@ -94,7 +94,7 @@ class WorkspaceRepository {
 
   Future<void> addMemberToWorkspace(String workspaceId, String userId, String role) async {
     await _workspaceDao.addMember(db.WorkspaceMembersCompanion(
-      id: Value(const Uuid().v4()),
+      id: Value(Uuid().v4()),
       workspaceId: Value(workspaceId),
       userId: Value(userId),
       role: Value(role),

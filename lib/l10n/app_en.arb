@@ -175,5 +175,9 @@
   "noResultsFound": "No results found",
   "workspace": "Workspace",
   "milestone": "Milestone",
-  "task": "Task"
+  "task": "Task",
+  "taskDeadlineReminderDayOf": "Task Deadline Today: {title}",
+  "taskDeadlineReminderDayBefore": "Task Deadline Tomorrow: {title}",
+  "milestoneDeadlineReminderDayOf": "Milestone Deadline Today: {title}",
+  "milestoneDeadlineReminderDayBefore": "Milestone Deadline Tomorrow: {title}"
 }

@@ -562,4 +562,24 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get task => 'مهمة';
+
+  @override
+  String taskDeadlineReminderDayOf(Object title) {
+    return 'موعد المهمة اليوم: $title';
+  }
+
+  @override
+  String taskDeadlineReminderDayBefore(Object title) {
+    return 'موعد المهمة غداً: $title';
+  }
+
+  @override
+  String milestoneDeadlineReminderDayOf(Object title) {
+    return 'موعد المرحلة اليوم: $title';
+  }
+
+  @override
+  String milestoneDeadlineReminderDayBefore(Object title) {
+    return 'موعد المرحلة غداً: $title';
+  }
 }

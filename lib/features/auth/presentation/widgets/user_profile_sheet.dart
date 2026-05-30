@@ -1,5 +1,5 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:glass/glass.dart';
 import 'package:provider/provider.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -40,104 +40,105 @@ class _UserProfileSheetState extends State<UserProfileSheet> {
         final user = authViewModel.user;
         final isLoading = authViewModel.isLoading;
 
-        return BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surface.withValues(alpha: 0.9),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.xxl)),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-            ),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 40,
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(2),
-                    ),
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface.withValues(alpha: 0.9),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.xxl)),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(2),
                   ),
-                  const SizedBox(height: AppSpacing.md),
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Opacity(
-                        opacity: isLoading ? 0.5 : 1.0,
-                        child: OrbitAvatar(
-                          radius: 35,
-                          imageUrl: user?.avatarUrl,
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Opacity(
+                      opacity: isLoading ? 0.5 : 1.0,
+                      child: OrbitAvatar(
+                        radius: 35,
+                        imageUrl: user?.avatarUrl,
+                      ),
+                    ),
+                    if (isLoading)
+                      SizedBox(
+                        width: 35,
+                        height: 35,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
                         ),
                       ),
-                      if (isLoading)
-                        SizedBox(
-                          width: 35,
-                          height: 35,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
-                          ),
-                        ),
-                      if (!isLoading)
-                        Positioned(
-                          right: 0,
-                          bottom: 0,
-                          child: GestureDetector(
-                            onTap: () => _showAvatarOptions(context),
-                            child: Container(
-                              padding: const EdgeInsets.all(6),
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.primary,
-                                shape: BoxShape.circle,
-                                border: Border.all(color: theme.colorScheme.surface, width: 2),
-                              ),
-                              child: const Icon(Icons.camera_alt, size: 12, color: Colors.white),
+                    if (!isLoading)
+                      Positioned(
+                        right: 0,
+                        bottom: 0,
+                        child: GestureDetector(
+                          onTap: () => _showAvatarOptions(context),
+                          child: Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primary,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: theme.colorScheme.surface, width: 2),
                             ),
+                            child: const Icon(Icons.camera_alt, size: 12, color: Colors.white),
                           ),
                         ),
-                    ],
-                  ),
-                  const SizedBox(height: AppSpacing.sm),
-                  Text(
-                    user?.name ?? 'User',
-                    style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
-                  ),
-                  Text(
-                    user?.email ?? '',
-                    style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
-                  ),
-                  const SizedBox(height: AppSpacing.lg),
-                  const Divider(),
-                  
-                  _buildListTile(
-                    icon: Icons.person_outline,
-                    title: l10n.profileSettings,
-                    onTap: () {},
-                  ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  user?.name ?? 'User',
+                  style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
+                ),
+                Text(
+                  user?.email ?? '',
+                  style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurface.withValues(alpha: 0.6)),
+                ),
+                const SizedBox(height: AppSpacing.lg),
+                const Divider(),
+                
+                _buildListTile(
+                  icon: Icons.person_outline,
+                  title: l10n.profileSettings,
+                  onTap: () {},
+                ),
 
-                  _buildAppearanceSection(theme, themeModel, l10n),
-                  
-                  _buildLanguageSection(theme, localeModel, l10n),
+                _buildAppearanceSection(theme, themeModel, l10n),
+                
+                _buildLanguageSection(theme, localeModel, l10n),
 
-                  const Divider(),
-                  _buildListTile(
-                    icon: Icons.logout,
-                    title: l10n.logout,
-                    color: Colors.redAccent,
-                    onTap: () async {
-                      final nav = Navigator.of(context);
-                      await authViewModel.logout();
-                      nav.pushNamedAndRemoveUntil('/welcome', (route) => false);
-                    },
-                  ),
-                  SizedBox(height: MediaQuery.of(context).padding.bottom + AppSpacing.md),
-                ],
-              ),
+                const Divider(),
+                _buildListTile(
+                  icon: Icons.logout,
+                  title: l10n.logout,
+                  color: Colors.redAccent,
+                  onTap: () async {
+                    final nav = Navigator.of(context);
+                    await authViewModel.logout();
+                    nav.pushNamedAndRemoveUntil('/welcome', (route) => false);
+                  },
+                ),
+                SizedBox(height: MediaQuery.of(context).padding.bottom + AppSpacing.md),
+              ],
             ),
           ),
+        ).asGlass(
+          blurX: 10,
+          blurY: 10,
+          clipBorderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.xxl)),
         );
       },
     );

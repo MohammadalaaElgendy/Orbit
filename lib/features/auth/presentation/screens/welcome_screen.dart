@@ -14,57 +14,68 @@ class WelcomeScreen extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return AuthBackground(
-      child: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 600),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.containerMargin),
-              child: Column(
-                children: [
-                  const Spacer(flex: 3),
-                  _buildAnimatedItem(
-                    delay: 0,
-                    child: const OrbitLogo(size: 90),
-                  ),
-                  const SizedBox(height: AppSpacing.xl),
-                  _buildAnimatedItem(
-                    delay: 200,
-                    child: Text(
-                      l10n.appTitle,
-                      style: theme.textTheme.displayLarge?.copyWith(
-                        fontSize: 64,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -3.0,
-                        color: theme.colorScheme.onSurface,
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: SafeArea(
+          child: CustomScrollView(
+            physics: const BouncingScrollPhysics(),
+            slivers: [
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 600),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.containerMargin),
+                      child: Column(
+                        children: [
+                          const Spacer(flex: 3),
+                          _buildAnimatedItem(
+                            delay: 0,
+                            child: const OrbitLogo(size: 90),
+                          ),
+                          const SizedBox(height: AppSpacing.xl),
+                          _buildAnimatedItem(
+                            delay: 200,
+                            child: Text(
+                              l10n.appTitle,
+                              style: theme.textTheme.displayLarge?.copyWith(
+                                fontSize: 64,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: -3.0,
+                                color: theme.colorScheme.onSurface,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
+                          _buildAnimatedItem(
+                            delay: 400,
+                            child: Text(
+                              l10n.focusElevated,
+                              style: theme.textTheme.bodyLarge?.copyWith(
+                                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+                                letterSpacing: 0.5,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          const Spacer(flex: 4),
+                          _buildAnimatedItem(
+                            delay: 600,
+                            child: OrbitButton(
+                              text: l10n.signInToOrbit,
+                              onPressed: () => Navigator.pushReplacementNamed(context, '/login'),
+                              icon: const Icon(Icons.arrow_forward, size: 18),
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.xxl),
+                        ],
                       ),
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.xs),
-                  _buildAnimatedItem(
-                    delay: 400,
-                    child: Text(
-                      l10n.focusElevated,
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
-                        letterSpacing: 0.5,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  const Spacer(flex: 4),
-                  _buildAnimatedItem(
-                    delay: 600,
-                    child: OrbitButton(
-                      text: l10n.signInToOrbit,
-                      onPressed: () => Navigator.pushReplacementNamed(context, '/login'),
-                      icon: const Icon(Icons.arrow_forward, size: 18),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.xxl),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ),

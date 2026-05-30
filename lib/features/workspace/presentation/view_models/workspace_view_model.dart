@@ -127,7 +127,7 @@ class WorkspaceViewModel extends ChangeNotifier {
       finalImageUrl = await _saveImageLocally(imageUrl);
     }
 
-    final workspaceId = const Uuid().v4();
+    final workspaceId = Uuid().v4();
     final workspace = Workspace(
       id: workspaceId,
       name: name,
@@ -199,7 +199,7 @@ class WorkspaceViewModel extends ChangeNotifier {
 
   Future<void> createProject(String workspaceId, String name, String description, String color) async {
     final project = Project(
-      id: const Uuid().v4(),
+      id: Uuid().v4(),
       workspaceId: workspaceId,
       name: name,
       description: description,

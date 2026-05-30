@@ -30,7 +30,7 @@ class MilestoneMenuSheet extends StatelessWidget {
               builder: (_) => MilestoneDialog(
                 milestone: milestone,
                 onSave: (name, desc, dueDate) {
-                  viewModel.updateMilestone(milestone.copyWith(
+                  viewModel.updateMilestone(context, milestone.copyWith(
                     name: name,
                     description: desc,
                     dueDate: dueDate,

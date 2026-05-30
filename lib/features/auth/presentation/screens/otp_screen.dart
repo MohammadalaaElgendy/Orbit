@@ -30,83 +30,88 @@ class OtpScreen extends StatelessWidget {
             onPressed: () => Navigator.of(context).pop(),
           ),
         ),
-        body: SingleChildScrollView(
+        body: CustomScrollView(
           physics: const BouncingScrollPhysics(),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 500),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.containerMargin),
-                child: Column(
-                  children: [
-                    SizedBox(height: MediaQuery.of(context).padding.top + AppSpacing.xl),
-                    const OrbitLogo(size: 64),
-                    const SizedBox(height: AppSpacing.md),
-                    Text(
-                      l10n.verification,
-                      style: const TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -1.5,
-                      ),
-                    ),
-                    Text(
-                      l10n.enterCodeSent(authViewModel.emailController.text),
-                      textAlign: TextAlign.center,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.xl),
-                    GlassCard(
-                      opacity: 0.1,
-                      borderColor: Colors.white.withValues(alpha: 0.1),
-                      child: Column(
-                        children: [
-                          Align(
-                            alignment: AlignmentDirectional.centerStart,
-                            child: Text(
-                              l10n.otpCode,
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                            ),
+          slivers: [
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 500),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.containerMargin),
+                    child: Column(
+                      children: [
+                        SizedBox(height: MediaQuery.of(context).padding.top + AppSpacing.xl),
+                        const OrbitLogo(size: 64),
+                        const SizedBox(height: AppSpacing.md),
+                        Text(
+                          l10n.verification,
+                          style: const TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -1.5,
                           ),
-                          const SizedBox(height: AppSpacing.md),
-                          OrbitPinField(
-                            controller: authViewModel.otpController,
-                            onCompleted: (pin) async {
-                              final success = await authViewModel.verifyOtp();
-                              if (success && context.mounted) {
-                                Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (route) => false);
-                              }
-                            },
+                        ),
+                        Text(
+                          l10n.enterCodeSent(authViewModel.emailController.text),
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                           ),
-                          const SizedBox(height: AppSpacing.xl),
-                          if (authViewModel.errorMessage != null)
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                              child: Text(
-                                authViewModel.errorMessage!,
-                                style: TextStyle(color: theme.colorScheme.error, fontSize: 12),
+                        ),
+                        const SizedBox(height: AppSpacing.xl),
+                        GlassCard(
+                          opacity: 0.1,
+                          borderColor: Colors.white.withValues(alpha: 0.1),
+                          child: Column(
+                            children: [
+                              Align(
+                                alignment: AlignmentDirectional.centerStart,
+                                child: Text(
+                                  l10n.otpCode,
+                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                                ),
                               ),
-                            ),
-                          OrbitButton(
-                            text: l10n.verifyAndSignIn,
-                            isLoading: authViewModel.isLoading,
-                            onPressed: () async {
-                              final success = await authViewModel.verifyOtp();
-                              if (success && context.mounted) {
-                                Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (route) => false);
-                              }
-                            },
+                              const SizedBox(height: AppSpacing.md),
+                              OrbitPinField(
+                                controller: authViewModel.otpController,
+                                onCompleted: (pin) async {
+                                  final success = await authViewModel.verifyOtp();
+                                  if (success && context.mounted) {
+                                    Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (route) => false);
+                                  }
+                                },
+                              ),
+                              const SizedBox(height: AppSpacing.xl),
+                              if (authViewModel.errorMessage != null)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                                  child: Text(
+                                    authViewModel.errorMessage!,
+                                    style: TextStyle(color: theme.colorScheme.error, fontSize: 12),
+                                  ),
+                                ),
+                              OrbitButton(
+                                text: l10n.verifyAndSignIn,
+                                isLoading: authViewModel.isLoading,
+                                onPressed: () async {
+                                  final success = await authViewModel.verifyOtp();
+                                  if (success && context.mounted) {
+                                    Navigator.pushNamedAndRemoveUntil(context, '/dashboard', (route) => false);
+                                  }
+                                },
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
-          ),
+          ],
         ),
       ),
     );

@@ -12,7 +12,6 @@ import 'package:orbit/features/dashboard/presentation/view_models/dashboard_view
 import 'package:orbit/features/workspace/presentation/widgets/workspace_dialog.dart';
 import 'package:orbit/shared/widgets/top_padding.dart';
 import 'package:orbit/shared/widgets/global_search_overlay.dart';
-import '../../../../shared/models/user.dart' as model_user;
 import '../../../../l10n/app_localizations.dart';
 
 class DashboardScreen extends StatelessWidget {
@@ -32,55 +31,88 @@ class DashboardScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final viewModel = context.watch<DashboardViewModel>();
     final l10n = AppLocalizations.of(context)!;
 
-    final workspaces = viewModel.workspaces;
-    final milestones = viewModel.recentMilestones;
-    final tasks = viewModel.recentTasks;
-
-    final body = SingleChildScrollView(
+    final body = CustomScrollView(
       physics: const BouncingScrollPhysics(),
-      padding: EdgeInsets.zero,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const TopPadding(),
-          const DashboardStats(),
-          
-          const SizedBox(height: AppSpacing.xl),
-          _buildSectionHeader(theme, l10n.activeWorkspaces, '${workspaces.length} ${l10n.total}'),
-          const SizedBox(height: AppSpacing.md),
+      slivers: [
+        const SliverToBoxAdapter(child: TopPadding()),
+        const SliverToBoxAdapter(child: DashboardStats()),
+        
+        const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xl)),
+        SliverToBoxAdapter(
+          child: Selector<DashboardViewModel, int>(
+            selector: (_, vm) => vm.workspaces.length,
+            builder: (context, count, _) => _buildSectionHeader(theme, l10n.activeWorkspaces, '$count ${l10n.total}'),
+          ),
+        ),
+        const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.md)),
 
-          workspaces.isEmpty
-              ? Center(
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.xl),
-              child: Text(l10n.noWorkspaces),
-            ),
-          )
-              : LayoutBuilder(
-            builder: (context, constraints) {
-              final isMobile = constraints.maxWidth < 600;
-
-              // Mobile Layout
-              if (isMobile) {
-                return ConstrainedBox(
-                  constraints: const BoxConstraints(
-                    maxHeight: 200,
+        Selector<DashboardViewModel, ({List workspaces, Map membersMap})>(
+          selector: (_, vm) => (workspaces: vm.workspaces, membersMap: vm.workspaceMembersMap),
+          builder: (context, data, _) {
+            final workspaces = data.workspaces;
+            if (workspaces.isEmpty) {
+              return SliverToBoxAdapter(
+                child: Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.xl),
+                    child: Text(l10n.noWorkspaces),
                   ),
-                  child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.md,
+                ),
+              );
+            }
+
+            return SliverLayoutBuilder(
+              builder: (context, constraints) {
+                final isMobile = constraints.crossAxisExtent < 600;
+
+                // Mobile Layout
+                if (isMobile) {
+                  return SliverToBoxAdapter(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxHeight: 200,
+                      ),
+                      child: ListView.separated(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppSpacing.md,
+                        ),
+                        scrollDirection: Axis.horizontal,
+                        itemCount: workspaces.length,
+                        separatorBuilder: (context, index) =>
+                        const SizedBox(width: AppSpacing.md),
+                        itemBuilder: (context, index) {
+                          final ws = workspaces[index];
+                          final members = data.membersMap[ws.id] ?? [];
+
+                          return WorkspaceCard(
+                            ws: ws,
+                            isDark: isDark,
+                            members: members,
+                          );
+                        },
+                      ),
                     ),
-                    scrollDirection: Axis.horizontal,
+                  );
+                }
+
+                // Desktop / Tablet Layout
+                return SliverPadding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                  ),
+                  sliver: SliverGrid.builder(
                     itemCount: workspaces.length,
-                    separatorBuilder: (context, index) =>
-                    const SizedBox(width: AppSpacing.md),
+                    gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: 350,
+                      mainAxisExtent: 180,
+                      crossAxisSpacing: AppSpacing.md,
+                      mainAxisSpacing: AppSpacing.md,
+                    ),
                     itemBuilder: (context, index) {
                       final ws = workspaces[index];
-                      final List<model_user.User> members =
-                          viewModel.workspaceMembersMap[ws.id] ?? [];
+                      final members = data.membersMap[ws.id] ?? [];
 
                       return WorkspaceCard(
                         ws: ws,
@@ -90,79 +122,74 @@ class DashboardScreen extends StatelessWidget {
                     },
                   ),
                 );
-              }
+              },
+            );
+          },
+        ),
 
-              // Desktop / Tablet Layout
-              return Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                ),
-                child: GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: workspaces.length,
-                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 350, // العرض ديناميك
-                    mainAxisExtent: 180, // ارتفاع ثابت
-                    crossAxisSpacing: AppSpacing.md,
-                    mainAxisSpacing: AppSpacing.md,
+        Selector<DashboardViewModel, List>(
+          selector: (_, vm) => vm.recentMilestones,
+          builder: (context, milestones, _) {
+            if (milestones.isEmpty) return const SliverToBoxAdapter(child: SizedBox.shrink());
+            return SliverMainAxisGroup(
+              slivers: [
+                const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xl)),
+                SliverToBoxAdapter(child: _buildSectionHeader(theme, l10n.priorityMilestones, l10n.recent)),
+                const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.md)),
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) => Padding(
+                        padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                        child: MilestoneCard(milestone: milestones[index]),
+                      ),
+                      childCount: milestones.length,
+                    ),
                   ),
-                  itemBuilder: (context, index) {
-                    final ws = workspaces[index];
-                    final List<model_user.User> members =
-                        viewModel.workspaceMembersMap[ws.id] ?? [];
-
-                    return WorkspaceCard(
-                      ws: ws,
-                      isDark: isDark,
-                      members: members,
-                    );
-                  },
                 ),
-              );
-            },
-          ),
+              ],
+            );
+          },
+        ),
 
-          if (milestones.isNotEmpty) ...[
-            const SizedBox(height: AppSpacing.xl),
-            _buildSectionHeader(theme, l10n.priorityMilestones, l10n.recent),
-            const SizedBox(height: AppSpacing.md),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-              child: Column(
-                children: milestones.map((m) => Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                  child: MilestoneCard(milestone: m),
-                )).toList(),
-              ),
-            ),
-          ],
-
-          if (tasks.isNotEmpty) ...[
-            const SizedBox(height: AppSpacing.xl),
-            _buildSectionHeader(
-              theme, 
-              l10n.recentActivity, 
-              l10n.viewAll, 
-              onTap: () => showDialog(
-                context: context,
-                builder: (_) => const AllTasksDialog(),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-              child: Column(
-                children: tasks.map((t) => Padding(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                  child: TaskCard(task: t),
-                )).toList(),
-              ),
-            ),
-          ],
-          const BottomPadding(),
-        ],
-      ),
+        Selector<DashboardViewModel, List>(
+          selector: (_, vm) => vm.recentTasks,
+          builder: (context, tasks, _) {
+            if (tasks.isEmpty) return const SliverToBoxAdapter(child: SizedBox.shrink());
+            return SliverMainAxisGroup(
+              slivers: [
+                const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.xl)),
+                SliverToBoxAdapter(
+                  child: _buildSectionHeader(
+                    theme, 
+                    l10n.recentActivity, 
+                    l10n.viewAll, 
+                    onTap: () => showDialog(
+                      context: context,
+                      builder: (_) => const AllTasksDialog(),
+                    ),
+                  ),
+                ),
+                const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.md)),
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) => Padding(
+                        padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                        child: TaskCard(task: tasks[index]),
+                      ),
+                      childCount: tasks.length,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+        const SliverToBoxAdapter(child: BottomPadding()),
+      ],
     );
 
     if (isTab) return body;

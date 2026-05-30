@@ -1,5 +1,5 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:glass/glass.dart';
 import 'orbit_logo.dart';
 import 'glass_card.dart';
 import '../../core/constants/app_constants.dart';
@@ -112,80 +112,78 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
   Widget _buildCustomGlassAppBar(ThemeData theme, double topPadding, double extraPadding) {
     final isDark = theme.brightness == Brightness.dark;
     final bgColor = isDark 
-        ? Colors.white.withValues(alpha: 0.15) 
-        : Colors.white.withValues(alpha: 0.3);
+        ? theme.colorScheme.surface.withValues(alpha: 0.6) 
+        : Colors.white.withValues(alpha: 0.7);
     
     return Container(
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.05),
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.08),
             blurRadius: 20,
             offset: const Offset(0, 4),
           )
         ],
       ),
-      child: ClipRRect(
-        borderRadius: const BorderRadius.only(
+      child: Container(
+        padding: EdgeInsets.fromLTRB(AppSpacing.md, topPadding + extraPadding, AppSpacing.md, extraPadding),
+        height: kToolbarHeight + topPadding + extraPadding,
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: const BorderRadius.only(
+            bottomLeft: Radius.circular(AppRadius.xxl),
+            bottomRight: Radius.circular(AppRadius.xxl),
+          ),
+          border: Border.all(
+            color: isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.05),
+            width: 1.0,
+          ),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Text(
+                widget.title, 
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -0.5,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            if (widget.actions != null) 
+              ...widget.actions!.map((action) => Padding(
+                padding: const EdgeInsetsDirectional.only(end: AppSpacing.sm),
+                child: action,
+              )),
+            
+            GestureDetector(
+              onTap: () => _showUserMenu(context),
+              child: Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.2), width: 1.5),
+                ),
+                child: OrbitAvatar(
+                  radius: 16,
+                  imageUrl: context.watch<AuthViewModel>().user?.avatarUrl,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ).asGlass(
+        blurX: 15,
+        blurY: 15,
+        clipBorderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(AppRadius.xxl),
           bottomRight: Radius.circular(AppRadius.xxl),
-        ),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-          child: Container(
-            padding: EdgeInsets.fromLTRB(AppSpacing.md, topPadding + extraPadding, AppSpacing.md, extraPadding),
-            height: kToolbarHeight + topPadding + extraPadding,
-            decoration: BoxDecoration(
-              color: bgColor,
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(AppRadius.xxl),
-                bottomRight: Radius.circular(AppRadius.xxl),
-              ),
-              border: Border.all(
-                color: isDark ? Colors.white.withValues(alpha: 0.1) : Colors.black.withValues(alpha: 0.05),
-                width: 1.0,
-              ),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Text(
-                    widget.title, 
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: -0.5,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                const SizedBox(width: AppSpacing.sm),
-                if (widget.actions != null) 
-                  ...widget.actions!.map((action) => Padding(
-                    padding: const EdgeInsetsDirectional.only(end: AppSpacing.sm),
-                    child: action,
-                  )),
-                
-                GestureDetector(
-                  onTap: () => _showUserMenu(context),
-                  child: Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.2), width: 1.5),
-                    ),
-                    child: OrbitAvatar(
-                      radius: 16,
-                      imageUrl: context.watch<AuthViewModel>().user?.avatarUrl,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
         ),
       ),
     );
@@ -212,37 +210,35 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
             )
           ],
         ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(AppRadius.xxl),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 25, sigmaY: 25),
-            child: Container(
-              decoration: BoxDecoration(
-                color: bgColor,
-                borderRadius: BorderRadius.circular(AppRadius.xxl),
-                border: Border.all(
-                  color: isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.05),
-                  width: 1.0,
-                ),
-              ),
-              child: BottomNavigationBar(
-                currentIndex: widget.currentIndex,
-                onTap: widget.onTabSelected,
-                type: BottomNavigationBarType.fixed,
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                selectedItemColor: theme.colorScheme.primary,
-                unselectedItemColor: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                showSelectedLabels: false,
-                showUnselectedLabels: false,
-                items: [
-                  BottomNavigationBarItem(icon: const Icon(Icons.dashboard_rounded, size: 26), label: l10n.home),
-                  BottomNavigationBarItem(icon: const Icon(Icons.work_rounded, size: 26), label: l10n.work),
-                  BottomNavigationBarItem(icon: const Icon(Icons.flag_rounded, size: 26), label: l10n.goals),
-                ],
-              ),
+        child: Container(
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.circular(AppRadius.xxl),
+            border: Border.all(
+              color: isDark ? Colors.white.withValues(alpha: 0.15) : Colors.black.withValues(alpha: 0.05),
+              width: 1.0,
             ),
           ),
+          child: BottomNavigationBar(
+            currentIndex: widget.currentIndex,
+            onTap: widget.onTabSelected,
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            selectedItemColor: theme.colorScheme.primary,
+            unselectedItemColor: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+            showSelectedLabels: false,
+            showUnselectedLabels: false,
+            items: [
+              BottomNavigationBarItem(icon: const Icon(Icons.dashboard_rounded, size: 26), label: l10n.home),
+              BottomNavigationBarItem(icon: const Icon(Icons.work_rounded, size: 26), label: l10n.work),
+              BottomNavigationBarItem(icon: const Icon(Icons.flag_rounded, size: 26), label: l10n.goals),
+            ],
+          ),
+        ).asGlass(
+          blurX: 25,
+          blurY: 25,
+          clipBorderRadius: BorderRadius.circular(AppRadius.xxl),
         ),
       ),
     );

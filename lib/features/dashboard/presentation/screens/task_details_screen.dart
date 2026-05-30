@@ -50,6 +50,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
         workspaceMembers: viewModel.workspaceMembers,
         onSave: ({required description, required priority, required status, required title, assigneeId, dueDate}) {
           viewModel.createTask(
+            context: context,
             milestoneId: currentTask.milestoneId,
             parentTaskId: currentTask.id,
             title: title,
@@ -102,83 +103,98 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
           const SizedBox(width: AppSpacing.sm),
         ],
       ),
-      body: SingleChildScrollView(
+      body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildBadge(theme, currentTask.status),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              currentTask.title,
-              style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w900, letterSpacing: -0.5),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            _buildInfoGrid(theme, currentTask, viewModel.workspaceMembers, l10n),
-            const SizedBox(height: AppSpacing.xl),
-            
-            if (currentTask.description.trim().isNotEmpty) ...[
-              Text(l10n.description, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                currentTask.description,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant,
-                  height: 1.6,
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: _buildBadge(theme, currentTask.status),
                 ),
-              ),
-            ] else 
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(AppSpacing.md),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(AppRadius.md),
-                  border: Border.all(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  currentTask.title,
+                  style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w900, letterSpacing: -0.5),
                 ),
-                child: Column(
+                const SizedBox(height: AppSpacing.lg),
+                _buildInfoGrid(theme, currentTask, viewModel.workspaceMembers, l10n),
+                const SizedBox(height: AppSpacing.xl),
+
+                if (currentTask.description.trim().isNotEmpty) ...[
+                  Text(l10n.description, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    currentTask.description,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant,
+                      height: 1.6,
+                    ),
+                  ),
+                ] else
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                      border: Border.all(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
+                    ),
+                    child: Column(
+                      children: [
+                        Icon(Icons.description_outlined, size: 24, color: theme.colorScheme.outline),
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          l10n.noDescription,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                const SizedBox(height: AppSpacing.xl),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Icon(Icons.description_outlined, size: 24, color: theme.colorScheme.outline),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      l10n.noDescription,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                        fontStyle: FontStyle.italic,
-                      ),
+                    Text(l10n.subtasks, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+                    IconButton(
+                      icon: const Icon(Icons.add_circle_outline_rounded, size: 20),
+                      onPressed: _showAddSubtaskDialog,
+                      color: theme.colorScheme.primary,
                     ),
                   ],
                 ),
-              ),
-
-            const SizedBox(height: AppSpacing.xl),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(l10n.subtasks, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
-                IconButton(
-                  icon: const Icon(Icons.add_circle_outline_rounded, size: 20),
-                  onPressed: _showAddSubtaskDialog,
-                  color: theme.colorScheme.primary,
-                ),
-              ],
+                const SizedBox(height: AppSpacing.sm),
+              ]),
             ),
-            const SizedBox(height: AppSpacing.sm),
-            if (subtasks.isEmpty)
-              _buildEmptySubtasks(theme, l10n)
-            else
-              ...subtasks.map((st) => Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                child: TaskCard(
-                  task: st,
-                  onTap: () {
-                    Navigator.of(context).pushNamed('/task-details', arguments: st);
-                  },
+          ),
+          if (subtasks.isEmpty)
+            SliverToBoxAdapter(child: _buildEmptySubtasks(theme, l10n))
+          else
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) => Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                    child: TaskCard(
+                      task: subtasks[index],
+                      onTap: () {
+                        Navigator.of(context).pushNamed('/task-details', arguments: subtasks[index]);
+                      },
+                    ),
+                  ),
+                  childCount: subtasks.length,
                 ),
-              )),
-          ],
-        ),
+              ),
+            ),
+            const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.md)),
+        ],
       ),
     );
   }

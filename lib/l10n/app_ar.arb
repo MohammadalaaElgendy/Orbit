@@ -175,5 +175,9 @@
   "noResultsFound": "لم يتم العثور على نتائج",
   "workspace": "مساحة عمل",
   "milestone": "مرحلة",
-  "task": "مهمة"
+  "task": "مهمة",
+  "taskDeadlineReminderDayOf": "موعد المهمة اليوم: {title}",
+  "taskDeadlineReminderDayBefore": "موعد المهمة غداً: {title}",
+  "milestoneDeadlineReminderDayOf": "موعد المرحلة اليوم: {title}",
+  "milestoneDeadlineReminderDayBefore": "موعد المرحلة غداً: {title}"
 }

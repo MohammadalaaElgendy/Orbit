@@ -48,6 +48,7 @@ class _MilestoneDetailsScreenState extends State<MilestoneDetailsScreen> {
         workspaceMembers: viewModel.workspaceMembers,
         onSave: ({required description, required priority, required status, required title, assigneeId, dueDate}) {
           context.read<TaskViewModel>().createTask(
+            context: context,
             milestoneId: widget.milestone.id,
             title: title,
             description: description,
@@ -70,123 +71,95 @@ class _MilestoneDetailsScreenState extends State<MilestoneDetailsScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: BoxDecoration(
-          color: theme.scaffoldBackgroundColor,
-          gradient: LinearGradient(
-            begin: Alignment.topRight,
-            end: Alignment.bottomLeft,
-            colors: [
-              theme.colorScheme.primary.withValues(alpha: 0.05),
-              Colors.transparent,
-              theme.colorScheme.secondary.withValues(alpha: 0.02),
-            ],
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leadingWidth: 70,
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: GlassCard(
+            padding: EdgeInsets.zero,
+            borderRadius: AppRadius.lg,
+            blur: 10,
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back_ios_new, size: 18),
+              onPressed: () => Navigator.pop(context),
+            ),
           ),
         ),
-        child: SafeArea(
-          child: CustomScrollView(
-            physics: const BouncingScrollPhysics(),
-            slivers: [
-              SliverAppBar(
-                expandedHeight: 180,
-                floating: false,
-                pinned: true,
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                leadingWidth: 70,
-                leading: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: GlassCard(
-                    padding: EdgeInsets.zero,
-                    borderRadius: AppRadius.lg,
-                    blur: 10,
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new, size: 18),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ),
-                ),
-                actions: [
-                  IconButton(
-                    icon: const Icon(Icons.more_vert_rounded),
-                    onPressed: _showMilestoneMenu,
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                ],
-                flexibleSpace: FlexibleSpaceBar(
-                  background: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const SizedBox(height: 40),
-                        Hero(
-                          tag: 'milestone_${currentMilestone.id}',
-                          child: Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(Icons.flag_rounded, color: theme.colorScheme.primary, size: 32),
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        Text(
-                          currentMilestone.name,
-                          style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              SliverPadding(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                sliver: SliverList(
-                  delegate: SliverChildListDelegate([
-                    Text(
-                      currentMilestone.description,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                        height: 1.6,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.more_vert_rounded),
+            onPressed: _showMilestoneMenu,
+          ),
+          const SizedBox(width: AppSpacing.sm),
+        ],
+      ),
+      body: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            sliver: SliverList(
+              delegate: SliverChildListDelegate([
+                Center(
+                  child: Hero(
+                    tag: 'milestone_icon_${currentMilestone.id}',
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                        shape: BoxShape.circle,
                       ),
-                      textAlign: TextAlign.center,
+                      child: Icon(Icons.flag_rounded, color: theme.colorScheme.primary, size: 32),
                     ),
-                    const SizedBox(height: AppSpacing.xl),
-                    _buildStatsRow(theme, currentMilestone, l10n),
-                    const SizedBox(height: AppSpacing.xl),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(l10n.tasks, style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
-                        TextButton.icon(
-                          onPressed: _showAddTaskDialog,
-                          icon: const Icon(Icons.add_rounded, size: 18),
-                          label: Text(l10n.addTask),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-                    if (tasks.isEmpty)
-                       Center(child: Padding(
-                         padding: const EdgeInsets.all(20.0),
-                         child: Text(l10n.noTasksForMilestone),
-                       ))
-                    else
-                      ...tasks.map((task) => Padding(
-                        padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                        child: TaskCard(task: task),
-                      )),
-                    const SizedBox(height: AppSpacing.xxl),
-                  ]),
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: AppSpacing.sm),
+                Text(
+                  currentMilestone.name,
+                  style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  currentMilestone.description,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    height: 1.6,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: AppSpacing.xl),
+                _buildStatsRow(theme, currentMilestone, l10n),
+                const SizedBox(height: AppSpacing.xl),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(l10n.tasks, style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900)),
+                    TextButton.icon(
+                      onPressed: _showAddTaskDialog,
+                      icon: const Icon(Icons.add_rounded, size: 18),
+                      label: Text(l10n.addTask),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: AppSpacing.md),
+                if (tasks.isEmpty)
+                   Center(child: Padding(
+                     padding: const EdgeInsets.all(20.0),
+                     child: Text(l10n.noTasksForMilestone),
+                   ))
+                else
+                  ...tasks.map((task) => Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                    child: TaskCard(task: task),
+                  )),
+                const SizedBox(height: AppSpacing.xxl),
+              ]),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

@@ -148,7 +148,7 @@ class DashboardViewModel extends ChangeNotifier {
     final currentUser = _authRepository.currentUser;
     if (currentUser == null) return;
 
-    final workspaceId = const Uuid().v4();
+    final workspaceId = Uuid().v4();
     final workspace = Workspace(
       id: workspaceId,
       name: name,

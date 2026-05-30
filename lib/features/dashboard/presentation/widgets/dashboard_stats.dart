@@ -11,7 +11,6 @@ class DashboardStats extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final viewModel = context.watch<DashboardViewModel>();
     final l10n = AppLocalizations.of(context)!;
 
     return Padding(
@@ -21,23 +20,33 @@ class DashboardStats extends StatelessWidget {
           final isWide = constraints.maxWidth > 600;
           
           return GlassCard(
-            padding: const EdgeInsets.all(AppSpacing.md), // Reduced from lg
-            blur: 5,
+            padding: const EdgeInsets.all(AppSpacing.md),
+            blur: 3, // Reduced from 5
             frosted: true,
             borderRadius: AppRadius.xxl,
-            child: Flex(
-              direction: isWide ? Axis.horizontal : Axis.vertical,
-              children: [
-                _buildProductivityPulse(theme, viewModel, l10n),
-                if (isWide) 
-                  Container(width: 1, height: 80, margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xl), color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3))
-                else 
-                  const SizedBox(height: AppSpacing.xl),
-                Expanded(
-                  flex: isWide ? 2 : 0,
-                  child: _buildGoalInsights(theme, viewModel, l10n),
-                ),
-              ],
+            child: Selector<DashboardViewModel, ({double progress, int total, int completed, List topMilestones})>(
+              selector: (_, vm) => (
+                progress: vm.overallProgress,
+                total: vm.totalMilestones,
+                completed: vm.completedMilestones,
+                topMilestones: vm.topMilestones,
+              ),
+              builder: (context, data, _) {
+                return Flex(
+                  direction: isWide ? Axis.horizontal : Axis.vertical,
+                  children: [
+                    _buildProductivityPulse(theme, data.progress, l10n),
+                    if (isWide) 
+                      Container(width: 1, height: 80, margin: const EdgeInsets.symmetric(horizontal: AppSpacing.xl), color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3))
+                    else 
+                      const SizedBox(height: AppSpacing.xl),
+                    Expanded(
+                      flex: isWide ? 2 : 0,
+                      child: _buildGoalInsights(theme, data.topMilestones, data.completed, data.total, l10n),
+                    ),
+                  ],
+                );
+              },
             ),
           );
         },
@@ -45,8 +54,7 @@ class DashboardStats extends StatelessWidget {
     );
   }
 
-  Widget _buildProductivityPulse(ThemeData theme, DashboardViewModel viewModel, AppLocalizations l10n) {
-    final progress = viewModel.overallProgress;
+  Widget _buildProductivityPulse(ThemeData theme, double progress, AppLocalizations l10n) {
     final percentage = (progress * 100).toInt();
 
     return Column(
@@ -98,9 +106,7 @@ class DashboardStats extends StatelessWidget {
     );
   }
 
-  Widget _buildGoalInsights(ThemeData theme, DashboardViewModel viewModel, AppLocalizations l10n) {
-    final topMilestones = viewModel.topMilestones;
-
+  Widget _buildGoalInsights(ThemeData theme, List topMilestones, int completed, int total, AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -118,7 +124,7 @@ class DashboardStats extends StatelessWidget {
               ),
             ),
             Text(
-              '${viewModel.completedMilestones}/${viewModel.totalMilestones} ${l10n.milestones}', 
+              '$completed/$total ${l10n.milestones}',
               style: theme.textTheme.labelSmall?.copyWith(
                 fontWeight: FontWeight.bold,
                 fontSize: 12,
