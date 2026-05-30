@@ -81,7 +81,6 @@ class _MilestoneDetailsScreenState extends State<MilestoneDetailsScreen> {
             padding: EdgeInsets.zero,
             borderRadius: AppRadius.lg,
             blur: 10,
-            enabled: false,
             child: IconButton(
               icon: const Icon(Icons.arrow_back_ios_new, size: 18),
               onPressed: () => Navigator.pop(context),
@@ -223,7 +222,6 @@ class _MilestoneDetailsScreenState extends State<MilestoneDetailsScreen> {
     return GlassCard(
       padding: const EdgeInsets.all(AppSpacing.md),
       borderRadius: AppRadius.xl,
-      enabled: false,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

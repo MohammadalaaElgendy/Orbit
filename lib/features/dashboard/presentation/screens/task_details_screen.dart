@@ -84,7 +84,6 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             padding: EdgeInsets.zero,
             borderRadius: AppRadius.lg,
             blur: 10,
-            enabled: false,
             child: IconButton(
               icon: const Icon(Icons.arrow_back_ios_new, size: 18),
               onPressed: () {
@@ -275,7 +274,6 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
       child: GlassCard(
         padding: const EdgeInsets.all(AppSpacing.md),
         borderRadius: AppRadius.lg,
-        enabled: false,
         child: Row(
           children: [
             leading ?? Icon(icon, size: 16, color: color ?? theme.colorScheme.primary),
