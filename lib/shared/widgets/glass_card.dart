@@ -11,6 +11,7 @@ class GlassCard extends StatelessWidget {
   final double blur;
   final double opacity;
   final bool frosted;
+  final bool enabled;
 
   const GlassCard({
     super.key,
@@ -21,7 +22,8 @@ class GlassCard extends StatelessWidget {
     this.backgroundColor,
     this.blur = 15.0,
     this.opacity = 0.7, // Matching .glass-card background: rgba(255, 255, 255, 0.7)
-    this.frosted = false
+    this.frosted = false,
+    this.enabled = true,
   });
 
   @override
@@ -30,7 +32,7 @@ class GlassCard extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
     final radius = borderRadius ?? AppRadius.xxl;
     
-    return Container(
+    final container = Container(
       padding: padding ?? const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
         color: backgroundColor ?? (isDark ? Colors.transparent : Colors.white.withValues(alpha: 0.45)), // Increased opacity for better "material" feel
@@ -51,7 +53,11 @@ class GlassCard extends StatelessWidget {
         ],
       ),
       child: child,
-    ).asGlass(
+    );
+
+    if (!enabled) return container;
+
+    return container.asGlass(
       blurX: isDark ? blur : 20.0, // Increased blur in light mode for "frosted" effect
       blurY: isDark ? blur : 20.0,
       clipBorderRadius: BorderRadius.circular(radius),
