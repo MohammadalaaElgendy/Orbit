@@ -177,7 +177,7 @@ class DashboardScreen extends StatelessWidget {
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) => Padding(
-                        padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                        padding: const EdgeInsets.only(bottom: AppSpacing.xs),
                         child: TaskCard(task: tasks[index]),
                       ),
                       childCount: tasks.length,

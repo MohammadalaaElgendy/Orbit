@@ -181,7 +181,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate(
                   (context, index) => Padding(
-                    padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                    padding: const EdgeInsets.only(bottom: AppSpacing.xs),
                     child: TaskCard(
                       task: subtasks[index],
                       onTap: () {

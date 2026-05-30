@@ -152,7 +152,7 @@ class _MilestoneDetailsScreenState extends State<MilestoneDetailsScreen> {
                    ))
                 else
                   ...tasks.map((task) => Padding(
-                    padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                    padding: const EdgeInsets.only(bottom: AppSpacing.xs),
                     child: TaskCard(task: task),
                   )),
                 const SizedBox(height: AppSpacing.xxl),

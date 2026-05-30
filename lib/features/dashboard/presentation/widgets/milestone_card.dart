@@ -24,16 +24,16 @@ class MilestoneCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: AppSpacing.md),
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
-          color: isDark ? Colors.white.withValues(alpha: 0.02) : Colors.white, // Slightly lighter
+          color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.white, // Slightly lighter
           borderRadius: BorderRadius.circular(AppRadius.xl),
           border: Border.all(
             color: isDark 
-                ? Colors.white.withValues(alpha: 0.04) // Lighter border
-                : theme.colorScheme.outlineVariant.withValues(alpha: 0.2), // Lighter border
+                ? Colors.white.withValues(alpha: 0.12) // Lighter border
+                : theme.colorScheme.outlineVariant.withValues(alpha: 0.4), // Lighter border
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.02), // Reduced from 0.2 / 0.03
+              color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.02), // Reduced from 0.2 / 0.03
               blurRadius: 10, // Reduced from 12
               offset: const Offset(0, 4), // Reduced from 6
             ),
@@ -112,7 +112,7 @@ class MilestoneCard extends StatelessWidget {
                   height: 6,
                   width: double.infinity,
                   decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withValues(alpha: 0.05),
+                    color: theme.colorScheme.primary.withValues(alpha: isDark ? 0.15 : 0.05),
                     borderRadius: BorderRadius.circular(AppRadius.full),
                   ),
                 ),

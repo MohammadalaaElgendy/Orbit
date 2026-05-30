@@ -58,7 +58,7 @@ class AllTasksDialog extends StatelessWidget {
                       itemCount: allTasks.length,
                       itemBuilder: (context, index) {
                         return Padding(
-                          padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                          padding: const EdgeInsets.only(bottom: AppSpacing.xs),
                           child: TaskCard(task: allTasks[index]),
                         );
                       },

@@ -18,16 +18,16 @@ class TaskCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
       decoration: BoxDecoration(
         // نفس ستايل الخلفية والـ Borders بتاعة الـ MilestoneCard
-        color: isDark ? Colors.white.withValues(alpha: 0.02) : Colors.white,
+        color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.white,
         borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(
           color: isDark
-              ? Colors.white.withValues(alpha: 0.04)
-              : theme.colorScheme.outlineVariant.withValues(alpha: 0.2),
+              ? Colors.white.withValues(alpha: 0.12)
+              : theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.15 : 0.02),
+            color: Colors.black.withValues(alpha: isDark ? 0.3 : 0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
