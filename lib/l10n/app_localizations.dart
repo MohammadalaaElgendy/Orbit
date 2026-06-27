@@ -1091,13 +1091,13 @@ abstract class AppLocalizations {
   /// No description provided for @work.
   ///
   /// In en, this message translates to:
-  /// **'Work'**
+  /// **'Workspaces'**
   String get work;
 
   /// No description provided for @goals.
   ///
   /// In en, this message translates to:
-  /// **'Goals'**
+  /// **'Milestones'**
   String get goals;
 
   /// No description provided for @addPhoto.

@@ -27,6 +27,18 @@ class MilestoneViewModel extends ChangeNotifier {
   List<User> _workspaceMembers = [];
   List<User> get workspaceMembers => _workspaceMembers;
 
+  bool get isAdmin {
+    final currentUserId = Supabase.instance.client.auth.currentUser?.id;
+    if (currentUserId == null) return false;
+    
+    try {
+      final membership = _workspaceMembers.firstWhere((m) => m.id == currentUserId);
+      return membership.role == 'admin';
+    } catch (_) {
+      return false;
+    }
+  }
+
   StreamSubscription? _taskSub;
   StreamSubscription? _memberSub;
   StreamSubscription? _milestoneSub;

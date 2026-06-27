@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide User;
 import '../../../../shared/models/workspace.dart';
 import '../../../../core/constants/app_constants.dart';
 import '../../../../shared/widgets/glass_card.dart';
@@ -315,7 +316,13 @@ class _WorkspaceDialogState extends State<WorkspaceDialog> {
                           border: Border.all(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5)),
                         ),
                         child: Column(
-                          children: _selectedMembers.map((user) {
+                          children: _selectedMembers.where((m) {
+                            final currentUser = context.read<WorkspaceViewModel>().allUsers.firstWhere(
+                              (u) => u.id == Supabase.instance.client.auth.currentUser?.id,
+                              orElse: () => m, // Fallback, won't hide if not found but safe
+                            );
+                            return m.id != currentUser.id;
+                          }).map((user) {
                             return CheckboxListTile(
                               value: true,
                               onChanged: (val) {

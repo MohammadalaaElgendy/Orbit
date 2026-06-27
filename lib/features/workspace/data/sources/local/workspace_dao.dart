@@ -44,6 +44,10 @@ class WorkspaceDao extends DatabaseAccessor<AppDatabase> with _$WorkspaceDaoMixi
     return (select(workspaces)..where((t) => t.id.equals(id))).getSingleOrNull();
   }
 
+  Stream<Workspace?> watchById(String id) {
+    return (select(workspaces)..where((t) => t.id.equals(id))).watchSingleOrNull();
+  }
+
   Future<int> removeMember(String workspaceId, String userId) {
     return (delete(workspaceMembers)
           ..where((t) => t.workspaceId.equals(workspaceId) & t.userId.equals(userId)))

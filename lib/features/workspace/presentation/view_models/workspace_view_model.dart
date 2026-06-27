@@ -31,6 +31,23 @@ class WorkspaceViewModel extends ChangeNotifier {
   List<User> _allUsers = [];
   List<User> get allUsers => _allUsers;
 
+  bool get isAdmin {
+    final currentUser = _authRepository.currentUser;
+    if (currentUser == null || _currentWorkspace == null) return false;
+    
+    // Owner is always admin
+    if (_currentWorkspace!.ownerId == currentUser.id) return true;
+    
+    // Check membership role
+    try {
+      final membership = _members.firstWhere((m) => m.id == currentUser.id);
+      return membership.role == 'admin';
+    } catch (_) {
+      return false;
+    }
+  }
+
+  StreamSubscription? _workspaceSub;
   StreamSubscription? _projectSub;
   StreamSubscription? _memberSub;
   StreamSubscription? _userSub;
@@ -49,15 +66,16 @@ class WorkspaceViewModel extends ChangeNotifier {
 
   void _listenToAuthChanges() {
     Supabase.instance.client.auth.onAuthStateChange.listen((data) {
-      if (data.session != null) {
+      if (data.event == AuthChangeEvent.signedIn || data.event == AuthChangeEvent.initialSession) {
         _init();
-      } else {
+      } else if (data.event == AuthChangeEvent.signedOut) {
         _clearData();
       }
     });
   }
 
   void _clearData() {
+    _workspaceSub?.cancel();
     _projectSub?.cancel();
     _memberSub?.cancel();
     _userSub?.cancel();
@@ -69,7 +87,7 @@ class WorkspaceViewModel extends ChangeNotifier {
   }
 
   void _init() {
-    _clearData();
+    _userSub?.cancel();
     _userSub = _userRepository.watchUsers().listen((data) {
       _allUsers = data;
       notifyListeners();
@@ -78,20 +96,23 @@ class WorkspaceViewModel extends ChangeNotifier {
 
   void loadWorkspace(String id) async {
     try {
-      _currentWorkspace = await _workspaceRepository.getWorkspaceById(id);
+      _workspaceSub?.cancel();
+      _workspaceSub = _workspaceRepository.watchWorkspaceById(id).listen((data) {
+        _currentWorkspace = data;
+        notifyListeners();
+      });
+
       _projectSub?.cancel();
       _projectSub = _projectRepository.watchProjectsByWorkspace(id).listen((data) {
         _projects = data;
         notifyListeners();
       });
-      
+
       _memberSub?.cancel();
       _memberSub = _workspaceRepository.watchWorkspaceMembers(id).listen((data) {
         _members = data;
         notifyListeners();
       });
-      
-      notifyListeners();
     } catch (e) {
       debugPrint('Error loading workspace: $e');
     }
@@ -148,6 +169,8 @@ class WorkspaceViewModel extends ChangeNotifier {
   }
 
   Future<void> updateWorkspace(String id, String name, String description, String? imageUrl, List<String> memberIds) async {
+    if (!isAdmin) return;
+    
     final ws = await _workspaceRepository.getWorkspaceById(id);
     if (ws == null) return;
     
@@ -194,6 +217,7 @@ class WorkspaceViewModel extends ChangeNotifier {
   }
 
   Future<void> deleteWorkspace(String id) async {
+    if (!isAdmin) return;
     await _workspaceRepository.deleteWorkspace(id);
   }
 
@@ -226,10 +250,12 @@ class WorkspaceViewModel extends ChangeNotifier {
   }
 
   Future<void> deleteProject(String id) async {
+    if (!isAdmin) return;
     await _projectRepository.deleteProject(id);
   }
 
   Future<void> addMember(String workspaceId, String userId) async {
+    if (!isAdmin) return;
     await _workspaceRepository.addMemberToWorkspace(workspaceId, userId, 'member');
   }
 
@@ -255,11 +281,13 @@ class WorkspaceViewModel extends ChangeNotifier {
   }
 
   Future<void> removeMember(String workspaceId, String userId) async {
+    if (!isAdmin) return;
     await _workspaceRepository.removeMemberFromWorkspace(workspaceId, userId);
   }
 
   @override
   void dispose() {
+    _workspaceSub?.cancel();
     _projectSub?.cancel();
     _memberSub?.cancel();
     _userSub?.cancel();

@@ -51,6 +51,17 @@ class WorkspaceRepository {
   Future<model.Workspace?> getWorkspaceById(String id) async {
     final row = await _workspaceDao.getById(id);
     if (row == null) return null;
+    return _mapToModel(row);
+  }
+
+  Stream<model.Workspace?> watchWorkspaceById(String id) {
+    return _workspaceDao.watchById(id).map((row) {
+      if (row == null) return null;
+      return _mapToModel(row);
+    });
+  }
+
+  model.Workspace _mapToModel(db.Workspace row) {
     return model.Workspace(
       id: row.id,
       name: row.name,
@@ -104,6 +115,10 @@ class WorkspaceRepository {
   }
 
   Future<void> removeMemberFromWorkspace(String workspaceId, String userId) async {
+    // 1. Unassign tasks locally first
+    await _taskDao.unassignTasks(workspaceId, userId);
+    
+    // 2. Remove member from local database
     await _workspaceDao.removeMember(workspaceId, userId);
   }
 

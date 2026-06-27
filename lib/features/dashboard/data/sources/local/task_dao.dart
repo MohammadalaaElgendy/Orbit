@@ -104,4 +104,10 @@ class TaskDao extends DatabaseAccessor<AppDatabase> with _$TaskDaoMixin {
   Future<int> softDeleteByWorkspace(String workspaceId) {
     return (delete(tasks)..where((t) => t.workspaceId.equals(workspaceId))).go();
   }
+
+  Future<void> unassignTasks(String workspaceId, String userId) {
+    return (update(tasks)
+          ..where((t) => t.workspaceId.equals(workspaceId) & t.assigneeId.equals(userId)))
+        .write(const TasksCompanion(assigneeId: Value(null)));
+  }
 }

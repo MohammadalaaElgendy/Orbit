@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide User;
 import 'package:orbit/core/constants/app_constants.dart';
 import 'package:orbit/shared/models/workspace.dart';
 import 'package:orbit/shared/models/user.dart';
@@ -32,6 +33,20 @@ class WorkspaceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
+    
+    // Check if current user is admin in this workspace
+    bool isAdmin = false;
+    final currentUserId = Supabase.instance.client.auth.currentUser?.id;
+    if (currentUserId != null) {
+      try {
+        final currentMember = members.firstWhere((m) => m.id == currentUserId);
+        isAdmin = currentMember.role == 'admin' || ws.ownerId == currentUserId;
+      } catch (_) {
+        // Fallback to owner check if not in members list yet
+        isAdmin = ws.ownerId == currentUserId;
+      }
+    }
+
     return GestureDetector(
       onTap: () => Navigator.pushNamed(context, '/workspace-details', arguments: ws),
       child: Container(
@@ -90,6 +105,7 @@ class WorkspaceCard extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
+                        if (isAdmin)
                         GestureDetector(
                           onTap: () => _showWorkspaceMenu(context),
                           child: Container(

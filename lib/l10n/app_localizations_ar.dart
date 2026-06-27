@@ -531,10 +531,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get home => 'الرئيسية';
 
   @override
-  String get work => 'الأعمال';
+  String get work => 'مساحات الأعمال';
 
   @override
-  String get goals => 'الأهداف';
+  String get goals => 'المراحل';
 
   @override
   String get addPhoto => 'إضافة صورة';

@@ -41,6 +41,7 @@ class MilestoneMenuSheet extends StatelessWidget {
             );
           },
         ),
+        if (viewModel.isAdmin)
         ListTile(
           leading: const Icon(Icons.delete_outline_rounded, color: Colors.red),
           title: Text(l10n.deleteMilestone, style: const TextStyle(color: Colors.red)),

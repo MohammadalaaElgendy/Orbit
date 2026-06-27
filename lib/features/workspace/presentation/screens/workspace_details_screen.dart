@@ -165,6 +165,7 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                   ),
                 ),
                 actions: [
+                  if (viewModel.isAdmin)
                    Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: GlassCard(
@@ -378,20 +379,20 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: AppSpacing.xl),
-                    _buildSectionHeader(theme, l10n.members, onAdd: _showMemberSearchDialog),
+                    _buildSectionHeader(theme, l10n.members, onAdd: viewModel.isAdmin ? _showMemberSearchDialog : null),
                     const SizedBox(height: AppSpacing.md),
-                    _buildMembersList(members, theme, l10n),
+                    _buildMembersList(members, theme, l10n, viewModel.isAdmin),
                     const SizedBox(height: AppSpacing.xl),
-                    _buildSectionHeader(theme, l10n.activeProjects, onAdd: () => _showProjectDialog()),
+                    _buildSectionHeader(theme, l10n.activeProjects, onAdd: viewModel.isAdmin ? () => _showProjectDialog() : null),
                     const SizedBox(height: AppSpacing.md),
                     projects.isEmpty
-                      ? _buildEmptyProjects(theme, l10n)
+                      ? _buildEmptyProjects(theme, l10n, viewModel.isAdmin)
                       : _buildProjectsGrid(projects, theme),
                     const SizedBox(height: AppSpacing.xl),
-                    _buildSectionHeader(theme, l10n.projectMilestones, onAdd: selectedProjectId != null ? _showMilestoneDialog : null),
+                    _buildSectionHeader(theme, l10n.projectMilestones, onAdd: (viewModel.isAdmin && selectedProjectId != null) ? _showMilestoneDialog : null),
                     const SizedBox(height: AppSpacing.md),
                     if (_milestones.isEmpty)
-                      _buildEmptyMilestones(theme, l10n)
+                      _buildEmptyMilestones(theme, l10n, viewModel.isAdmin)
                     else
                       _buildMilestonesGrid(_milestones, theme),
                     const BottomPadding(),
@@ -433,7 +434,7 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
     );
   }
 
-  Widget _buildMembersList(List<User> members, ThemeData theme, AppLocalizations l10n) {
+  Widget _buildMembersList(List<User> members, ThemeData theme, AppLocalizations l10n, bool isAdmin) {
     if (members.isEmpty) return Text(l10n.noMembers);
     return SizedBox(
       height: 40,
@@ -450,7 +451,7 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                 builder: (context) => MemberDetailsDialog(user: member),
               );
             },
-            onLongPress: () {
+            onLongPress: isAdmin ? () {
                showDialog(
                 context: context,
                 builder: (context) => ConfirmDialog(
@@ -461,7 +462,7 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                   onConfirm: () => context.read<WorkspaceViewModel>().removeMember(widget.workspace.id, member.id),
                 ),
               );
-            },
+            } : null,
             child: OrbitAvatar(
               radius: 20,
               imageUrl: member.avatarUrl,
@@ -507,20 +508,21 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
     );
   }
 
-  Widget _buildEmptyProjects(ThemeData theme, AppLocalizations l10n) {
+  Widget _buildEmptyProjects(ThemeData theme, AppLocalizations l10n, bool isAdmin) {
     return Center(
       child: Column(
         children: [
           Icon(Icons.folder_open_rounded, size: 48, color: theme.colorScheme.outline.withValues(alpha: 0.2)),
           const SizedBox(height: AppSpacing.sm),
           Text(l10n.noProjects),
-          TextButton(onPressed: () => _showProjectDialog(), child: Text(l10n.addProject)),
+          if (isAdmin)
+            TextButton(onPressed: () => _showProjectDialog(), child: Text(l10n.addProject)),
         ],
       ),
     );
   }
 
-  Widget _buildEmptyMilestones(ThemeData theme, AppLocalizations l10n) {
+  Widget _buildEmptyMilestones(ThemeData theme, AppLocalizations l10n, bool isAdmin) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.xxl),
@@ -529,7 +531,7 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
             Icon(Icons.auto_awesome_motion_rounded, size: 48, color: theme.colorScheme.outline.withValues(alpha: 0.2)),
             const SizedBox(height: AppSpacing.md),
             Text(selectedProjectId == null ? l10n.selectProjectToViewMilestones : l10n.noMilestonesForProject),
-            if (selectedProjectId != null)
+            if (isAdmin && selectedProjectId != null)
               TextButton(onPressed: _showMilestoneDialog, child: Text(l10n.addMilestone)),
           ],
         ),

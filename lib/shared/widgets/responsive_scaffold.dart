@@ -319,7 +319,7 @@ class _ResponsiveScaffoldState extends State<ResponsiveScaffold> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Text(context.watch<AuthViewModel>().user?.name ?? 'User', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), maxLines: 1, overflow: TextOverflow.ellipsis),
-                                      const Text('Pro Member', style: TextStyle(fontSize: 10, color: Colors.grey), maxLines: 1, overflow: TextOverflow.ellipsis),
+                                      Text(context.watch<AuthViewModel>().user?.email ?? '', style: const TextStyle(fontSize: 10, color: Colors.grey), maxLines: 1, overflow: TextOverflow.ellipsis),
                                     ],
                                   ),
                                 ),

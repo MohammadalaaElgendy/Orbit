@@ -530,10 +530,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get home => 'Home';
 
   @override
-  String get work => 'Work';
+  String get work => 'Workspaces';
 
   @override
-  String get goals => 'Goals';
+  String get goals => 'Milestones';
 
   @override
   String get addPhoto => 'Add Photo';

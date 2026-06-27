@@ -25,46 +25,48 @@ class WorkspaceMenuSheet extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        ListTile(
-          leading: const Icon(Icons.edit_rounded),
-          title: Text(l10n.editWorkspace),
-          onTap: () async {
-            Navigator.pop(context);
-            final members = await viewModel.getWorkspaceMembers(workspace.id);
-            if (!context.mounted) return;
-            
-            showDialog(
-              context: context,
-              builder: (_) => WorkspaceDialog(
-                workspace: workspace,
-                currentMembers: members,
-                onSave: (name, desc, imageUrl, memberIds) => viewModel.updateWorkspace(
-                  workspace.id, name, desc, imageUrl, memberIds,
+        if (viewModel.isAdmin) ...[
+          ListTile(
+            leading: const Icon(Icons.edit_rounded),
+            title: Text(l10n.editWorkspace),
+            onTap: () async {
+              Navigator.pop(context);
+              final members = await viewModel.getWorkspaceMembers(workspace.id);
+              if (!context.mounted) return;
+              
+              showDialog(
+                context: context,
+                builder: (_) => WorkspaceDialog(
+                  workspace: workspace,
+                  currentMembers: members,
+                  onSave: (name, desc, imageUrl, memberIds) => viewModel.updateWorkspace(
+                    workspace.id, name, desc, imageUrl, memberIds,
+                  ),
                 ),
-              ),
-            );
-          },
-        ),
-        ListTile(
-          leading: const Icon(Icons.delete_outline_rounded, color: Colors.red),
-          title: Text(l10n.deleteWorkspace, style: const TextStyle(color: Colors.red)),
-          onTap: () {
-            Navigator.pop(context);
-            showDialog(
-              context: context,
-              builder: (context) => ConfirmDialog(
-                title: l10n.deleteWorkspace,
-                message: l10n.deleteWorkspaceConfirm(workspace.name),
-                confirmLabel: l10n.delete,
-                confirmColor: Colors.red,
-                onConfirm: () {
-                  viewModel.deleteWorkspace(workspace.id);
-                  onDelete?.call();
-                },
-              ),
-            );
-          },
-        ),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.delete_outline_rounded, color: Colors.red),
+            title: Text(l10n.deleteWorkspace, style: const TextStyle(color: Colors.red)),
+            onTap: () {
+              Navigator.pop(context);
+              showDialog(
+                context: context,
+                builder: (context) => ConfirmDialog(
+                  title: l10n.deleteWorkspace,
+                  message: l10n.deleteWorkspaceConfirm(workspace.name),
+                  confirmLabel: l10n.delete,
+                  confirmColor: Colors.red,
+                  onConfirm: () {
+                    viewModel.deleteWorkspace(workspace.id);
+                    onDelete?.call();
+                  },
+                ),
+              );
+            },
+          ),
+        ],
         const SizedBox(height: AppSpacing.lg),
       ],
     );
