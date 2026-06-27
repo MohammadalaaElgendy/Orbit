@@ -231,26 +231,15 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                                 fontWeight: FontWeight.w900,
                                 color: titleColor,
                                 shadows: [
-                                  // Maximum contrast multi-layer black shadow
                                   Shadow(
-                                    color: Colors.black.withValues(alpha: (1.0 - ratio).clamp(0.0, 1.0)),
-                                    blurRadius: 2,
-                                    offset: const Offset(1, 1),
+                                    color: Colors.black.withValues(alpha: (0.35 * (1.0 - ratio)).clamp(0.0, 1.0)),
+                                    blurRadius: 6,
+                                    offset: const Offset(0, 1.5),
                                   ),
                                   Shadow(
-                                    color: Colors.black.withValues(alpha: (1.0 - ratio)),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                  Shadow(
-                                    color: Colors.black.withValues(alpha: (1.0 - ratio)),
-                                    blurRadius: 25,
-                                    offset: const Offset(0, 10),
-                                  ),
-                                  Shadow(
-                                    color: Colors.black.withValues(alpha: (1.0 - ratio) * 0.8),
-                                    blurRadius: 50,
-                                    offset: const Offset(0, 15),
+                                    color: Colors.black.withValues(alpha: (0.2 * (1.0 - ratio)).clamp(0.0, 1.0)),
+                                    blurRadius: 15,
+                                    offset: const Offset(0, 3),
                                   ),
                                 ],
                               )

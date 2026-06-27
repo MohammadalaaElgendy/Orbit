@@ -9,7 +9,16 @@ class WorkspaceDao extends DatabaseAccessor<AppDatabase> with _$WorkspaceDaoMixi
 
   Future<int> create(WorkspacesCompanion workspace) => into(workspaces).insert(workspace, mode: InsertMode.insertOrReplace);
 
-  Future<bool> updateEntry(WorkspacesCompanion workspace) => update(workspaces).replace(workspace);
+  Future<bool> updateEntry(WorkspacesCompanion workspace) async {
+    final currentUserId = attachedDatabase.userId;
+    if (currentUserId == null) return false;
+
+    final isAdmin = await isUserAdmin(currentUserId, workspace.id.value);
+    if (!isAdmin) {
+      throw Exception('Security Error: Only admins can update the workspace');
+    }
+    return update(workspaces).replace(workspace);
+  }
 
   Future<int> softDelete(String id) {
     return (delete(workspaces)..where((t) => t.id.equals(id))).go();
@@ -48,19 +57,44 @@ class WorkspaceDao extends DatabaseAccessor<AppDatabase> with _$WorkspaceDaoMixi
     return (select(workspaces)..where((t) => t.id.equals(id))).watchSingleOrNull();
   }
 
-  Future<int> removeMember(String workspaceId, String userId) {
+  Future<int> removeMember(String workspaceId, String userId) async {
+    final currentUserId = attachedDatabase.userId;
+    if (currentUserId == null) return 0;
+
+    final isAdmin = await isUserAdmin(currentUserId, workspaceId);
+    if (!isAdmin) {
+      throw Exception('Security Error: Only admins can remove members');
+    }
+
     return (delete(workspaceMembers)
           ..where((t) => t.workspaceId.equals(workspaceId) & t.userId.equals(userId)))
         .go();
   }
 
-  Future<int> removeAllMembers(String workspaceId) {
+  Future<int> removeAllMembers(String workspaceId) async {
+    final currentUserId = attachedDatabase.userId;
+    if (currentUserId == null) return 0;
+
+    final isAdmin = await isUserAdmin(currentUserId, workspaceId);
+    if (!isAdmin) {
+      throw Exception('Security Error: Only admins can remove all members');
+    }
+
     return (delete(workspaceMembers)
           ..where((t) => t.workspaceId.equals(workspaceId)))
         .go();
   }
 
-  Future<int> addMember(WorkspaceMembersCompanion member) => into(workspaceMembers).insert(member);
+  Future<int> addMember(WorkspaceMembersCompanion member) async {
+    final currentUserId = attachedDatabase.userId;
+    if (currentUserId == null) return 0;
+
+    final isAdmin = await isUserAdmin(currentUserId, member.workspaceId.value);
+    if (!isAdmin) {
+      throw Exception('Security Error: Only admins can add members');
+    }
+    return into(workspaceMembers).insert(member);
+  }
 
   Stream<List<WorkspaceMember>> watchMembers(String workspaceId) {
     return (select(workspaceMembers)..where((t) => t.workspaceId.equals(workspaceId))).watch();

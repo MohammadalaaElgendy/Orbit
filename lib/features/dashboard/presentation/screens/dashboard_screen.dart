@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:orbit/core/constants/app_constants.dart';
+import 'package:orbit/shared/models/workspace.dart';
+import 'package:orbit/shared/models/user.dart';
 import 'package:orbit/shared/widgets/glass_card.dart';
 import 'package:orbit/shared/widgets/responsive_scaffold.dart';
 import 'package:orbit/features/dashboard/presentation/widgets/dashboard_stats.dart';
@@ -48,7 +50,7 @@ class DashboardScreen extends StatelessWidget {
         ),
         const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.md)),
 
-        Selector<DashboardViewModel, ({List workspaces, Map membersMap})>(
+        Selector<DashboardViewModel, ({List<Workspace> workspaces, Map<String, List<User>> membersMap})>(
           selector: (_, vm) => (workspaces: vm.workspaces, membersMap: vm.workspaceMembersMap),
           builder: (context, data, _) {
             final workspaces = data.workspaces;
@@ -84,7 +86,7 @@ class DashboardScreen extends StatelessWidget {
                         const SizedBox(width: AppSpacing.md),
                         itemBuilder: (context, index) {
                           final ws = workspaces[index];
-                          final members = data.membersMap[ws.id] ?? [];
+                          final members = data.membersMap[ws.id] ?? <User>[];
 
                           return WorkspaceCard(
                             ws: ws,
@@ -112,7 +114,7 @@ class DashboardScreen extends StatelessWidget {
                     ),
                     itemBuilder: (context, index) {
                       final ws = workspaces[index];
-                      final members = data.membersMap[ws.id] ?? [];
+                      final members = data.membersMap[ws.id] ?? <User>[];
 
                       return WorkspaceCard(
                         ws: ws,

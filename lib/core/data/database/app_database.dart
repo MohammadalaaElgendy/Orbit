@@ -125,11 +125,19 @@ class SeedControl extends Table {
   ],
 )
 class AppDatabase extends _$AppDatabase {
+  String? _currentUserId;
+
   AppDatabase(PowerSyncDatabase powersync) : super(SqliteAsyncDriftConnection(powersync)) {
     powersync.updates.listen((update) {
       final updatedTables = update.tables.map((t) => TableUpdate(t)).toSet();
       notifyUpdates(updatedTables);
     });
+  }
+
+  String? get userId => _currentUserId;
+
+  void setUserId(String? id) {
+    _currentUserId = id;
   }
 
   @override

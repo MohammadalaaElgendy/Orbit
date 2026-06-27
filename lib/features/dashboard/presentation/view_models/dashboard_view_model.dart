@@ -75,10 +75,16 @@ class DashboardViewModel extends ChangeNotifier {
     });
   }
 
+  final Map<String, StreamSubscription> _memberSubscriptions = {};
+
   void _clearData() {
     _workspaceSub?.cancel();
     _milestoneSub?.cancel();
     _taskSub?.cancel();
+    for (var sub in _memberSubscriptions.values) {
+      sub.cancel();
+    }
+    _memberSubscriptions.clear();
     _workspaces = [];
     _workspaceMembersMap.clear();
     _recentMilestones = [];
@@ -90,17 +96,30 @@ class DashboardViewModel extends ChangeNotifier {
   }
 
   void _init() {
-    _clearData(); // مسح أي بيانات قديمة قبل الاشتراك الجديد
+    _clearData(); 
 
     final currentUser = _authRepository.currentUser;
     if (currentUser == null) return;
 
-    // Watch Workspaces for specific user
-    _workspaceSub = _workspaceRepository.watchWorkspacesForUser(currentUser.id).listen((data) async {
+    // Watch Workspaces
+    _workspaceSub = _workspaceRepository.watchWorkspacesForUser(currentUser.id).listen((data) {
       _workspaces = data;
+      
+      // Sync member subscriptions: Remove stale, add new
+      final currentWsIds = data.map((ws) => ws.id).toSet();
+      _memberSubscriptions.keys.where((id) => !currentWsIds.contains(id)).toList().forEach((id) {
+        _memberSubscriptions[id]?.cancel();
+        _memberSubscriptions.remove(id);
+        _workspaceMembersMap.remove(id);
+      });
+
       for (var ws in data) {
-        final members = await _workspaceRepository.watchWorkspaceMembers(ws.id).first;
-        _workspaceMembersMap[ws.id] = members;
+        if (!_memberSubscriptions.containsKey(ws.id)) {
+          _memberSubscriptions[ws.id] = _workspaceRepository.watchWorkspaceMembers(ws.id).listen((members) {
+            _workspaceMembersMap[ws.id] = members;
+            notifyListeners();
+          });
+        }
       }
       notifyListeners();
     });
@@ -213,6 +232,9 @@ class DashboardViewModel extends ChangeNotifier {
     _workspaceSub?.cancel();
     _milestoneSub?.cancel();
     _taskSub?.cancel();
+    for (var sub in _memberSubscriptions.values) {
+      sub.cancel();
+    }
     super.dispose();
   }
 }

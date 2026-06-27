@@ -6,6 +6,7 @@ class OrbitAvatar extends StatelessWidget {
   final double radius;
   final IconData placeholderIcon;
   final Color? backgroundColor;
+  final Color? foregroundColor;
 
   const OrbitAvatar({
     super.key,
@@ -13,6 +14,7 @@ class OrbitAvatar extends StatelessWidget {
     this.radius = 20,
     this.placeholderIcon = Icons.person,
     this.backgroundColor,
+    this.foregroundColor,
   });
 
   @override
@@ -37,7 +39,7 @@ class OrbitAvatar extends StatelessWidget {
             : Icon(
                 placeholderIcon,
                 size: radius,
-                color: theme.colorScheme.primary,
+                color: foregroundColor ?? theme.colorScheme.primary,
               ),
       ),
     );
