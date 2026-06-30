@@ -5,11 +5,15 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide User;
 import '../../../../shared/models/workspace.dart';
 import '../../../../shared/models/project.dart';
+import '../../../../shared/models/milestone.dart';
+import '../../../../shared/models/task.dart';
 import '../../../../shared/models/user.dart';
 import '../../../auth/domain/repositories/user_repository.dart';
 import '../../../auth/domain/repositories/auth_repository.dart';
 import '../../domain/repositories/workspace_repository.dart';
 import '../../domain/repositories/project_repository.dart';
+import '../../../milestone/domain/repositories/milestone_repository.dart';
+import '../../../dashboard/domain/repositories/task_repository.dart';
 import 'dart:async';
 import 'package:uuid/uuid.dart';
 
@@ -18,6 +22,8 @@ class WorkspaceViewModel extends ChangeNotifier {
   final ProjectRepository _projectRepository;
   final UserRepository _userRepository;
   final AuthRepository _authRepository;
+  final MilestoneRepository _milestoneRepository;
+  final TaskRepository _taskRepository;
 
   Workspace? _currentWorkspace;
   Workspace? get currentWorkspace => _currentWorkspace;
@@ -30,6 +36,19 @@ class WorkspaceViewModel extends ChangeNotifier {
 
   List<User> _allUsers = [];
   List<User> get allUsers => _allUsers;
+
+  // Stats
+  double _overallProgress = 0.0;
+  double get overallProgress => _overallProgress;
+
+  int _totalMilestones = 0;
+  int get totalMilestones => _totalMilestones;
+
+  int _completedMilestones = 0;
+  int get completedMilestones => _completedMilestones;
+
+  List<Milestone> _topMilestones = [];
+  List<Milestone> get topMilestones => _topMilestones;
 
   bool get isAdmin {
     final currentUser = _authRepository.currentUser;
@@ -51,16 +70,22 @@ class WorkspaceViewModel extends ChangeNotifier {
   StreamSubscription? _projectSub;
   StreamSubscription? _memberSub;
   StreamSubscription? _userSub;
+  StreamSubscription? _milestoneSub;
+  StreamSubscription? _taskSub;
 
   WorkspaceViewModel({
     required WorkspaceRepository workspaceRepository,
     required ProjectRepository projectRepository,
     required UserRepository userRepository,
     required AuthRepository authRepository,
+    required MilestoneRepository milestoneRepository,
+    required TaskRepository taskRepository,
   })  : _workspaceRepository = workspaceRepository,
         _projectRepository = projectRepository,
         _userRepository = userRepository,
-        _authRepository = authRepository {
+        _authRepository = authRepository,
+        _milestoneRepository = milestoneRepository,
+        _taskRepository = taskRepository {
     _listenToAuthChanges();
   }
 
@@ -79,10 +104,16 @@ class WorkspaceViewModel extends ChangeNotifier {
     _projectSub?.cancel();
     _memberSub?.cancel();
     _userSub?.cancel();
+    _milestoneSub?.cancel();
+    _taskSub?.cancel();
     _currentWorkspace = null;
     _projects = [];
     _members = [];
     _allUsers = [];
+    _overallProgress = 0.0;
+    _totalMilestones = 0;
+    _completedMilestones = 0;
+    _topMilestones = [];
     notifyListeners();
   }
 
@@ -111,6 +142,31 @@ class WorkspaceViewModel extends ChangeNotifier {
       _memberSub?.cancel();
       _memberSub = _workspaceRepository.watchWorkspaceMembers(id).listen((data) {
         _members = data;
+        notifyListeners();
+      });
+
+      _milestoneSub?.cancel();
+      _milestoneSub = _milestoneRepository.watchMilestonesByWorkspace(id).listen((data) {
+        _totalMilestones = data.length;
+        _completedMilestones = data.where((m) => m.progress >= 1.0).length;
+        
+        // Sorting all milestones by progress descending (most progressed first)
+        final sortedMilestones = List<Milestone>.from(data);
+        sortedMilestones.sort((a, b) => b.progress.compareTo(a.progress));
+
+        final active = sortedMilestones.where((m) => m.progress < 1.0).toList();
+        _topMilestones = active.take(3).toList();
+        notifyListeners();
+      });
+
+      _taskSub?.cancel();
+      _taskSub = _taskRepository.watchTasksByWorkspace(id).listen((data) {
+        if (data.isEmpty) {
+          _overallProgress = 0.0;
+        } else {
+          final completed = data.where((t) => t.status == TaskStatus.done).length;
+          _overallProgress = completed / data.length;
+        }
         notifyListeners();
       });
     } catch (e) {
@@ -291,6 +347,8 @@ class WorkspaceViewModel extends ChangeNotifier {
     _projectSub?.cancel();
     _memberSub?.cancel();
     _userSub?.cancel();
+    _milestoneSub?.cancel();
+    _taskSub?.cancel();
     super.dispose();
   }
 }

@@ -28,12 +28,22 @@ class TaskDao extends DatabaseAccessor<AppDatabase> with _$TaskDaoMixin {
   }
 
   Stream<List<Task>> watchAll() {
-    return (select(tasks)).watch();
+    return (select(tasks)
+      ..orderBy([(t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.asc)]))
+      .watch();
   }
 
   Stream<List<Task>> watchByMilestone(String milestoneId) {
     return (select(tasks)
-          ..where((t) => t.milestoneId.equals(milestoneId)))
+          ..where((t) => t.milestoneId.equals(milestoneId))
+          ..orderBy([(t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.asc)]))
+        .watch();
+  }
+
+  Stream<List<Task>> watchByWorkspace(String workspaceId) {
+    return (select(tasks)
+          ..where((t) => t.workspaceId.equals(workspaceId))
+          ..orderBy([(t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.asc)]))
         .watch();
   }
 
@@ -53,6 +63,7 @@ class TaskDao extends DatabaseAccessor<AppDatabase> with _$TaskDaoMixin {
     query.where(tasks.parentTaskId.equals(parentId));
     query.groupBy([tasks.id]);
     query.addColumns([subtaskCount, completedSubtasks]);
+    query.orderBy([OrderingTerm(expression: tasks.createdAt, mode: OrderingMode.asc)]);
 
     return query.watch().map((rows) {
       return rows.map((row) {
@@ -81,6 +92,7 @@ class TaskDao extends DatabaseAccessor<AppDatabase> with _$TaskDaoMixin {
     query.where(tasks.milestoneId.equals(milestoneId) & tasks.parentTaskId.isNull());
     query.groupBy([tasks.id]);
     query.addColumns([subtaskCount, completedSubtasks]);
+    query.orderBy([OrderingTerm(expression: tasks.createdAt, mode: OrderingMode.asc)]);
 
     return query.watch().map((rows) {
       return rows.map((row) {

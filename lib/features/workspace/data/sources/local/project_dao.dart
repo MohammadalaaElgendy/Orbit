@@ -16,12 +16,15 @@ class ProjectDao extends DatabaseAccessor<AppDatabase> with _$ProjectDaoMixin {
   }
 
   Stream<List<Project>> watchAll() {
-    return (select(projects)).watch();
+    return (select(projects)
+      ..orderBy([(t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.asc)]))
+      .watch();
   }
 
   Stream<List<Project>> watchByWorkspace(String workspaceId) {
     return (select(projects)
-          ..where((t) => t.workspaceId.equals(workspaceId)))
+          ..where((t) => t.workspaceId.equals(workspaceId))
+          ..orderBy([(t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.asc)]))
         .watch();
   }
 

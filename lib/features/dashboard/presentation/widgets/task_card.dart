@@ -2,22 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../../shared/models/task.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../shared/widgets/timeline_indicator.dart';
 
 class TaskCard extends StatelessWidget {
   final Task task;
   final VoidCallback? onTap;
+  final bool isSubtask;
+  final bool isFirst;
+  final bool isLast;
+  final bool showHierarchy;
 
-  const TaskCard({super.key, required this.task, this.onTap});
+  const TaskCard({
+    super.key, 
+    required this.task, 
+    this.onTap,
+    this.isSubtask = false,
+    this.isFirst = false,
+    this.isLast = false,
+    this.showHierarchy = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+    Widget card = Container(
       decoration: BoxDecoration(
-        // نفس ستايل الخلفية والـ Borders بتاعة الـ MilestoneCard
         color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.white,
         borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(
@@ -33,7 +44,6 @@ class TaskCard extends StatelessWidget {
           ),
         ],
       ),
-      // استخدام InkWell للحصول على الـ Ripple Effect جوة الكارت
       child: InkWell(
         borderRadius: BorderRadius.circular(AppRadius.xl),
         onTap: onTap ?? () => Navigator.pushNamed(context, '/task-details', arguments: task),
@@ -44,8 +54,7 @@ class TaskCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  _buildStatusIndicator(task.status),
-                  const SizedBox(width: AppSpacing.md),
+                  // Removed redundant status indicator as it's now on the timeline
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -147,6 +156,46 @@ class TaskCard extends StatelessWidget {
         ),
       ),
     );
+
+    if (showHierarchy) {
+      return IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            if (isSubtask) const SizedBox(width: AppSpacing.lg),
+            TimelineIndicator(
+              isFirst: isFirst,
+              isLast: isLast,
+              lineColor: task.status == TaskStatus.done 
+                  ? Colors.green 
+                  : theme.colorScheme.primary,
+              nodeSize: 24,
+              node: Container(
+                width: 12,
+                height: 12,
+                decoration: BoxDecoration(
+                  color: task.status == TaskStatus.done ? Colors.green : Colors.grey,
+                  shape: BoxShape.circle,
+                  border: Border.all(color: theme.scaffoldBackgroundColor, width: 2),
+                ),
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                child: card,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppSpacing.md),
+      child: card,
+    );
   }
 
   // حساب الـ Overdue بناءً على الأيام لتجنب فروق الساعات والدقائق الخفية
@@ -167,30 +216,6 @@ class TaskCard extends StatelessWidget {
 
     if (diffInDays < 3) return Colors.orange;
     return Colors.green;
-  }
-
-  Widget _buildStatusIndicator(TaskStatus status) {
-    Color color;
-    switch (status) {
-      case TaskStatus.todo: color = Colors.grey; break;
-      case TaskStatus.inProgress: color = Colors.orange; break;
-      case TaskStatus.done: color = Colors.green; break;
-    }
-    return Container(
-      width: 10, // تم تصغيرها قليلاً لتتناسب مع الكارت الـ Clean
-      height: 10,
-      decoration: BoxDecoration(
-        color: color,
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: color.withValues(alpha: 0.2),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-    );
   }
 
   Widget _buildPriorityBadge(TaskPriority priority) {

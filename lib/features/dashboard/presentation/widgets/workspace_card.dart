@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide User;
 import 'package:orbit/core/constants/app_constants.dart';
-import 'package:orbit/core/theme/app_colors.dart';
 import 'package:orbit/shared/models/workspace.dart';
 import 'package:orbit/shared/models/user.dart';
 import 'package:orbit/features/workspace/presentation/widgets/workspace_menu_sheet.dart';
@@ -173,9 +172,6 @@ class WorkspaceCard extends StatelessWidget {
             child: OrbitAvatar(
               radius: 10,
               imageUrl: displayMembers[i].avatarUrl,
-              // Use fixed colors that don't change with theme
-              backgroundColor: AppColors.primaryLight,
-              foregroundColor: Colors.white,
             ),
           ),
         )),

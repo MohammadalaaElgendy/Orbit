@@ -180,15 +180,18 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
               sliver: SliverList(
                 delegate: SliverChildBuilderDelegate(
-                  (context, index) => Padding(
-                    padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-                    child: TaskCard(
+                  (context, index) {
+                    return TaskCard(
                       task: subtasks[index],
+                      isSubtask: true,
+                      isFirst: index == 0,
+                      isLast: index == subtasks.length - 1,
+                      showHierarchy: true,
                       onTap: () {
                         Navigator.of(context).pushNamed('/task-details', arguments: subtasks[index]);
                       },
-                    ),
-                  ),
+                    );
+                  },
                   childCount: subtasks.length,
                 ),
               ),

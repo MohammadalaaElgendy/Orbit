@@ -15,6 +15,7 @@ import '../widgets/member_search_dialog.dart';
 import '../widgets/member_details_dialog.dart';
 import '../widgets/workspace_menu_sheet.dart';
 import '../widgets/project_card.dart';
+import '../widgets/workspace_stats.dart';
 import '../../../milestone/presentation/view_models/milestone_view_model.dart';
 import '../../../milestone/presentation/widgets/milestone_dialog.dart';
 import '../../../dashboard/presentation/widgets/milestone_card.dart';
@@ -368,6 +369,8 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: AppSpacing.xl),
+                    const WorkspaceStats(),
+                    const SizedBox(height: AppSpacing.xl),
                     _buildSectionHeader(theme, l10n.members, onAdd: viewModel.isAdmin ? _showMemberSearchDialog : null),
                     const SizedBox(height: AppSpacing.md),
                     _buildMembersList(members, theme, l10n, viewModel.isAdmin),
@@ -531,26 +534,50 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
   Widget _buildMilestonesGrid(List<model.Milestone> milestones, ThemeData theme) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        const double minWidth = 280.0;
-        const double maxWidth = 400.0;
+        const double minWidth = 300.0;
         const double spacing = AppSpacing.md;
         
         int crossAxisCount = (constraints.maxWidth / (minWidth + spacing)).floor();
         crossAxisCount = crossAxisCount.clamp(1, milestones.isNotEmpty ? milestones.length : 1);
         
-        double itemWidth = (constraints.maxWidth - (spacing * (crossAxisCount - 1))) / crossAxisCount;
-        itemWidth = itemWidth.clamp(minWidth, maxWidth);
+        final isGrid = crossAxisCount > 1;
 
-        return Wrap(
-          spacing: spacing,
-          runSpacing: spacing,
-          alignment: WrapAlignment.start,
-          children: milestones.map((milestone) {
-            return SizedBox(
-              width: itemWidth,
-              child: MilestoneCard(milestone: milestone),
+        if (!isGrid) {
+          return ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            padding: EdgeInsets.zero,
+            itemCount: milestones.length,
+            itemBuilder: (context, index) {
+              return MilestoneCard(
+                milestone: milestones[index],
+                isFirst: index == 0,
+                isLast: index == milestones.length - 1,
+                showTimeline: true,
+                index: index,
+              );
+            },
+          );
+        }
+
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: EdgeInsets.zero,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: spacing,
+            mainAxisSpacing: spacing,
+            mainAxisExtent: 185, // Standardized height for perfect alignment
+          ),
+          itemCount: milestones.length,
+          itemBuilder: (context, index) {
+            return MilestoneCard(
+              milestone: milestones[index],
+              index: index,
+              showTimeline: false,
             );
-          }).toList(),
+          },
         );
       },
     );

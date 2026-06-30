@@ -33,6 +33,12 @@ class MilestoneRepository {
         .toList());
   }
 
+  Stream<List<model.Milestone>> watchMilestonesByWorkspace(String workspaceId) {
+    return _milestoneDao.watchByWorkspaceWithCounts(workspaceId).map((rows) => rows
+        .map(_mapWithCountsToDomain)
+        .toList());
+  }
+
   Stream<model.Milestone?> watchMilestoneById(String id) {
     return _milestoneDao.watchByIdWithCounts(id).map((row) {
       if (row == null) return null;

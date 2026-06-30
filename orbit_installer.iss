@@ -1,6 +1,6 @@
 ; Script generated for Orbit App
 #define MyAppName "Orbit"
-#define MyAppVersion "1.0.0"
+#define MyAppVersion "1.0.5"
 #define MyAppPublisher "Mohammad Alaa"
 #define MyAppExeName "orbit.exe"
 #define MyAppAssocName "Orbit Protocol"

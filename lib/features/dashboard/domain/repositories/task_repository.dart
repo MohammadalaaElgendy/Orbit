@@ -31,6 +31,10 @@ class TaskRepository {
     return _taskDao.watchAll().map((rows) => rows.map(_mapToDomain).toList());
   }
 
+  Stream<List<model.Task>> watchTasksByWorkspace(String workspaceId) {
+    return _taskDao.watchByWorkspace(workspaceId).map((rows) => rows.map(_mapToDomain).toList());
+  }
+
   Stream<List<model.Task>> watchRootTasksByMilestone(String milestoneId) {
     return _taskDao.watchRootTasksByMilestoneWithCounts(milestoneId).map((rows) => rows
         .map((row) => _mapToDomain(row.task, subtaskCount: row.subtaskCount, completedSubtasks: row.completedSubtasks))

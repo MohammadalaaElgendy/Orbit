@@ -140,14 +140,45 @@ class DashboardScreen extends StatelessWidget {
                 const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.md)),
                 SliverPadding(
                   padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                  sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) => Padding(
-                        padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                        child: MilestoneCard(milestone: milestones[index]),
-                      ),
-                      childCount: milestones.length,
-                    ),
+                  sliver: SliverLayoutBuilder(
+                    builder: (context, constraints) {
+                      const double minWidth = 300.0;
+                      const double spacing = AppSpacing.md;
+                      
+                      int crossAxisCount = (constraints.crossAxisExtent / (minWidth + spacing)).floor();
+                      crossAxisCount = crossAxisCount.clamp(1, milestones.length);
+
+                      if (crossAxisCount == 1) {
+                        return SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) => Padding(
+                              padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                              child: MilestoneCard(
+                                milestone: milestones[index],
+                                showTimeline: false,
+                              ),
+                            ),
+                            childCount: milestones.length,
+                          ),
+                        );
+                      }
+
+                      return SliverGrid(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: crossAxisCount,
+                          crossAxisSpacing: spacing,
+                          mainAxisSpacing: spacing,
+                          mainAxisExtent: 185, // Standardized height that fits 1 line title + 2 lines desc + progress
+                        ),
+                        delegate: SliverChildBuilderDelegate(
+                          (context, index) => MilestoneCard(
+                            milestone: milestones[index],
+                            showTimeline: false,
+                          ),
+                          childCount: milestones.length,
+                        ),
+                      );
+                    },
                   ),
                 ),
               ],

@@ -22,12 +22,17 @@ class OrbitAvatar extends StatelessWidget {
     final theme = Theme.of(context);
     final size = radius * 2;
 
+    // Determine default background color based on theme
+    final Color defaultBgColor = theme.brightness == Brightness.dark
+        ? theme.colorScheme.primaryContainer.withValues(alpha: 0.8)
+        : theme.colorScheme.primary.withValues(alpha: 0.9);
+
     return Container(
       width: size,
       height: size,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: backgroundColor ?? theme.colorScheme.primary.withValues(alpha: 0.1),
+        color: backgroundColor ?? defaultBgColor,
       ),
       child: ClipOval(
         child: imageUrl != null && imageUrl!.isNotEmpty
@@ -39,7 +44,7 @@ class OrbitAvatar extends StatelessWidget {
             : Icon(
                 placeholderIcon,
                 size: radius,
-                color: foregroundColor ?? theme.colorScheme.primary,
+                color: foregroundColor ?? Colors.white,
               ),
       ),
     );

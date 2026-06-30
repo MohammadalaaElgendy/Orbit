@@ -151,10 +151,16 @@ class _MilestoneDetailsScreenState extends State<MilestoneDetailsScreen> {
                      child: Text(l10n.noTasksForMilestone),
                    ))
                 else
-                  ...tasks.map((task) => Padding(
-                    padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-                    child: TaskCard(task: task),
-                  )),
+                  ...tasks.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final task = entry.value;
+                    return TaskCard(
+                      task: task,
+                      isFirst: index == 0,
+                      isLast: index == tasks.length - 1,
+                      showHierarchy: true,
+                    );
+                  }),
                 const SizedBox(height: AppSpacing.xxl),
               ]),
             ),
