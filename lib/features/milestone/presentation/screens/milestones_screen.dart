@@ -132,15 +132,50 @@ class _MilestonesScreenState extends State<MilestonesScreen> {
                   ),
                   SliverPadding(
                     padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-                    sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final m = entry.value[index];
-                          // Removed Center and ConstrainedBox to let the card fill the width
-                          return MilestoneCard(milestone: m);
-                        },
-                        childCount: entry.value.length,
-                      ),
+                    sliver: SliverLayoutBuilder(
+                      builder: (context, constraints) {
+                        const double minWidth = 300.0;
+                        const double spacing = AppSpacing.md;
+                        
+                        int crossAxisCount = (constraints.crossAxisExtent / (minWidth + spacing)).floor();
+                        crossAxisCount = crossAxisCount.clamp(1, entry.value.length);
+
+                        final isGrid = crossAxisCount > 1;
+
+                        if (!isGrid) {
+                          return SliverList(
+                            delegate: SliverChildBuilderDelegate(
+                              (context, index) {
+                                final m = entry.value[index];
+                                return MilestoneCard(
+                                  milestone: m,
+                                  showTimeline: false,
+                                );
+                              },
+                              childCount: entry.value.length,
+                            ),
+                          );
+                        }
+
+                        return SliverGrid(
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: crossAxisCount,
+                            crossAxisSpacing: spacing,
+                            mainAxisSpacing: spacing,
+                            mainAxisExtent: 185,
+                          ),
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              final m = entry.value[index];
+                              return MilestoneCard(
+                                milestone: m,
+                                showTimeline: false,
+                              );
+                            },
+                            childCount: entry.value.length,
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ],

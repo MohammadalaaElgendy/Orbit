@@ -121,6 +121,7 @@ class MilestoneCard extends StatelessWidget {
                       ],
                     ),
                   ),
+                  const SizedBox(width: AppSpacing.sm,),
                   Text(
                     '${(milestone.progress * 100).toInt()}%', 
                     style: TextStyle(
