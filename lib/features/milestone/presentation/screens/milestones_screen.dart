@@ -134,10 +134,10 @@ class _MilestonesScreenState extends State<MilestonesScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                     sliver: SliverLayoutBuilder(
                       builder: (context, constraints) {
-                        const double minWidth = 300.0;
+                        const double minWidth = 280.0;
                         const double spacing = AppSpacing.md;
                         
-                        int crossAxisCount = (constraints.crossAxisExtent / (minWidth + spacing)).floor();
+                        int crossAxisCount = (constraints.crossAxisExtent / minWidth).floor();
                         crossAxisCount = crossAxisCount.clamp(1, entry.value.length);
 
                         final isGrid = crossAxisCount > 1;
@@ -147,9 +147,12 @@ class _MilestonesScreenState extends State<MilestonesScreen> {
                             delegate: SliverChildBuilderDelegate(
                               (context, index) {
                                 final m = entry.value[index];
-                                return MilestoneCard(
-                                  milestone: m,
-                                  showTimeline: false,
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                                  child: MilestoneCard(
+                                    milestone: m,
+                                    showTimeline: false,
+                                  ),
                                 );
                               },
                               childCount: entry.value.length,

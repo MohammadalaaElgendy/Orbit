@@ -135,10 +135,10 @@ class DashboardScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
                   sliver: SliverLayoutBuilder(
                     builder: (context, constraints) {
-                      const double minWidth = 300.0;
+                      const double minWidth = 280.0;
                       const double spacing = AppSpacing.md;
                       
-                      int crossAxisCount = (constraints.crossAxisExtent / (minWidth + spacing)).floor();
+                      int crossAxisCount = (constraints.crossAxisExtent / minWidth).floor();
                       crossAxisCount = crossAxisCount.clamp(1, milestones.length);
 
                       if (crossAxisCount == 1) {

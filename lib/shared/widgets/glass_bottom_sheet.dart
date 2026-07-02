@@ -12,8 +12,9 @@ class GlassBottomSheet extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     
-    final bgAlpha = isDark ? 0.15 : 0.35;
-    final blurAmount = 18.0;
+    // Premium glassmorphism values
+    final bgAlpha = isDark ? 0.35 : 0.65; // Balanced for readability and glass effect
+    final blurAmount = 25.0; // Deeper blur for premium feel
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -25,19 +26,34 @@ class GlassBottomSheet extends StatelessWidget {
         borderRadius: const BorderRadius.vertical(
           top: Radius.circular(AppRadius.xxl),
         ),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+        // Thinner, more subtle border to catch the "light"
+        border: Border.all(
+          color: isDark 
+              ? Colors.white.withValues(alpha: 0.12) 
+              : Colors.black.withValues(alpha: 0.05),
+          width: 0.8,
+        ),
+        // Subtle outer shadow to lift the sheet
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: isDark ? 0.4 : 0.08),
+            blurRadius: 30,
+            spreadRadius: 0,
+            offset: const Offset(0, -10),
+          ),
+        ],
       ),
       child: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Handle bar
+            // Handle bar - refined with better volume
             Container(
               width: 40,
               height: 4,
               decoration: BoxDecoration(
-                color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(2),
+                color: theme.colorScheme.onSurface.withValues(alpha: isDark ? 0.15 : 0.1),
+                borderRadius: BorderRadius.circular(AppRadius.full),
               ),
             ),
             const SizedBox(height: AppSpacing.md),
@@ -48,6 +64,7 @@ class GlassBottomSheet extends StatelessWidget {
     ).asGlass(
       blurX: blurAmount,
       blurY: blurAmount,
+      frosted: false,
       clipBorderRadius: const BorderRadius.vertical(
         top: Radius.circular(AppRadius.xxl),
       ),

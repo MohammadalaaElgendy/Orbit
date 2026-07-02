@@ -1,5 +1,27 @@
+import 'package:orbit/l10n/app_localizations.dart';
+
 enum TaskPriority { low, medium, high }
 enum TaskStatus { todo, inProgress, done }
+
+extension TaskStatusExtension on TaskStatus {
+  String getLabel(AppLocalizations l10n) {
+    switch (this) {
+      case TaskStatus.todo: return l10n.statusTodo;
+      case TaskStatus.inProgress: return l10n.statusInProgress;
+      case TaskStatus.done: return l10n.statusDone;
+    }
+  }
+}
+
+extension TaskPriorityExtension on TaskPriority {
+  String getLabel(AppLocalizations l10n) {
+    switch (this) {
+      case TaskPriority.low: return l10n.priorityLow;
+      case TaskPriority.medium: return l10n.priorityMedium;
+      case TaskPriority.high: return l10n.priorityHigh;
+    }
+  }
+}
 
 class Task {
   final String id;

@@ -1154,6 +1154,42 @@ abstract class AppLocalizations {
   /// **'Task'**
   String get task;
 
+  /// No description provided for @statusTodo.
+  ///
+  /// In en, this message translates to:
+  /// **'To Do'**
+  String get statusTodo;
+
+  /// No description provided for @statusInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In Progress'**
+  String get statusInProgress;
+
+  /// No description provided for @statusDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get statusDone;
+
+  /// No description provided for @priorityLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Low'**
+  String get priorityLow;
+
+  /// No description provided for @priorityMedium.
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get priorityMedium;
+
+  /// No description provided for @priorityHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'High'**
+  String get priorityHigh;
+
   /// No description provided for @taskDeadlineReminderDayOf.
   ///
   /// In en, this message translates to:

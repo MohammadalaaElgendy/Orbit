@@ -29,6 +29,14 @@ class _ProjectDialogState extends State<ProjectDialog> {
     '#F59E0B', // Amber
     '#EF4444', // Red
     '#EC4899', // Pink
+
+    // الألوان الجديدة المضافة:
+    '#8B5CF6', // Violet (بنفسجي حيوي)
+    '#06B6D4', // Cyan (سماوي/تيركواز مشرق)
+    '#14B8A6', // Teal (أخضر تركوازي هادئ)
+    '#F97316', // Orange (برتقالي دافئ)
+    '#A855F7', // Purple (أرجواني ملكي)
+    '#64748B', // Slate (رمادي مزرق احترافي - ممتاز للحيادية)
   ];
 
   @override

@@ -564,6 +564,24 @@ class AppLocalizationsAr extends AppLocalizations {
   String get task => 'مهمة';
 
   @override
+  String get statusTodo => 'قيد الانتظار';
+
+  @override
+  String get statusInProgress => 'قيد التنفيذ';
+
+  @override
+  String get statusDone => 'مكتمل';
+
+  @override
+  String get priorityLow => 'منخفضة';
+
+  @override
+  String get priorityMedium => 'متوسطة';
+
+  @override
+  String get priorityHigh => 'عالية';
+
+  @override
   String taskDeadlineReminderDayOf(Object title) {
     return 'موعد المهمة اليوم: $title';
   }

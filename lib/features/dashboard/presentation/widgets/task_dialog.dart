@@ -174,7 +174,7 @@ class _TaskDialogState extends State<TaskDialog> {
                             ),
                             items: TaskStatus.values.map((s) => DropdownMenuItem(
                               value: s, 
-                              child: Text('${s.name[0].toUpperCase()}${s.name.substring(1)}')
+                              child: Text(s.getLabel(l10n))
                             )).toList(),
                             onChanged: (v) => setState(() => _status = v!),
                           ),
@@ -190,7 +190,7 @@ class _TaskDialogState extends State<TaskDialog> {
                             ),
                             items: TaskPriority.values.map((p) => DropdownMenuItem(
                               value: p, 
-                              child: Text('${p.name[0].toUpperCase()}${p.name.substring(1)}')
+                              child: Text(p.getLabel(l10n))
                             )).toList(),
                             onChanged: (v) => setState(() => _priority = v!),
                           ),

@@ -28,8 +28,7 @@ class MilestoneCard extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context)!;
     
-    Widget content = Container(
-      padding: const EdgeInsets.all(AppSpacing.md),
+    Widget card = Container(
       decoration: BoxDecoration(
         color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.white,
         borderRadius: BorderRadius.circular(AppRadius.xl),
@@ -46,166 +45,168 @@ class MilestoneCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween, // Safe way to push footer to bottom
-        children: [
-          // Top Part: Header, Deadline, Description
-          Column(
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        onTap: () => Navigator.pushNamed(context, '/milestone-details', arguments: milestone),
+        onLongPress: () => _showMenu(context),
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween, // Safe way to push footer to bottom
             children: [
-              Row(
+              // Top Part: Header, Deadline, Description
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Stack(
-                    alignment: Alignment.center,
+                  Row(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(AppSpacing.xs),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Icon(
-                          Icons.flag_rounded, 
-                          color: theme.colorScheme.primary, 
-                          size: 14,
-                        ),
-                      ),
                       if (index != null)
-                        Positioned(
-                          right: -2,
-                          top: -2,
-                          child: Container(
-                            padding: const EdgeInsets.all(2),
-                            decoration: BoxDecoration(
+                        Container(
+                          width: 24,
+                          height: 24,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Text(
+                            '${index! + 1}',
+                            style: TextStyle(
                               color: theme.colorScheme.primary,
-                              shape: BoxShape.circle,
-                              border: Border.all(color: theme.colorScheme.surface, width: 1.5),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w900,
+                              letterSpacing: -0.5,
                             ),
-                            child: Text(
-                              '${index! + 1}',
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontSize: 7,
-                                fontWeight: FontWeight.bold,
+                          ),
+                        )
+                      else
+                        Container(
+                          padding: const EdgeInsets.all(AppSpacing.xs),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.flag_rounded, 
+                            color: theme.colorScheme.primary, 
+                            size: 14,
+                          ),
+                        ),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              milestone.name, 
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w900,
+                                fontSize: 15,
+                                letterSpacing: -0.3,
+                                color: theme.colorScheme.onSurface,
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                          ),
-                        ),
-                    ],
-                  ),
-                  const SizedBox(width: AppSpacing.sm),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          milestone.name, 
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.w900,
-                            fontSize: 15,
-                            letterSpacing: -0.3,
-                            color: theme.colorScheme.onSurface,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        if (milestone.projectName != null)
-                          Text(
-                            milestone.projectName!,
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: theme.colorScheme.primary,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 10,
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.sm,),
-                  Text(
-                    '${(milestone.progress * 100).toInt()}%', 
-                    style: TextStyle(
-                      fontSize: 16, 
-                      fontWeight: FontWeight.w900, 
-                      color: theme.colorScheme.primary,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              _buildDeadlineInfo(milestone.dueDate, theme, l10n),
-              const SizedBox(height: 8),
-              SizedBox(
-                height: 34, // Fixed height for 2 lines of description
-                child: Text(
-                  milestone.description, 
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-                    fontSize: 12,
-                  ), 
-                  maxLines: 2, 
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
-          
-          // Bottom Part: Progress Bar and Tasks
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 12),
-              Stack(
-                children: [
-                  Container(
-                    height: 4,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary.withValues(alpha: isDark ? 0.15 : 0.05),
-                      borderRadius: BorderRadius.circular(AppRadius.full),
-                    ),
-                  ),
-                  FractionallySizedBox(
-                    widthFactor: milestone.progress,
-                    child: Container(
-                      height: 4,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [
-                            theme.colorScheme.primary,
-                            theme.colorScheme.primary.withValues(alpha: 0.7),
+                            if (milestone.projectName != null)
+                              Text(
+                                milestone.projectName!,
+                                style: theme.textTheme.labelSmall?.copyWith(
+                                  color: theme.colorScheme.primary,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 10,
+                                ),
+                              ),
                           ],
                         ),
-                        borderRadius: BorderRadius.circular(AppRadius.full),
                       ),
+                      const SizedBox(width: AppSpacing.sm,),
+                      Text(
+                        '${(milestone.progress * 100).toInt()}%', 
+                        style: TextStyle(
+                          fontSize: 16, 
+                          fontWeight: FontWeight.w900, 
+                          color: theme.colorScheme.primary,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  _buildDeadlineInfo(milestone.dueDate, theme, l10n),
+                  const SizedBox(height: 8),
+                  SizedBox(
+                    height: 34, // Fixed height for 2 lines of description
+                    child: Text(
+                      milestone.description, 
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                        fontSize: 12,
+                      ), 
+                      maxLines: 2, 
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 6),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              
+              // Bottom Part: Progress Bar and Tasks
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    l10n.tasksCount('${milestone.completedTasks}/${milestone.totalTasks}'),
-                    style: theme.textTheme.labelSmall?.copyWith(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w800,
-                      color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-                    ),
+                  const SizedBox(height: 12),
+                  Stack(
+                    children: [
+                      Container(
+                        height: 4,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary.withValues(alpha: isDark ? 0.15 : 0.05),
+                          borderRadius: BorderRadius.circular(AppRadius.full),
+                        ),
+                      ),
+                      FractionallySizedBox(
+                        widthFactor: milestone.progress,
+                        child: Container(
+                          height: 4,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                theme.colorScheme.primary,
+                                theme.colorScheme.primary.withValues(alpha: 0.7),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(AppRadius.full),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        l10n.tasksCount('${milestone.completedTasks}/${milestone.totalTasks}'),
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
 
     if (showTimeline) {
-      content = IntrinsicHeight(
+      return IntrinsicHeight(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -238,7 +239,7 @@ class MilestoneCard extends StatelessWidget {
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                child: content,
+                child: card,
               ),
             ),
           ],
@@ -246,11 +247,7 @@ class MilestoneCard extends StatelessWidget {
       );
     }
 
-    return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, '/milestone-details', arguments: milestone),
-      onLongPress: () => _showMenu(context),
-      child: content,
-    );
+    return card;
   }
 
   void _showMenu(BuildContext context) {

@@ -9,6 +9,7 @@ import 'package:orbit/shared/widgets/timeline_indicator.dart';
 import 'package:orbit/shared/widgets/orbit_avatar.dart';
 import 'package:orbit/features/dashboard/presentation/view_models/dashboard_view_model.dart';
 import 'task_menu_sheet.dart';
+import 'package:orbit/l10n/app_localizations.dart';
 
 class TaskCard extends StatelessWidget {
   final Task task;
@@ -32,6 +33,7 @@ class TaskCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
 
     // Use context.select to listen specifically to the assignee's data in the member map.
     // This allows the card to rebuild if the task changes (passed via constructor)
@@ -114,7 +116,7 @@ class TaskCard extends StatelessWidget {
                       imageUrl: assignee.avatarUrl,
                     ),
                   const SizedBox(width: 8),
-                  _buildPriorityBadge(task.priority),
+                  _buildPriorityBadge(task.priority, l10n),
                 ],
               ),
               if (task.dueDate != null || task.subtaskCount > 0) ...[
@@ -252,7 +254,7 @@ class TaskCard extends StatelessWidget {
     return Colors.green;
   }
 
-  Widget _buildPriorityBadge(TaskPriority priority) {
+  Widget _buildPriorityBadge(TaskPriority priority, AppLocalizations l10n) {
     Color color;
     switch (priority) {
       case TaskPriority.low: color = Colors.blue; break;
@@ -266,7 +268,7 @@ class TaskCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.full),
       ),
       child: Text(
-        priority.name.toUpperCase(),
+        priority.getLabel(l10n).toUpperCase(),
         style: TextStyle(
           color: color,
           fontSize: 8,

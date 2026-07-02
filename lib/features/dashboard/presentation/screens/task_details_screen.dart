@@ -80,7 +80,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
           mainAxisSize: MainAxisSize.min,
           children: TaskPriority.values.map((p) => ListTile(
             leading: Icon(Icons.priority_high_rounded, color: _getPriorityColor(p)),
-            title: Text(p.name.toUpperCase()),
+            title: Text(p.getLabel(AppLocalizations.of(context)!)),
             trailing: currentTask.priority == p ? const Icon(Icons.check_circle_rounded, color: Colors.green) : null,
             onTap: () {
               Navigator.pop(context);
@@ -198,9 +198,10 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             padding: const EdgeInsets.all(AppSpacing.md),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
+                const SizedBox(height: AppSpacing.md),
                 Align(
                   alignment: AlignmentDirectional.centerStart,
-                  child: _buildBadge(theme, currentTask.status),
+                  child: _buildBadge(theme, currentTask.status, l10n),
                 ),
                 const SizedBox(height: AppSpacing.md),
                 Text(
@@ -291,7 +292,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     );
   }
 
-  Widget _buildBadge(ThemeData theme, TaskStatus status) {
+  Widget _buildBadge(ThemeData theme, TaskStatus status, AppLocalizations l10n) {
     Color color;
     switch (status) {
       case TaskStatus.todo: color = Colors.grey; break;
@@ -307,7 +308,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
         border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Text(
-        status.name.toUpperCase(),
+        status.getLabel(l10n).toUpperCase(),
         style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 0.5),
       ),
     );
@@ -339,7 +340,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             _buildInfoItem(
               theme, 
               l10n.priority, 
-              task.priority.name.toUpperCase(), 
+              task.priority.getLabel(l10n).toUpperCase(),
               icon: Icons.priority_high_rounded, 
               color: priorityColor,
               onTap: canManage ? () => _showPriorityPicker(task) : null,

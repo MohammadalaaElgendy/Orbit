@@ -564,6 +564,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get task => 'Task';
 
   @override
+  String get statusTodo => 'To Do';
+
+  @override
+  String get statusInProgress => 'In Progress';
+
+  @override
+  String get statusDone => 'Done';
+
+  @override
+  String get priorityLow => 'Low';
+
+  @override
+  String get priorityMedium => 'Medium';
+
+  @override
+  String get priorityHigh => 'High';
+
+  @override
   String taskDeadlineReminderDayOf(Object title) {
     return 'Task Deadline Today: $title';
   }

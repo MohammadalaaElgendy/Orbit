@@ -531,15 +531,36 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
   Widget _buildMilestonesGrid(List<model.Milestone> milestones, ThemeData theme) {
     return LayoutBuilder(
       builder: (context, constraints) {
+        const double minWidth = 300.0;
         const double spacing = AppSpacing.md;
-        const double maxItemWidth = 480.0;
+        
+        int crossAxisCount = (constraints.maxWidth / (minWidth + spacing)).floor();
+        crossAxisCount = crossAxisCount.clamp(1, milestones.length);
+
+        final isGrid = crossAxisCount > 1;
+
+        if (!isGrid) {
+          return ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: milestones.length,
+            itemBuilder: (context, index) {
+              return MilestoneCard(
+                milestone: milestones[index],
+                isFirst: index == 0,
+                isLast: index == milestones.length - 1,
+                showTimeline: true,
+              );
+            },
+          );
+        }
 
         return GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           padding: EdgeInsets.zero,
-          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-            maxCrossAxisExtent: maxItemWidth,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
             mainAxisSpacing: spacing,
             crossAxisSpacing: spacing,
             mainAxisExtent: 185,
