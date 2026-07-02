@@ -156,6 +156,12 @@ class AppTheme {
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),
+      bottomSheetTheme: BottomSheetThemeData(
+        clipBehavior: Clip.antiAlias,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xxl)),
+        ),
+      ),
       textTheme: _textTheme(brightness),
       filledButtonTheme: _filledButtonTheme(brightness),
       inputDecorationTheme: _inputDecorationTheme(brightness),

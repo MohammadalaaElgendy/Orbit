@@ -23,7 +23,7 @@ class Workspace {
     String? id,
     String? name,
     String? description,
-    String? imageUrl,
+    dynamic imageUrl = _undefined,
     String? ownerId,
     String? createdBy,
     DateTime? createdAt,
@@ -33,7 +33,7 @@ class Workspace {
       id: id ?? this.id,
       name: name ?? this.name,
       description: description ?? this.description,
-      imageUrl: imageUrl ?? this.imageUrl,
+      imageUrl: imageUrl == _undefined ? this.imageUrl : imageUrl as String?,
       ownerId: ownerId ?? this.ownerId,
       createdBy: createdBy ?? this.createdBy,
       createdAt: createdAt ?? this.createdAt,
@@ -41,3 +41,5 @@ class Workspace {
     );
   }
 }
+
+const _undefined = Object();

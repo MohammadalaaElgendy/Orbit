@@ -22,7 +22,7 @@ class Project {
     String? workspaceId,
     String? name,
     String? description,
-    String? color,
+    dynamic color = _undefined,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -31,9 +31,11 @@ class Project {
       workspaceId: workspaceId ?? this.workspaceId,
       name: name ?? this.name,
       description: description ?? this.description,
-      color: color ?? this.color,
+      color: color == _undefined ? this.color : color as String?,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
   }
 }
+
+const _undefined = Object();

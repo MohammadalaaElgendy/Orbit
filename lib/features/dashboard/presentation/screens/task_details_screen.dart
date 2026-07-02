@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import '../../../../core/constants/app_constants.dart';
-import '../../../../shared/models/task.dart';
-import '../../../../shared/models/user.dart';
-import '../../../../shared/widgets/glass_card.dart';
-import '../widgets/task_card.dart';
-import '../view_models/task_view_model.dart';
-import '../widgets/task_dialog.dart';
-import '../widgets/task_menu_sheet.dart';
-import '../../../../shared/widgets/smart_image.dart';
-import '../../../../l10n/app_localizations.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' hide User;
+import 'package:orbit/core/constants/app_constants.dart';
+import 'package:orbit/shared/models/task.dart';
+import 'package:orbit/shared/models/user.dart';
+import 'package:orbit/shared/widgets/glass_card.dart';
+import 'package:orbit/features/dashboard/presentation/view_models/dashboard_view_model.dart';
+import 'package:orbit/features/dashboard/presentation/widgets/task_card.dart';
+import 'package:orbit/features/dashboard/presentation/view_models/task_view_model.dart';
+import 'package:orbit/features/dashboard/presentation/widgets/task_dialog.dart';
+import 'package:orbit/features/dashboard/presentation/widgets/task_menu_sheet.dart';
+import 'package:orbit/shared/widgets/smart_image.dart';
+import 'package:orbit/l10n/app_localizations.dart';
+
+import '../../../../shared/widgets/orbit_avatar.dart';
+import '../../../../shared/widgets/glass_bottom_sheet.dart';
 
 class TaskDetailsScreen extends StatefulWidget {
   final Task task;
@@ -33,6 +38,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
   void _showTaskMenu() {
     showModalBottomSheet(
       context: context,
+      backgroundColor: Colors.transparent,
       builder: (_) => TaskMenuSheet(
         task: context.read<TaskViewModel>().currentTask ?? widget.task,
       ),
@@ -65,6 +71,68 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     );
   }
 
+  void _showPriorityPicker(Task currentTask) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => GlassBottomSheet(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: TaskPriority.values.map((p) => ListTile(
+            leading: Icon(Icons.priority_high_rounded, color: _getPriorityColor(p)),
+            title: Text(p.name.toUpperCase()),
+            trailing: currentTask.priority == p ? const Icon(Icons.check_circle_rounded, color: Colors.green) : null,
+            onTap: () {
+              Navigator.pop(context);
+              context.read<TaskViewModel>().updateTask(context, currentTask.copyWith(priority: p));
+            },
+          )).toList(),
+        ),
+      ),
+    );
+  }
+
+  void _showAssigneePicker(Task currentTask, List<User> members) {
+    final l10n = AppLocalizations.of(context)!;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => GlassBottomSheet(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.person_off_rounded),
+              title: Text(l10n.unassigned),
+              trailing: currentTask.assigneeId == null ? const Icon(Icons.check_circle_rounded, color: Colors.green) : null,
+              onTap: () {
+                Navigator.pop(context);
+                context.read<TaskViewModel>().updateTask(context, currentTask.copyWith(assigneeId: null));
+              },
+            ),
+            ...members.map((u) => ListTile(
+              leading: OrbitAvatar(radius: 14, imageUrl: u.avatarUrl),
+              title: Text(u.name),
+              trailing: currentTask.assigneeId == u.id ? const Icon(Icons.check_circle_rounded, color: Colors.green) : null,
+              onTap: () {
+                Navigator.pop(context);
+                context.read<TaskViewModel>().updateTask(context, currentTask.copyWith(assigneeId: u.id));
+              },
+            )),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Color _getPriorityColor(TaskPriority priority) {
+    switch (priority) {
+      case TaskPriority.low: return Colors.blue;
+      case TaskPriority.medium: return Colors.amber;
+      case TaskPriority.high: return Colors.red;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -72,6 +140,25 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     final currentTask = viewModel.currentTask ?? widget.task;
     final subtasks = viewModel.subtasks;
     final l10n = AppLocalizations.of(context)!;
+    
+    // Permission check
+    final currentUserId = Supabase.instance.client.auth.currentUser?.id;
+    
+    // Check if user is Admin or Owner
+    // We use context.select on DashboardViewModel for the owner check and admin check
+    final (isAdminOrOwner, isAssignee) = context.select<DashboardViewModel, (bool, bool)>((dvm) {
+       final workspace = dvm.workspaces.where((w) => w.id == currentTask.workspaceId).firstOrNull;
+       final isOwner = workspace?.ownerId == currentUserId;
+       
+       final members = dvm.workspaceMembersMap[currentTask.workspaceId] ?? [];
+       final currentMember = members.where((u) => u.id == currentUserId).firstOrNull;
+       final isAdmin = currentMember?.role == 'admin' || isOwner;
+       
+       final isAssignee = currentTask.assigneeId == currentUserId;
+       return (isAdmin, isAssignee);
+    });
+
+    final canManage = currentTask.assigneeId == null || isAssignee || isAdminOrOwner;
 
     return Scaffold(
       appBar: AppBar(
@@ -96,10 +183,11 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
           ),
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.more_vert_rounded),
-            onPressed: _showTaskMenu,
-          ),
+          if (canManage)
+            IconButton(
+              icon: const Icon(Icons.more_vert_rounded),
+              onPressed: _showTaskMenu,
+            ),
           const SizedBox(width: AppSpacing.sm),
         ],
       ),
@@ -120,7 +208,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                   style: theme.textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.w900, letterSpacing: -0.5),
                 ),
                 const SizedBox(height: AppSpacing.lg),
-                _buildInfoGrid(theme, currentTask, viewModel.workspaceMembers, l10n),
+                _buildInfoGrid(theme, currentTask, viewModel.workspaceMembers, l10n, canManage),
                 const SizedBox(height: AppSpacing.xl),
 
                 if (currentTask.description.trim().isNotEmpty) ...[
@@ -162,11 +250,12 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(l10n.subtasks, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
-                    IconButton(
-                      icon: const Icon(Icons.add_circle_outline_rounded, size: 20),
-                      onPressed: _showAddSubtaskDialog,
-                      color: theme.colorScheme.primary,
-                    ),
+                    if (canManage)
+                      IconButton(
+                        icon: const Icon(Icons.add_circle_outline_rounded, size: 20),
+                        onPressed: _showAddSubtaskDialog,
+                        color: theme.colorScheme.primary,
+                      ),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.sm),
@@ -224,7 +313,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     );
   }
 
-  Widget _buildInfoGrid(ThemeData theme, Task task, List<User> members, AppLocalizations l10n) {
+  Widget _buildInfoGrid(ThemeData theme, Task task, List<User> members, AppLocalizations l10n, bool canManage) {
     Color priorityColor;
     switch (task.priority) {
       case TaskPriority.low: priorityColor = Colors.blue; break;
@@ -247,9 +336,22 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
       children: [
         Row(
           children: [
-            _buildInfoItem(theme, l10n.priority, task.priority.name.toUpperCase(), icon: Icons.priority_high_rounded, color: priorityColor),
+            _buildInfoItem(
+              theme, 
+              l10n.priority, 
+              task.priority.name.toUpperCase(), 
+              icon: Icons.priority_high_rounded, 
+              color: priorityColor,
+              onTap: canManage ? () => _showPriorityPicker(task) : null,
+            ),
             const SizedBox(width: AppSpacing.md),
-            _buildInfoItem(theme, l10n.assignee, assignee?.name ?? l10n.unassigned, leading: assigneeLeading),
+            _buildInfoItem(
+              theme, 
+              l10n.assignee, 
+              assignee?.name ?? l10n.unassigned, 
+              leading: assigneeLeading,
+              onTap: canManage ? () => _showAssigneePicker(task, members) : null,
+            ),
           ],
         ),
         if (task.dueDate != null) ...[
@@ -272,30 +374,39 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     );
   }
 
-  Widget _buildInfoItem(ThemeData theme, String label, String value, {Widget? leading, IconData? icon, Color? color}) {
+  Widget _buildInfoItem(ThemeData theme, String label, String value, {Widget? leading, IconData? icon, Color? color, VoidCallback? onTap}) {
     return Expanded(
       child: GlassCard(
-        padding: const EdgeInsets.all(AppSpacing.md),
+        padding: EdgeInsets.zero,
         borderRadius: AppRadius.lg,
-        child: Row(
-          children: [
-            leading ?? Icon(icon, size: 16, color: color ?? theme.colorScheme.primary),
-            const SizedBox(width: AppSpacing.sm),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(label, style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
-                  Text(
-                    value, 
-                    style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w800, color: color),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppRadius.lg),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Row(
+              children: [
+                leading ?? Icon(icon, size: 16, color: color ?? theme.colorScheme.primary),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(label, style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                      Text(
+                        value, 
+                        style: theme.textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w800, color: color),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                if (onTap != null)
+                   Icon(Icons.chevron_right_rounded, size: 14, color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

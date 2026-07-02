@@ -126,6 +126,8 @@ class WorkspaceViewModel extends ChangeNotifier {
   }
 
   void loadWorkspace(String id) async {
+    if (_currentWorkspace?.id == id) return;
+
     try {
       _workspaceSub?.cancel();
       _workspaceSub = _workspaceRepository.watchWorkspaceById(id).listen((data) {

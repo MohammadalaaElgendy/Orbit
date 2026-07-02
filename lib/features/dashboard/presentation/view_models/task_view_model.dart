@@ -77,6 +77,7 @@ class TaskViewModel extends ChangeNotifier {
   }
 
   void loadTaskDetails(Task task) async {
+    if (_currentTask?.id == task.id) return;
     _currentTask = task;
     
     _taskSub?.cancel();
@@ -127,6 +128,32 @@ class TaskViewModel extends ChangeNotifier {
     final project = await _projectRepository.getProjectById(milestone.projectId);
     if (project == null) return;
 
+    // Subtask inheritance logic: Inherit assignee from parent if not specified
+    String? finalAssigneeId = assigneeId;
+    if (parentTaskId != null && finalAssigneeId == null) {
+      final parentTask = await _taskRepository.getTaskById(parentTaskId);
+      if (parentTask != null) {
+        finalAssigneeId = parentTask.assigneeId;
+      }
+    }
+
+    // Auto-assign logic for members (only if still unassigned)
+    if (finalAssigneeId == null) {
+      try {
+        List<User> members = _workspaceMembers;
+        if (members.isEmpty) {
+          members = await _workspaceRepository.watchWorkspaceMembers(project.workspaceId).first;
+        }
+        
+        final membership = members.firstWhere((m) => m.id == currentUser.id);
+        if (membership.role != 'admin') {
+          finalAssigneeId = currentUser.id;
+        }
+      } catch (_) {
+        // Fallback if role can't be determined
+      }
+    }
+
     final task = Task(
       id: Uuid().v4(),
       workspaceId: project.workspaceId,
@@ -134,7 +161,7 @@ class TaskViewModel extends ChangeNotifier {
       parentTaskId: parentTaskId,
       title: title,
       description: description,
-      assigneeId: assigneeId,
+      assigneeId: finalAssigneeId,
       createdBy: currentUser.id,
       priority: priority,
       status: status,
@@ -170,6 +197,13 @@ class TaskViewModel extends ChangeNotifier {
       final index = _subtasks.indexWhere((st) => st.id == task.id);
       if (index != -1) {
         _subtasks[index] = task;
+      }
+
+      // Cascade assignee change to all loaded subtasks in memory
+      for (int i = 0; i < _subtasks.length; i++) {
+        if (_subtasks[i].parentTaskId == task.id) {
+          _subtasks[i] = _subtasks[i].copyWith(assigneeId: task.assigneeId);
+        }
       }
 
       notifyListeners();

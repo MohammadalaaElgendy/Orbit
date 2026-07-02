@@ -4,6 +4,7 @@ import '../../../../core/constants/app_constants.dart';
 import '../../../../shared/models/milestone.dart';
 import '../../../../shared/widgets/timeline_indicator.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../milestone/presentation/widgets/milestone_menu_sheet.dart';
 
 class MilestoneCard extends StatelessWidget {
   final Milestone milestone;
@@ -247,7 +248,16 @@ class MilestoneCard extends StatelessWidget {
 
     return GestureDetector(
       onTap: () => Navigator.pushNamed(context, '/milestone-details', arguments: milestone),
+      onLongPress: () => _showMenu(context),
       child: content,
+    );
+  }
+
+  void _showMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (_) => MilestoneMenuSheet(milestone: milestone),
     );
   }
 

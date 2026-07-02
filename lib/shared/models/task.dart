@@ -42,17 +42,17 @@ class Task {
 
   Task copyWith({
     String? id,
-    String? workspaceId, // تم إضافة الحقل هنا
+    String? workspaceId,
     String? milestoneId,
-    String? parentTaskId,
+    dynamic parentTaskId = _undefined,
     String? title,
     String? description,
-    String? assigneeId,
+    dynamic assigneeId = _undefined,
     String? createdBy,
     TaskStatus? status,
     TaskPriority? priority,
-    DateTime? startDate,
-    DateTime? dueDate,
+    dynamic startDate = _undefined,
+    dynamic dueDate = _undefined,
     DateTime? createdAt,
     DateTime? updatedAt,
     List<Task>? subtasks,
@@ -61,17 +61,17 @@ class Task {
   }) {
     return Task(
       id: id ?? this.id,
-      workspaceId: workspaceId ?? this.workspaceId, // تم إضافة الحقل هنا
+      workspaceId: workspaceId ?? this.workspaceId,
       milestoneId: milestoneId ?? this.milestoneId,
-      parentTaskId: parentTaskId ?? this.parentTaskId,
+      parentTaskId: parentTaskId == _undefined ? this.parentTaskId : parentTaskId as String?,
       title: title ?? this.title,
       description: description ?? this.description,
-      assigneeId: assigneeId ?? this.assigneeId,
+      assigneeId: assigneeId == _undefined ? this.assigneeId : assigneeId as String?,
       createdBy: createdBy ?? this.createdBy,
       status: status ?? this.status,
       priority: priority ?? this.priority,
-      startDate: startDate ?? this.startDate,
-      dueDate: dueDate ?? this.dueDate,
+      startDate: startDate == _undefined ? this.startDate : startDate as DateTime?,
+      dueDate: dueDate == _undefined ? this.dueDate : dueDate as DateTime?,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       subtasks: subtasks ?? this.subtasks,
@@ -80,3 +80,5 @@ class Task {
     );
   }
 }
+
+const _undefined = Object();

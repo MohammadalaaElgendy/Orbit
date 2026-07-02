@@ -33,6 +33,7 @@ class _MilestoneDetailsScreenState extends State<MilestoneDetailsScreen> {
   void _showMilestoneMenu() {
     showModalBottomSheet(
       context: context,
+      backgroundColor: Colors.transparent,
       builder: (_) => MilestoneMenuSheet(
         milestone: context.read<MilestoneViewModel>().currentMilestone ?? widget.milestone,
       ),

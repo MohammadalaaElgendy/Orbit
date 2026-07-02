@@ -74,6 +74,8 @@ class MilestoneViewModel extends ChangeNotifier {
   }
 
   void loadMilestoneData(String milestoneId) async {
+    if (_currentMilestone?.id == milestoneId) return;
+
     _taskSub?.cancel();
     _taskSub = _taskRepository.watchRootTasksByMilestone(milestoneId).listen((data) {
       _tasks = data;

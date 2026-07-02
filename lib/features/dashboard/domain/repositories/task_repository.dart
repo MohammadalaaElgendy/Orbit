@@ -89,6 +89,14 @@ class TaskRepository {
       createdAt: Value(task.createdAt.toIso8601String()),
       updatedAt: Value(DateTime.now().toUtc().toIso8601String()),
     ));
+
+    // Cascade assigneeId change to all direct subtasks
+    await (_taskDao.update(_taskDao.tasks)
+          ..where((t) => t.parentTaskId.equals(task.id)))
+        .write(db.TasksCompanion(
+      assigneeId: Value(task.assigneeId),
+      updatedAt: Value(DateTime.now().toUtc().toIso8601String()),
+    ));
   }
 
   Future<void> deleteTask(String id) async {

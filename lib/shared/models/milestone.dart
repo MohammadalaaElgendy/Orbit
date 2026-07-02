@@ -31,13 +31,13 @@ class Milestone {
 
   Milestone copyWith({
     String? id,
-    String? workspaceId, // تم إضافة الحقل هنا
+    String? workspaceId,
     String? projectId,
     String? projectName,
     String? workspaceName,
     String? name,
     String? description,
-    DateTime? dueDate,
+    dynamic dueDate = _undefined,
     double? progress,
     int? totalTasks,
     int? completedTasks,
@@ -46,13 +46,13 @@ class Milestone {
   }) {
     return Milestone(
       id: id ?? this.id,
-      workspaceId: workspaceId ?? this.workspaceId, // تم إضافة الحقل هنا
+      workspaceId: workspaceId ?? this.workspaceId,
       projectId: projectId ?? this.projectId,
       projectName: projectName ?? this.projectName,
       workspaceName: workspaceName ?? this.workspaceName,
       name: name ?? this.name,
       description: description ?? this.description,
-      dueDate: dueDate ?? this.dueDate,
+      dueDate: dueDate == _undefined ? this.dueDate : dueDate as DateTime?,
       progress: progress ?? this.progress,
       totalTasks: totalTasks ?? this.totalTasks,
       completedTasks: completedTasks ?? this.completedTasks,
@@ -61,3 +61,5 @@ class Milestone {
     );
   }
 }
+
+const _undefined = Object();

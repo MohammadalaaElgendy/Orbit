@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:orbit/core/constants/app_constants.dart';
 import 'package:orbit/shared/models/workspace.dart';
-import 'package:orbit/shared/models/user.dart';
 import 'package:orbit/shared/widgets/glass_card.dart';
 import 'package:orbit/shared/widgets/responsive_scaffold.dart';
 import 'package:orbit/features/dashboard/presentation/widgets/dashboard_stats.dart';
@@ -50,10 +49,9 @@ class DashboardScreen extends StatelessWidget {
         ),
         const SliverToBoxAdapter(child: SizedBox(height: AppSpacing.md)),
 
-        Selector<DashboardViewModel, ({List<Workspace> workspaces, Map<String, List<User>> membersMap})>(
-          selector: (_, vm) => (workspaces: vm.workspaces, membersMap: vm.workspaceMembersMap),
-          builder: (context, data, _) {
-            final workspaces = data.workspaces;
+        Selector<DashboardViewModel, List<Workspace>>(
+          selector: (_, vm) => vm.workspaces,
+          builder: (context, workspaces, _) {
             if (workspaces.isEmpty) {
               return SliverToBoxAdapter(
                 child: Center(
@@ -86,12 +84,10 @@ class DashboardScreen extends StatelessWidget {
                         const SizedBox(width: AppSpacing.md),
                         itemBuilder: (context, index) {
                           final ws = workspaces[index];
-                          final members = data.membersMap[ws.id] ?? <User>[];
 
                           return WorkspaceCard(
                             ws: ws,
                             isDark: isDark,
-                            members: members,
                           );
                         },
                       ),
@@ -107,19 +103,16 @@ class DashboardScreen extends StatelessWidget {
                   sliver: SliverGrid.builder(
                     itemCount: workspaces.length,
                     gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                      maxCrossAxisExtent: 350,
-                      mainAxisExtent: 180,
-                      crossAxisSpacing: AppSpacing.md,
+                      maxCrossAxisExtent: 480.0,
                       mainAxisSpacing: AppSpacing.md,
+                      crossAxisSpacing: AppSpacing.md,
+                      mainAxisExtent: 180,
                     ),
                     itemBuilder: (context, index) {
                       final ws = workspaces[index];
-                      final members = data.membersMap[ws.id] ?? <User>[];
-
                       return WorkspaceCard(
                         ws: ws,
                         isDark: isDark,
-                        members: members,
                       );
                     },
                   ),

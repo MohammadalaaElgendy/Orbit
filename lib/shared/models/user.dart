@@ -21,19 +21,21 @@ class User {
     String? id,
     String? name,
     String? email,
-    String? avatarUrl,
+    dynamic avatarUrl = _undefined,
     bool? isVerified,
     String? authProvider,
-    String? role,
+    dynamic role = _undefined,
   }) {
     return User(
       id: id ?? this.id,
       name: name ?? this.name,
       email: email ?? this.email,
-      avatarUrl: avatarUrl ?? this.avatarUrl,
+      avatarUrl: avatarUrl == _undefined ? this.avatarUrl : avatarUrl as String?,
       isVerified: isVerified ?? this.isVerified,
       authProvider: authProvider ?? this.authProvider,
-      role: role ?? this.role,
+      role: role == _undefined ? this.role : role as String?,
     );
   }
 }
+
+const _undefined = Object();

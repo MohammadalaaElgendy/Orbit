@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide User;
 import 'package:orbit/core/constants/app_constants.dart';
 import 'package:orbit/shared/models/workspace.dart';
@@ -6,25 +7,25 @@ import 'package:orbit/shared/models/user.dart';
 import 'package:orbit/features/workspace/presentation/widgets/workspace_menu_sheet.dart';
 import 'package:orbit/shared/widgets/smart_image.dart';
 import 'package:orbit/shared/widgets/orbit_avatar.dart';
+import '../view_models/dashboard_view_model.dart';
 import '../../../../l10n/app_localizations.dart';
 
 class WorkspaceCard extends StatelessWidget {
   final Workspace ws;
   final bool isDark;
   final double? width;
-  final List<User> members;
 
   const WorkspaceCard({
     super.key,
     required this.ws,
     required this.isDark,
     this.width,
-    this.members = const [],
   });
 
   void _showWorkspaceMenu(BuildContext context) {
     showModalBottomSheet(
       context: context,
+      backgroundColor: Colors.transparent,
       builder: (_) => WorkspaceMenuSheet(workspace: ws),
     );
   }
@@ -33,6 +34,11 @@ class WorkspaceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
+
+    // Reactively watch for members of this workspace
+    final members = context.select<DashboardViewModel, List<User>>(
+      (vm) => vm.workspaceMembersMap[ws.id] ?? []
+    );
     
     // Check if current user is admin in this workspace
     bool isAdmin = false;
@@ -49,6 +55,7 @@ class WorkspaceCard extends StatelessWidget {
 
     return GestureDetector(
       onTap: () => Navigator.pushNamed(context, '/workspace-details', arguments: ws),
+      onLongPress: isAdmin ? () => _showWorkspaceMenu(context) : null,
       child: Container(
         width: width ?? 260,
         height: 180, // Explicit height for grid consistency

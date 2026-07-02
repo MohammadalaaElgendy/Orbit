@@ -4,7 +4,6 @@ import '../../../../core/constants/app_constants.dart';
 import '../../../dashboard/presentation/view_models/dashboard_view_model.dart';
 import '../../../dashboard/presentation/widgets/workspace_card.dart';
 import 'package:orbit/shared/widgets/top_padding.dart';
-import '../../../../shared/models/user.dart' as model_user;
 import '../../../../l10n/app_localizations.dart';
 
 class WorkspacesScreen extends StatelessWidget {
@@ -37,8 +36,9 @@ class WorkspacesScreen extends StatelessWidget {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final crossAxisCount = constraints.maxWidth > 1200 ? 3 : (constraints.maxWidth > 800 ? 2 : 1);
-        
+        const double spacing = AppSpacing.md;
+        const double maxItemWidth = 480.0;
+
         return CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
@@ -46,20 +46,18 @@ class WorkspacesScreen extends StatelessWidget {
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
               sliver: SliverGrid(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: crossAxisCount,
-                  crossAxisSpacing: AppSpacing.md,
-                  mainAxisSpacing: AppSpacing.md,
+                gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                  maxCrossAxisExtent: maxItemWidth,
+                  mainAxisSpacing: spacing,
+                  crossAxisSpacing: spacing,
                   mainAxisExtent: 180,
                 ),
                 delegate: SliverChildBuilderDelegate(
                   (context, index) {
                     final ws = workspaces[index];
-                    final List<model_user.User> members = viewModel.workspaceMembersMap[ws.id] ?? [];
                     return WorkspaceCard(
                       ws: ws,
                       isDark: isDark,
-                      members: members,
                     );
                   },
                   childCount: workspaces.length,

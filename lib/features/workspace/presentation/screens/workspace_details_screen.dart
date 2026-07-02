@@ -103,6 +103,7 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
   void _showWorkspaceMenu() {
     showModalBottomSheet(
       context: context,
+      backgroundColor: Colors.transparent,
       builder: (_) => WorkspaceMenuSheet(
         workspace: widget.workspace,
         onDelete: () => Navigator.pop(context),
@@ -468,33 +469,29 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
   Widget _buildProjectsGrid(List<Project> projects, ThemeData theme) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        const double minWidth = 160.0;
-        const double maxWidth = 240.0; // Added max width constraint
         const double spacing = AppSpacing.md;
-        
-        int crossAxisCount = (constraints.maxWidth / (minWidth + spacing)).floor();
-        crossAxisCount = crossAxisCount.clamp(1, projects.isNotEmpty ? projects.length : 1);
-        
-        double itemWidth = (constraints.maxWidth - (spacing * (crossAxisCount - 1))) / crossAxisCount;
-        
-        // Ensure the width doesn't exceed maxWidth
-        if (itemWidth > maxWidth) {
-          itemWidth = maxWidth;
-        }
+        const double maxItemWidth = 480.0;
 
-        return Wrap(
-          spacing: spacing,
-          runSpacing: spacing,
-          alignment: WrapAlignment.start,
-          children: projects.map((project) {
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          padding: EdgeInsets.zero,
+          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: maxItemWidth,
+            mainAxisSpacing: spacing,
+            crossAxisSpacing: spacing,
+            mainAxisExtent: 140,
+          ),
+          itemCount: projects.length,
+          itemBuilder: (context, index) {
+            final project = projects[index];
             final isSelected = selectedProjectId == project.id;
             return ProjectCard(
               project: project,
               isSelected: isSelected,
               onTap: () => _onProjectSelected(isSelected ? null : project.id),
-              width: itemWidth,
             );
-          }).toList(),
+          },
         );
       },
     );
@@ -534,41 +531,18 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
   Widget _buildMilestonesGrid(List<model.Milestone> milestones, ThemeData theme) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        const double minWidth = 300.0;
         const double spacing = AppSpacing.md;
-        
-        int crossAxisCount = (constraints.maxWidth / (minWidth + spacing)).floor();
-        crossAxisCount = crossAxisCount.clamp(1, milestones.isNotEmpty ? milestones.length : 1);
-        
-        final isGrid = crossAxisCount > 1;
-
-        if (!isGrid) {
-          return ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            padding: EdgeInsets.zero,
-            itemCount: milestones.length,
-            itemBuilder: (context, index) {
-              return MilestoneCard(
-                milestone: milestones[index],
-                isFirst: index == 0,
-                isLast: index == milestones.length - 1,
-                showTimeline: true,
-                index: index,
-              );
-            },
-          );
-        }
+        const double maxItemWidth = 480.0;
 
         return GridView.builder(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           padding: EdgeInsets.zero,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: crossAxisCount,
-            crossAxisSpacing: spacing,
+          gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+            maxCrossAxisExtent: maxItemWidth,
             mainAxisSpacing: spacing,
-            mainAxisExtent: 185, // Standardized height for perfect alignment
+            crossAxisSpacing: spacing,
+            mainAxisExtent: 185,
           ),
           itemCount: milestones.length,
           itemBuilder: (context, index) {
