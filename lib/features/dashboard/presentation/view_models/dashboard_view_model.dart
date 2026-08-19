@@ -51,6 +51,7 @@ class DashboardViewModel extends ChangeNotifier {
   StreamSubscription? _workspaceSub;
   StreamSubscription? _milestoneSub;
   StreamSubscription? _taskSub;
+  final Map<String, StreamSubscription> _memberSubscriptions = {};
   
   DashboardViewModel({
     required WorkspaceRepository workspaceRepository,
@@ -65,17 +66,17 @@ class DashboardViewModel extends ChangeNotifier {
   }
 
   void _listenToAuthChanges() {
-    // إعادة التهيئة عند تغيير المستخدم
+    // إعادة التهيئة فقط إذا تغير المستخدم فعلياً
     Supabase.instance.client.auth.onAuthStateChange.listen((data) {
-      if (data.session != null) {
-        _init();
+      final newUser = data.session?.user;
+      if (newUser != null) {
+        // لا تمسح البيانات إذا كان نفس المستخدم (تجديد توكن مثلاً)
+        _init(isNewUser: newUser.id != _authRepository.currentUser?.id);
       } else {
         _clearData();
       }
     });
   }
-
-  final Map<String, StreamSubscription> _memberSubscriptions = {};
 
   void _clearData() {
     _workspaceSub?.cancel();
@@ -95,17 +96,33 @@ class DashboardViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _init() {
-    _clearData(); 
+  void _init({bool isNewUser = true}) {
+    if (isNewUser) {
+      _clearData(); 
+    }
 
     final currentUser = _authRepository.currentUser;
     if (currentUser == null) return;
 
+    // إلغاء الاشتراكات القديمة قبل البدء بجديد لضمان عدم التكرار
+    _workspaceSub?.cancel();
+    _milestoneSub?.cancel();
+    _taskSub?.cancel();
+
     // Watch Workspaces
     _workspaceSub = _workspaceRepository.watchWorkspacesForUser(currentUser.id).listen((data) {
       _workspaces = data;
-      
-      // Sync member subscriptions: Remove stale, add new
+      // ... باقي الكود كما هو
+      _updateMemberSubscriptions(data);
+      notifyListeners();
+    }, onError: (e) => debugPrint('DashboardViewModel: Workspace Stream Error: $e'));
+
+    // ... التحميل لباقي الـ Streams بنفس الطريقة
+    _initMilestones();
+    _initTasks();
+  }
+
+  void _updateMemberSubscriptions(List<Workspace> data) {
       final currentWsIds = data.map((ws) => ws.id).toSet();
       _memberSubscriptions.keys.where((id) => !currentWsIds.contains(id)).toList().forEach((id) {
         _memberSubscriptions[id]?.cancel();
@@ -121,47 +138,42 @@ class DashboardViewModel extends ChangeNotifier {
           });
         }
       }
-      notifyListeners();
-    });
+  }
 
-    // Watch ALL Milestones - Ensure this is robust
+  void _initMilestones() {
     _milestoneSub = _milestoneRepository.watchAllMilestones().listen((data) {
       _allMilestones = data;
-      
-      // Priority Milestones = Active milestones (progress < 100%) sorted by nearest deadline
       final activeMilestones = data.where((m) => m.progress < 1.0).toList();
       activeMilestones.sort((a, b) {
         if (a.dueDate == null && b.dueDate == null) return 0;
-        if (a.dueDate == null) return 1; // الأهداف بدون تاريخ تأتي في الآخر
-        if (b.dueDate == null) return -1; // الأهداف التي لها تاريخ تسبق التي ليس لها تاريخ
-        return a.dueDate!.compareTo(b.dueDate!); // الأقرب موعداً أولاً
+        if (a.dueDate == null) return 1;
+        if (b.dueDate == null) return -1;
+        return a.dueDate!.compareTo(b.dueDate!);
       });
-
       _recentMilestones = activeMilestones.take(5).toList();
       _totalMilestones = data.length;
       _completedMilestones = data.where((m) => m.progress >= 1.0).length;
-      
       final active = data.where((m) => m.progress < 1.0).toList();
       active.sort((a, b) => b.progress.compareTo(a.progress));
       _topMilestones = active.take(3).toList();
-      
       notifyListeners();
-    });
+    }, onError: (e) => debugPrint('DashboardViewModel: Milestone Stream Error: $e'));
+  }
 
+  void _initTasks() {
     _taskSub = _taskRepository.watchAllTasks().listen((data) {
       _allTasks = data;
       _recentTasks = data.take(5).toList();
-      
       if (data.isEmpty) {
         _overallProgress = 0.0;
       } else {
         final completed = data.where((t) => t.status == TaskStatus.done).length;
         _overallProgress = completed / data.length;
       }
-      
       notifyListeners();
-    });
+    }, onError: (e) => debugPrint('DashboardViewModel: Task Stream Error: $e'));
   }
+
 
   Future<void> createWorkspace(String name, String description, String? imageUrl, List<String> memberIds) async {
     final currentUser = _authRepository.currentUser;

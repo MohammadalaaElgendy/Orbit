@@ -39,7 +39,7 @@ class SupabaseConnector extends PowerSyncBackendConnector {
       _lastReturnedToken = session.accessToken;
 
       return PowerSyncCredentials(
-        endpoint: 'https://6a10976463989ab5d2f1e091.powersync.journeyapps.com',
+        endpoint: 'https://6a10976463989ab5d2f1e08f.powersync.journeyapps.com',
         token: session.accessToken,
         userId: session.user.id,
         expiresAt: DateTime.now().add(const Duration(minutes: 50)),

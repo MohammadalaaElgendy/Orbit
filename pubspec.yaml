@@ -2,7 +2,7 @@ name: orbit
 description: "Orbit is a cross-platform productivity and project management app built to organize workspaces, projects, milestones, and tasks in a simple and structured way.  It supports multiple workspaces, team collaboration, task assignment, deadlines, and nested subtasks for better workflow management.  Built with an offline-first architecture using Drift, Supabase, and PowerSync, Orbit ensures fast performance, reliable offline access, and seamless synchronization across devices.  Available on mobile and desktop with both light and dark themes."
 publish_to: 'none'
 
-version: 1.0.5+2
+version: 1.0.6+3
 
 environment:
   sdk: ^3.11.5
@@ -40,6 +40,7 @@ dependencies:
   timezone: 0.9.4
   shared_preferences: ^2.5.5
   cached_network_image: ^3.4.1
+  logging: ^1.2.0
 
 dev_dependencies:
   flutter_test:

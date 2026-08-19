@@ -25,6 +25,11 @@ class SyncService {
     await db.initialize();
     _isInitialized = true;
 
+    // مراقبة حالة المزامنة لمعرفة سبب عدم ظهور البيانات
+    db.statusStream.listen((status) {
+      debugPrint('Orbit PowerSync: Connected: ${status.connected}, Last Synced: ${status.lastSyncedAt}, Error: ${status.downloadError}');
+    });
+
     // Connect automatically if session exists
     final currentSession = Supabase.instance.client.auth.currentSession;
     if (currentSession != null) {
@@ -66,7 +71,7 @@ class SyncService {
 
         // 3. تحديث السيرفر (Supabase) لضمان وصولها للكل
         await supabase.from('workspaces').update({'image_url': publicUrl}).eq('id', id);
-        
+
         debugPrint('Orbit Sync: Successfully recovered image for $id');
       }
     } catch (e) {

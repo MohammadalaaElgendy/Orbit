@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:protocol_handler/protocol_handler.dart';
@@ -44,6 +45,12 @@ import 'l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // ضبط مستوى السجلات لكتم الضجيج غير الضروري من PowerSync
+  Logger.root.level = Level.WARNING;
+  Logger.root.onRecord.listen((record) {
+    debugPrint('${record.level.name}: ${record.time}: ${record.message}');
+  });
   
   final prefs = await SharedPreferences.getInstance();
   final settingsService = SettingsService(prefs);
@@ -67,6 +74,15 @@ void main() async {
 
   final syncService = SyncService();
   await syncService.initialize();
+
+  // ─── مراقبة حالة الدخول عالمياً لربط المزامنة فوراً ──────────────────────
+  Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+    if (data.session != null) {
+      syncService.connect();
+    } else {
+      syncService.disconnect();
+    }
+  });
 
   await NotificationService().init();
 
@@ -120,13 +136,31 @@ class OrbitApp extends StatefulWidget {
   State<OrbitApp> createState() => _OrbitAppState();
 }
 
-class _OrbitAppState extends State<OrbitApp> {
+class _OrbitAppState extends State<OrbitApp> with WidgetsBindingObserver {
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _listenToNotifications();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // حل مشكلة اختفاء البيانات عند العودة من السكون
+    if (state == AppLifecycleState.resumed) {
+      debugPrint('Orbit: App resumed, re-activating database connection...');
+      // فصل ثم وصل لضمان إعادة تنشيط الـ Isolate والقاعدة المحلية
+      widget.syncService.disconnect();
+      widget.syncService.connect();
+    }
   }
 
   void _listenToNotifications() {
