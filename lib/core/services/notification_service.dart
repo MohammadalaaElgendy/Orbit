@@ -57,7 +57,7 @@ class NotificationService {
         }
       }
     } catch (e) {
-      debugPrint('Error getting notification launch details: $e');
+      if (kDebugMode) debugPrint('Error getting notification launch details: $e');
     }
 
     // طلب إذن الإشعارات للأندرويد 13+
@@ -69,7 +69,7 @@ class NotificationService {
         await _notifications.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
             ?.requestExactAlarmsPermission();
       } catch (e) {
-        debugPrint('Error requesting Android permissions: $e');
+        if (kDebugMode) debugPrint('Error requesting Android permissions: $e');
       }
     }
   }
@@ -85,7 +85,7 @@ class NotificationService {
   }) async {
     // Windows/Web placeholder
     if (kIsWeb || (!kIsWeb && (Platform.isWindows || Platform.isLinux))) {
-      debugPrint('Notifications not fully supported on this platform yet.');
+      if (kDebugMode) debugPrint('Notifications not fully supported on this platform yet.');
       return;
     }
 

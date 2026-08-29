@@ -7,6 +7,9 @@ part 'workspace_dao.g.dart';
 class WorkspaceDao extends DatabaseAccessor<AppDatabase> with _$WorkspaceDaoMixin {
   WorkspaceDao(super.db);
 
+  // الحصول على نسخة الجدول الفعلية من قاعدة البيانات
+  Users get usersTable => attachedDatabase.users;
+
   Future<int> create(WorkspacesCompanion workspace) => into(workspaces).insert(workspace, mode: InsertMode.insertOrReplace);
 
   Future<bool> updateEntry(WorkspacesCompanion workspace) async {
@@ -30,12 +33,23 @@ class WorkspaceDao extends DatabaseAccessor<AppDatabase> with _$WorkspaceDaoMixi
 
   /// Get all workspaces where the user is a member (Many-to-Many)
   Stream<List<Workspace>> watchWorkspacesForUser(String userId) {
+    // استعلام مباشر: أي مساحة أنا صاحبها أو أنا عضو فيها
     final query = select(workspaces).join([
-      innerJoin(workspaceMembers, workspaceMembers.workspaceId.equalsExp(workspaces.id)),
+      leftOuterJoin(workspaceMembers, workspaceMembers.workspaceId.equalsExp(workspaces.id)),
     ])
-      ..where(workspaceMembers.userId.equals(userId));
+      ..where(workspaces.ownerId.equals(userId) | workspaceMembers.userId.equals(userId));
 
-    return query.watch().map((rows) => rows.map((row) => row.readTable(workspaces)).toList());
+    return query.watch().map((rows) {
+      final List<Workspace> list = [];
+      final Set<String> seenIds = {};
+      for (final row in rows) {
+        final ws = row.readTable(workspaces);
+        if (seenIds.add(ws.id)) {
+          list.add(ws);
+        }
+      }
+      return list;
+    });
   }
 
   /// Check if a user is an admin in a workspace
@@ -89,6 +103,16 @@ class WorkspaceDao extends DatabaseAccessor<AppDatabase> with _$WorkspaceDaoMixi
     final currentUserId = attachedDatabase.userId;
     if (currentUserId == null) return 0;
 
+    // التحقق من وجود أعضاء سابقين
+    final existingMembers = await (select(workspaceMembers)
+          ..where((t) => t.workspaceId.equals(member.workspaceId.value)))
+        .get();
+
+    // السماح بالإضافة إذا كانت المساحة خالية (عند الإنشاء) أو إذا كان المستخدم أدمن
+    if (existingMembers.isEmpty) {
+      return into(workspaceMembers).insert(member);
+    }
+
     final isAdmin = await isUserAdmin(currentUserId, member.workspaceId.value);
     if (!isAdmin) {
       throw Exception('Security Error: Only admins can add members');
@@ -100,11 +124,21 @@ class WorkspaceDao extends DatabaseAccessor<AppDatabase> with _$WorkspaceDaoMixi
     return (select(workspaceMembers)..where((t) => t.workspaceId.equals(workspaceId))).watch();
   }
 
-  Stream<List<TypedResult>> watchMembersWithUsers(String workspaceId) {
-    return (select(workspaceMembers)..where((t) => t.workspaceId.equals(workspaceId)))
-        .join([
-          innerJoin(users, users.id.equalsExp(workspaceMembers.userId)),
-        ])
-        .watch();
+  // دالة جديدة تقوم بالربط والتحويل داخل الـ DAO لتجنب مشاكل الأنواع
+  Stream<List<({WorkspaceMember member, User? user})>> watchMembersWithUsers(String workspaceId) {
+    final query = select(workspaceMembers).join([
+      leftOuterJoin(attachedDatabase.users, attachedDatabase.users.id.equalsExp(workspaceMembers.userId)),
+    ]);
+    
+    query.where(workspaceMembers.workspaceId.equals(workspaceId));
+
+    return query.watch().map((rows) {
+      return rows.map((row) {
+        return (
+          member: row.readTable(workspaceMembers),
+          user: row.readTableOrNull(attachedDatabase.users),
+        );
+      }).toList();
+    });
   }
 }

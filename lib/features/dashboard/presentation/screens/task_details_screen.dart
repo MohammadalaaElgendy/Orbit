@@ -58,6 +58,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
           viewModel.createTask(
             context: context,
             milestoneId: currentTask.milestoneId,
+            workspaceId: currentTask.workspaceId, // تمرير معرف مساحة العمل
             parentTaskId: currentTask.id,
             title: title,
             description: description,

@@ -190,12 +190,18 @@ class DashboardViewModel extends ChangeNotifier {
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );
-    await _workspaceRepository.createWorkspace(workspace);
     
-    for (final userId in memberIds) {
-      if (userId != currentUser.id) {
-        await _workspaceRepository.addMemberToWorkspace(workspaceId, userId, 'member');
+    try {
+      await _workspaceRepository.createWorkspace(workspace);
+      
+      for (final userId in memberIds) {
+        if (userId != currentUser.id) {
+          await _workspaceRepository.addMemberToWorkspace(workspaceId, userId, 'member');
+        }
       }
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error creating workspace in DashboardViewModel: $e');
     }
   }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide User;
+import '../../../../shared/view_models/base_view_model.dart';
 import '../../../../shared/models/task.dart';
 import '../../../../shared/models/milestone.dart';
 import '../../../../shared/models/user.dart';
@@ -12,7 +13,7 @@ import 'package:uuid/uuid.dart';
 import '../../../../core/services/notification_service.dart';
 import '../../../../l10n/app_localizations.dart';
 
-class MilestoneViewModel extends ChangeNotifier {
+class MilestoneViewModel extends BaseViewModel {
   final MilestoneRepository _milestoneRepository;
   final ProjectRepository _projectRepository;
   final WorkspaceRepository _workspaceRepository;
@@ -33,15 +34,11 @@ class MilestoneViewModel extends ChangeNotifier {
     
     try {
       final membership = _workspaceMembers.firstWhere((m) => m.id == currentUserId);
-      return membership.role == 'admin';
+      return membership.isAdmin;
     } catch (_) {
       return false;
     }
   }
-
-  StreamSubscription? _taskSub;
-  StreamSubscription? _memberSub;
-  StreamSubscription? _milestoneSub;
 
   MilestoneViewModel({
     required MilestoneRepository milestoneRepository,
@@ -51,52 +48,39 @@ class MilestoneViewModel extends ChangeNotifier {
   })  : _milestoneRepository = milestoneRepository,
         _projectRepository = projectRepository,
         _workspaceRepository = workspaceRepository,
-        _taskRepository = taskRepository {
-    _listenToAuthChanges();
-  }
+        _taskRepository = taskRepository;
 
-  void _listenToAuthChanges() {
-    Supabase.instance.client.auth.onAuthStateChange.listen((data) {
-      if (data.session == null) {
-        _clearData();
-      }
-    });
-  }
-
-  void _clearData() {
-    _taskSub?.cancel();
-    _memberSub?.cancel();
-    _milestoneSub?.cancel();
+  @override
+  void onLoggedOut() {
     _tasks = [];
     _currentMilestone = null;
     _workspaceMembers = [];
-    notifyListeners();
+    super.onLoggedOut();
   }
 
   void loadMilestoneData(String milestoneId) async {
     if (_currentMilestone?.id == milestoneId) return;
 
-    _taskSub?.cancel();
-    _taskSub = _taskRepository.watchRootTasksByMilestone(milestoneId).listen((data) {
+    clearSubscriptions();
+
+    addSubscription(_taskRepository.watchRootTasksByMilestone(milestoneId).listen((data) {
       _tasks = data;
       notifyListeners();
-    });
+    }));
 
-    _milestoneSub?.cancel();
-    _milestoneSub = _milestoneRepository.watchMilestoneById(milestoneId).listen((data) {
+    addSubscription(_milestoneRepository.watchMilestoneById(milestoneId).listen((data) {
       _currentMilestone = data;
       notifyListeners();
-    });
+    }));
 
     final milestone = await _milestoneRepository.getMilestoneById(milestoneId);
     if (milestone != null) {
       final project = await _projectRepository.getProjectById(milestone.projectId);
       if (project != null) {
-        _memberSub?.cancel();
-        _memberSub = _workspaceRepository.watchWorkspaceMembers(project.workspaceId).listen((data) {
+        addSubscription(_workspaceRepository.watchWorkspaceMembers(project.workspaceId).listen((data) {
           _workspaceMembers = data;
           notifyListeners();
-        });
+        }));
       }
     }
   }
@@ -105,13 +89,21 @@ class MilestoneViewModel extends ChangeNotifier {
     return _milestoneRepository.watchMilestonesByProject(projectId);
   }
 
-  Future<void> createMilestone(BuildContext context, String projectId, String name, String description, DateTime? dueDate) async {
-    final project = await _projectRepository.getProjectById(projectId);
-    if (project == null) return;
+  Future<void> createMilestone(BuildContext context, String projectId, String name, String description, DateTime? dueDate, {String? workspaceId}) async {
+    String? finalWorkspaceId = workspaceId;
+
+    if (finalWorkspaceId == null) {
+      final project = await _projectRepository.getProjectById(projectId);
+      if (project == null) {
+        debugPrint('MilestoneViewModel: Cannot create milestone because project $projectId was not found locally.');
+        return;
+      }
+      finalWorkspaceId = project.workspaceId;
+    }
 
     final milestone = Milestone(
       id: Uuid().v4(),
-      workspaceId: project.workspaceId,
+      workspaceId: finalWorkspaceId,
       projectId: projectId,
       name: name,
       description: description,
@@ -119,17 +111,23 @@ class MilestoneViewModel extends ChangeNotifier {
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );
-    await _milestoneRepository.createMilestone(milestone, project.workspaceId);
+    
+    try {
+      await _milestoneRepository.createMilestone(milestone, finalWorkspaceId);
+      notifyListeners();
 
-    if (dueDate != null && context.mounted) {
-      final l10n = AppLocalizations.of(context)!;
-      await NotificationService().scheduleDeadlineReminders(
-        id: milestone.id,
-        title: name,
-        dayOfBody: l10n.milestoneDeadlineReminderDayOf(name),
-        dayBeforeBody: l10n.milestoneDeadlineReminderDayBefore(name),
-        deadline: dueDate,
-      );
+      if (dueDate != null && context.mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        await NotificationService().scheduleDeadlineReminders(
+          id: milestone.id,
+          title: name,
+          dayOfBody: l10n.milestoneDeadlineReminderDayOf(name),
+          dayBeforeBody: l10n.milestoneDeadlineReminderDayBefore(name),
+          deadline: dueDate,
+        );
+      }
+    } catch (e) {
+      debugPrint('Error creating milestone: $e');
     }
   }
 
@@ -163,13 +161,5 @@ class MilestoneViewModel extends ChangeNotifier {
 
   Future<void> deleteMilestone(String id) async {
     await _milestoneRepository.deleteMilestone(id);
-  }
-
-  @override
-  void dispose() {
-    _taskSub?.cancel();
-    _memberSub?.cancel();
-    _milestoneSub?.cancel();
-    super.dispose();
   }
 }

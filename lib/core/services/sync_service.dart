@@ -25,17 +25,10 @@ class SyncService {
     await db.initialize();
     _isInitialized = true;
 
-    // مراقبة حالة المزامنة لمعرفة سبب عدم ظهور البيانات
-    db.statusStream.listen((status) {
-      debugPrint('Orbit PowerSync: Connected: ${status.connected}, Last Synced: ${status.lastSyncedAt}, Error: ${status.downloadError}');
-    });
-
     // Connect automatically if session exists
     final currentSession = Supabase.instance.client.auth.currentSession;
     if (currentSession != null) {
       connect();
-      // محاولة إصلاح الصور العالقة عند التشغيل
-      reconcilePendingImages();
     }
   }
 
@@ -57,7 +50,7 @@ class SyncService {
 
         if (!file.existsSync()) continue;
 
-        debugPrint('Orbit Sync: Recovering stuck image for workspace $id');
+        if (kDebugMode) debugPrint('Orbit Sync: Recovering stuck image for workspace $id');
 
         final String fileName = '${id}_recovered_${DateTime.now().millisecondsSinceEpoch}${extension(localPath)}';
         final String storagePath = 'workspace_images/$fileName';
@@ -72,10 +65,10 @@ class SyncService {
         // 3. تحديث السيرفر (Supabase) لضمان وصولها للكل
         await supabase.from('workspaces').update({'image_url': publicUrl}).eq('id', id);
 
-        debugPrint('Orbit Sync: Successfully recovered image for $id');
+        if (kDebugMode) debugPrint('Orbit Sync: Successfully recovered image for $id');
       }
     } catch (e) {
-      debugPrint('Orbit Sync Error during recovery: $e');
+      if (kDebugMode) debugPrint('Orbit Sync Error during recovery: $e');
     }
   }
 

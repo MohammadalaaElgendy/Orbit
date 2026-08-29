@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' hide User;
 import '../../../../core/services/notification_service.dart';
+import '../../../../shared/view_models/base_view_model.dart';
 import '../../../../shared/models/task.dart';
 import '../../../../shared/models/user.dart';
 import '../../domain/repositories/task_repository.dart';
@@ -12,7 +13,7 @@ import 'dart:async';
 import 'package:uuid/uuid.dart';
 import '../../../../l10n/app_localizations.dart';
 
-class TaskViewModel extends ChangeNotifier {
+class TaskViewModel extends BaseViewModel {
   final TaskRepository _taskRepository;
   final MilestoneRepository _milestoneRepository;
   final ProjectRepository _projectRepository;
@@ -34,15 +35,11 @@ class TaskViewModel extends ChangeNotifier {
     
     try {
       final membership = _workspaceMembers.firstWhere((m) => m.id == currentUserId);
-      return membership.role == 'admin';
+      return membership.isAdmin;
     } catch (_) {
       return false;
     }
   }
-
-  StreamSubscription? _taskSub;
-  StreamSubscription? _subtaskSub;
-  StreamSubscription? _memberSub;
 
   TaskViewModel({
     required TaskRepository taskRepository,
@@ -54,55 +51,42 @@ class TaskViewModel extends ChangeNotifier {
         _milestoneRepository = milestoneRepository,
         _projectRepository = projectRepository,
         _workspaceRepository = workspaceRepository,
-        _authRepository = authRepository {
-    _listenToAuthChanges();
-  }
+        _authRepository = authRepository;
 
-  void _listenToAuthChanges() {
-    Supabase.instance.client.auth.onAuthStateChange.listen((data) {
-      if (data.session == null) {
-        _clearData();
-      }
-    });
-  }
-
-  void _clearData() {
-    _taskSub?.cancel();
-    _subtaskSub?.cancel();
-    _memberSub?.cancel();
+  @override
+  void onLoggedOut() {
     _currentTask = null;
     _subtasks = [];
     _workspaceMembers = [];
-    notifyListeners();
+    super.onLoggedOut();
   }
 
   void loadTaskDetails(Task task) async {
     if (_currentTask?.id == task.id) return;
     _currentTask = task;
     
-    _taskSub?.cancel();
-    _taskSub = _taskRepository.watchTaskById(task.id).listen((data) {
+    clearSubscriptions(); // Clears previous task/member subs
+    
+    addSubscription(_taskRepository.watchTaskById(task.id).listen((data) {
       if (data != null) {
         _currentTask = data;
         notifyListeners();
       }
-    });
+    }));
 
-    _subtaskSub?.cancel();
-    _subtaskSub = _taskRepository.watchSubtasks(task.id).listen((data) {
+    addSubscription(_taskRepository.watchSubtasks(task.id).listen((data) {
       _subtasks = data;
       notifyListeners();
-    });
+    }));
 
     final milestone = await _milestoneRepository.getMilestoneById(task.milestoneId);
     if (milestone != null) {
       final project = await _projectRepository.getProjectById(milestone.projectId);
       if (project != null) {
-        _memberSub?.cancel();
-        _memberSub = _workspaceRepository.watchWorkspaceMembers(project.workspaceId).listen((data) {
+        addSubscription(_workspaceRepository.watchWorkspaceMembers(project.workspaceId).listen((data) {
           _workspaceMembers = data;
           notifyListeners();
-        });
+        }));
       }
     }
     notifyListeners();
@@ -111,6 +95,7 @@ class TaskViewModel extends ChangeNotifier {
   Future<void> createTask({
     required BuildContext context,
     required String milestoneId,
+    String? workspaceId, // أضفنا هذا لزيادة الثبات
     String? parentTaskId,
     required String title,
     required String description,
@@ -122,11 +107,17 @@ class TaskViewModel extends ChangeNotifier {
     final currentUser = _authRepository.currentUser;
     if (currentUser == null) return;
 
-    final milestone = await _milestoneRepository.getMilestoneById(milestoneId);
-    if (milestone == null) return;
+    String? finalWorkspaceId = workspaceId;
 
-    final project = await _projectRepository.getProjectById(milestone.projectId);
-    if (project == null) return;
+    // إذا لم يتم توفير معرف مساحة العمل، نحاول جلبه من الداتابيز
+    if (finalWorkspaceId == null) {
+      final milestone = await _milestoneRepository.getMilestoneById(milestoneId);
+      if (milestone == null) {
+        debugPrint('TaskViewModel: Cannot create task because milestone $milestoneId was not found locally.');
+        return;
+      }
+      finalWorkspaceId = milestone.workspaceId;
+    }
 
     // Subtask inheritance logic: Inherit assignee from parent if not specified
     String? finalAssigneeId = assigneeId;
@@ -142,7 +133,7 @@ class TaskViewModel extends ChangeNotifier {
       try {
         List<User> members = _workspaceMembers;
         if (members.isEmpty) {
-          members = await _workspaceRepository.watchWorkspaceMembers(project.workspaceId).first;
+          members = await _workspaceRepository.watchWorkspaceMembers(finalWorkspaceId).first;
         }
         
         final membership = members.firstWhere((m) => m.id == currentUser.id);
@@ -156,7 +147,7 @@ class TaskViewModel extends ChangeNotifier {
 
     final task = Task(
       id: Uuid().v4(),
-      workspaceId: project.workspaceId,
+      workspaceId: finalWorkspaceId,
       milestoneId: milestoneId,
       parentTaskId: parentTaskId,
       title: title,
@@ -169,17 +160,23 @@ class TaskViewModel extends ChangeNotifier {
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );
-    await _taskRepository.createTask(task, project.workspaceId);
+    
+    try {
+      await _taskRepository.createTask(task, finalWorkspaceId);
+      notifyListeners();
 
-    if (dueDate != null && context.mounted) {
-      final l10n = AppLocalizations.of(context)!;
-      await NotificationService().scheduleDeadlineReminders(
-        id: task.id,
-        title: title,
-        dayOfBody: l10n.taskDeadlineReminderDayOf(title),
-        dayBeforeBody: l10n.taskDeadlineReminderDayBefore(title),
-        deadline: dueDate,
-      );
+      if (dueDate != null && context.mounted) {
+        final l10n = AppLocalizations.of(context)!;
+        await NotificationService().scheduleDeadlineReminders(
+          id: task.id,
+          title: title,
+          dayOfBody: l10n.taskDeadlineReminderDayOf(title),
+          dayBeforeBody: l10n.taskDeadlineReminderDayBefore(title),
+          deadline: dueDate,
+        );
+      }
+    } catch (e) {
+      debugPrint('Error creating task: $e');
     }
   }
 
@@ -228,13 +225,5 @@ class TaskViewModel extends ChangeNotifier {
 
   Future<void> deleteTask(String id) async {
     await _taskRepository.deleteTask(id);
-  }
-
-  @override
-  void dispose() {
-    _taskSub?.cancel();
-    _subtaskSub?.cancel();
-    _memberSub?.cancel();
-    super.dispose();
   }
 }

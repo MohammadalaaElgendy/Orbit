@@ -26,14 +26,17 @@ class SmartImage extends StatelessWidget {
         height: height,
       );
     } else if (imageUrl.startsWith('http')) {
-      // استخدام الكاش للروابط الويب لضمان وجود الصورة أوفلاين بعد أول تحميل
       return CachedNetworkImage(
         imageUrl: imageUrl,
         fit: fit,
         width: width,
         height: height,
+        memCacheWidth: width != null ? (width! * 2).toInt() : null, // تحسين الكاش
         placeholder: (context, url) => _buildLoadingPlaceholder(),
-        errorWidget: (context, url, error) => _buildPlaceholder(),
+        errorWidget: (context, url, error) {
+          debugPrint('SmartImage: Error loading URL: $url | Error: $error');
+          return _buildPlaceholder();
+        },
       );
     } else {
       // التعامل مع المسارات المحلية (التي يتم إنشاؤها أوفلاين)

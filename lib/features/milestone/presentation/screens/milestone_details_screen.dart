@@ -42,15 +42,18 @@ class _MilestoneDetailsScreenState extends State<MilestoneDetailsScreen> {
 
   void _showAddTaskDialog() {
     final viewModel = context.read<MilestoneViewModel>();
+    final currentMilestone = viewModel.currentMilestone ?? widget.milestone;
+    
     showDialog(
       context: context,
       builder: (_) => TaskDialog(
-        milestoneId: widget.milestone.id,
+        milestoneId: currentMilestone.id,
         workspaceMembers: viewModel.workspaceMembers,
         onSave: ({required description, required priority, required status, required title, assigneeId, dueDate}) {
           context.read<TaskViewModel>().createTask(
             context: context,
-            milestoneId: widget.milestone.id,
+            milestoneId: currentMilestone.id,
+            workspaceId: currentMilestone.workspaceId, // تمرير معرف مساحة العمل مباشرة
             title: title,
             description: description,
             status: status,

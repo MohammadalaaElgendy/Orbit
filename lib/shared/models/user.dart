@@ -38,4 +38,8 @@ class User {
   }
 }
 
+extension UserRoleX on User {
+  bool get isAdmin => role == 'admin';
+}
+
 const _undefined = Object();

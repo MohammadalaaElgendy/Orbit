@@ -2,11 +2,11 @@ import 'dart:ui';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:logging/logging.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:protocol_handler/protocol_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'core/theme/app_theme.dart';
 import 'core/services/settings_service.dart';
 import 'core/data/database/app_database.dart' hide Workspace, Milestone, Task;
@@ -45,38 +45,36 @@ import 'l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
 
-  // ضبط مستوى السجلات لكتم الضجيج غير الضروري من PowerSync
-  Logger.root.level = Level.WARNING;
-  Logger.root.onRecord.listen((record) {
-    debugPrint('${record.level.name}: ${record.time}: ${record.message}');
-  });
-  
   final prefs = await SharedPreferences.getInstance();
   final settingsService = SettingsService(prefs);
 
-  // تسجيل البروتوكول للديسكتوب لكي يتمكن المتصفح من العودة للتطبيق بعد تسجيل الدخول
   if (!kIsWeb && (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
     await protocolHandler.register('io.supabase.orbit');
   }
   
-  const String supabaseUrl = 'https://ysrahcfgllkkedpwjmjg.supabase.co';
-  const String supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlzcmFoY2ZnbGxra2VkcHdqbWpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMjgzOTcsImV4cCI6MjA5MjcwNDM5N30._kRvAUwM8fM2qN-VL-aOHqlyUuDNwyUPHJKlREAHFuA';
+  final String supabaseUrl = dotenv.get('SUPABASE_URL');
+  final String supabaseAnonKey = dotenv.get('SUPABASE_ANON_KEY');
 
   await Supabase.initialize(
     url: supabaseUrl,
-    anonKey: supabaseAnonKey,
-    authOptions: const FlutterAuthClientOptions(
-      authFlowType: AuthFlowType.pkce,
-    ),
-    debug: true,
+    publishableKey: supabaseAnonKey,
   );
 
   final syncService = SyncService();
   await syncService.initialize();
 
-  // ─── مراقبة حالة الدخول عالمياً لربط المزامنة فوراً ──────────────────────
+  // ─── مراقبة حالة الدخول عالمياً لربط المزامنة وتحديد هوية المستخدم ──────────────────────
+  final database = AppDatabase(syncService.db);
+  
+  // تعيين الهوية الابتدائية إذا كان هناك جلسة نشطة
+  database.setUserId(Supabase.instance.client.auth.currentSession?.user.id);
+
   Supabase.instance.client.auth.onAuthStateChange.listen((data) {
+    final userId = data.session?.user.id;
+    database.setUserId(userId);
+    
     if (data.session != null) {
       syncService.connect();
     } else {
@@ -86,7 +84,6 @@ void main() async {
 
   await NotificationService().init();
 
-  final database = AppDatabase(syncService.db);
   final supabaseAuthService = SupabaseAuthService();
   final userRepo = UserRepository(database.userDao);
   final authRepo = AuthRepository(supabaseAuthService, userRepo);
@@ -136,31 +133,18 @@ class OrbitApp extends StatefulWidget {
   State<OrbitApp> createState() => _OrbitAppState();
 }
 
-class _OrbitAppState extends State<OrbitApp> with WidgetsBindingObserver {
+class _OrbitAppState extends State<OrbitApp> {
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
     _listenToNotifications();
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    // حل مشكلة اختفاء البيانات عند العودة من السكون
-    if (state == AppLifecycleState.resumed) {
-      debugPrint('Orbit: App resumed, re-activating database connection...');
-      // فصل ثم وصل لضمان إعادة تنشيط الـ Isolate والقاعدة المحلية
-      widget.syncService.disconnect();
-      widget.syncService.connect();
-    }
   }
 
   void _listenToNotifications() {

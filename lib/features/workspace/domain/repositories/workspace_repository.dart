@@ -18,6 +18,7 @@ class WorkspaceRepository {
   WorkspaceRepository(this._workspaceDao, this._projectDao, this._milestoneDao, this._taskDao);
 
   Future<void> createWorkspace(model.Workspace workspace) async {
+    // 1. إنشاء مساحة العمل
     await _workspaceDao.create(db.WorkspacesCompanion(
       id: Value(workspace.id),
       name: Value(workspace.name),
@@ -29,8 +30,15 @@ class WorkspaceRepository {
       updatedAt: Value(workspace.updatedAt.toIso8601String()),
     ));
     
-    // Also add the creator as an admin automatically
-    await addMemberToWorkspace(workspace.id, workspace.createdBy, 'admin');
+    // 2. إضافة المنشئ كعضو أدمن فوراً (محلياً) لضمان ثبات المزامنة
+    await _workspaceDao.addMember(db.WorkspaceMembersCompanion(
+      id: Value(Uuid().v4()),
+      workspaceId: Value(workspace.id),
+      userId: Value(workspace.createdBy),
+      role: const Value('admin'),
+      createdAt: Value(DateTime.now().toUtc().toIso8601String()),
+      updatedAt: Value(DateTime.now().toUtc().toIso8601String()),
+    ));
   }
 
   Stream<List<model.Workspace>> watchWorkspacesForUser(String userId) {
@@ -125,14 +133,24 @@ class WorkspaceRepository {
   Stream<List<model.User>> watchWorkspaceMembers(String workspaceId) {
     return _workspaceDao.watchMembersWithUsers(workspaceId).map((rows) {
       return rows.map((row) {
-        final user = row.readTable(_workspaceDao.users);
-        final membership = row.readTable(_workspaceDao.workspaceMembers);
+        final user = row.user;
+        final membership = row.member;
+        
+        if (user == null) {
+          return model.User(
+            id: membership.userId,
+            name: 'Loading...',
+            email: '',
+            role: membership.role,
+          );
+        }
+
         return model.User(
           id: user.id,
           name: user.name,
           email: user.email,
           avatarUrl: user.avatarUrl,
-          role: membership.role, // ربط الرتبة هنا
+          role: membership.role,
         );
       }).toList();
     });

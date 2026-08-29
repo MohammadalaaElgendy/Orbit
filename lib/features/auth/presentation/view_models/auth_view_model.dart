@@ -58,6 +58,8 @@ class AuthViewModel extends ChangeNotifier {
       if (data.session != null) {
         user = authRepository.currentUser;
         _syncService.connect();
+        // إجبار مزامنة بيانات المستخدم لضمان قبول العمليات المرتبطة به (مثل Workspace)
+        authRepository.syncCurrentUser();
         isLoading = false;
         _loginSuccessController.add(true);
         notifyListeners();

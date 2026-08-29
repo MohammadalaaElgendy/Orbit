@@ -94,7 +94,14 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
       builder: (_) => MilestoneDialog(
         projectId: selectedProjectId,
         onSave: (name, desc, dueDate) {
-          context.read<MilestoneViewModel>().createMilestone(context, selectedProjectId!, name, desc, dueDate);
+          context.read<MilestoneViewModel>().createMilestone(
+            context, 
+            selectedProjectId!, 
+            name, 
+            desc, 
+            dueDate,
+            workspaceId: widget.workspace.id, // تمرير معرف مساحة العمل لضمان النجاح حتى لو لم يتم تحميل المشروع محلياً بعد
+          );
         },
       ),
     );

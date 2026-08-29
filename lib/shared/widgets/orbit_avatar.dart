@@ -28,6 +28,7 @@ class OrbitAvatar extends StatelessWidget {
         : theme.colorScheme.primary.withValues(alpha: 0.9);
 
     return Container(
+      key: ValueKey(imageUrl), // إجبار الويدجت على إعادة البناء عند تغيير الرابط
       width: size,
       height: size,
       decoration: BoxDecoration(

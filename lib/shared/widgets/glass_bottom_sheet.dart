@@ -44,21 +44,24 @@ class GlassBottomSheet extends StatelessWidget {
         ],
       ),
       child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Handle bar - refined with better volume
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: theme.colorScheme.onSurface.withValues(alpha: isDark ? 0.15 : 0.1),
-                borderRadius: BorderRadius.circular(AppRadius.full),
+        child: Material(
+          color: Colors.transparent,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Handle bar - refined with better volume
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.onSurface.withValues(alpha: isDark ? 0.15 : 0.1),
+                  borderRadius: BorderRadius.circular(AppRadius.full),
+                ),
               ),
-            ),
-            const SizedBox(height: AppSpacing.md),
-            child,
-          ],
+              const SizedBox(height: AppSpacing.md),
+              child,
+            ],
+          ),
         ),
       ),
     ).asGlass(

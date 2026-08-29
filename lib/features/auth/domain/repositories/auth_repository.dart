@@ -25,6 +25,13 @@ class AuthRepository {
     });
   }
 
+  Future<void> syncCurrentUser() async {
+    final user = currentUser;
+    if (user != null) {
+      await _userRepository.createUser(user);
+    }
+  }
+
   // وظيفة موحدة لتحويل مستخدم سوبابيس إلى الموديل الخاص بنا
   User _mapSupabaseUserToModel(supabase.User sUser) {
     final metadata = sUser.userMetadata ?? {};
