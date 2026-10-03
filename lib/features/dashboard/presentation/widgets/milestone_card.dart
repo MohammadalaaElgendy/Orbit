@@ -29,6 +29,7 @@ class MilestoneCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     
     Widget card = Container(
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.white,
         borderRadius: BorderRadius.circular(AppRadius.xl),
@@ -259,6 +260,33 @@ class MilestoneCard extends StatelessWidget {
   }
 
   Widget _buildDeadlineInfo(DateTime? deadline, ThemeData theme, AppLocalizations l10n) {
+    if (milestone.progress >= 1.0) {
+      return Row(
+        children: [
+          const Icon(Icons.check_circle_rounded, size: 14, color: Colors.green),
+          const SizedBox(width: 4),
+          Text(
+            l10n.statusDone,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: Colors.green,
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+            ),
+          ),
+          if (deadline != null) ...[
+            const Spacer(),
+            Text(
+              DateFormat('MMM dd').format(deadline),
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5),
+                fontSize: 11,
+              ),
+            ),
+          ],
+        ],
+      );
+    }
+
     if (deadline == null) return const SizedBox.shrink();
     
     final now = DateTime.now();

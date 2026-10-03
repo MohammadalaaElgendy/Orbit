@@ -31,12 +31,51 @@ class _TaskMenuSheetState extends State<TaskMenuSheet> {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<TaskViewModel>();
+    final currentTask = viewModel.currentTask ?? widget.task;
     final l10n = AppLocalizations.of(context)!;
 
     return GlassBottomSheet(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
+          // Status Quick Actions
+          if (currentTask.status != TaskStatus.done)
+            ListTile(
+              leading: const Icon(Icons.check_circle_outline_rounded, color: Colors.green),
+              title: Text(l10n.statusDone, style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+              onTap: () {
+                Navigator.pop(context);
+                viewModel.updateTask(context, currentTask.copyWith(
+                  status: TaskStatus.done,
+                  updatedAt: DateTime.now(),
+                ));
+              },
+            ),
+          if (currentTask.status != TaskStatus.inProgress)
+            ListTile(
+              leading: const Icon(Icons.pending_actions_rounded, color: Colors.orange),
+              title: Text(l10n.statusInProgress, style: const TextStyle(color: Colors.orange)),
+              onTap: () {
+                Navigator.pop(context);
+                viewModel.updateTask(context, currentTask.copyWith(
+                  status: TaskStatus.inProgress,
+                  updatedAt: DateTime.now(),
+                ));
+              },
+            ),
+          if (currentTask.status != TaskStatus.todo)
+            ListTile(
+              leading: const Icon(Icons.radio_button_unchecked_rounded, color: Colors.blue),
+              title: Text(l10n.statusTodo, style: const TextStyle(color: Colors.blue)),
+              onTap: () {
+                Navigator.pop(context);
+                viewModel.updateTask(context, currentTask.copyWith(
+                  status: TaskStatus.todo,
+                  updatedAt: DateTime.now(),
+                ));
+              },
+            ),
+          const Divider(height: 1),
           ListTile(
             leading: const Icon(Icons.edit_rounded),
             title: Text(l10n.editTaskLabel),
@@ -45,10 +84,10 @@ class _TaskMenuSheetState extends State<TaskMenuSheet> {
               showDialog(
                 context: context,
                 builder: (_) => TaskDialog(
-                  task: widget.task,
+                  task: currentTask,
                   workspaceMembers: viewModel.workspaceMembers,
                   onSave: ({required description, required priority, required status, required title, assigneeId, dueDate}) {
-                    viewModel.updateTask(context, widget.task.copyWith(
+                    viewModel.updateTask(context, currentTask.copyWith(
                       title: title,
                       description: description,
                       status: status,
@@ -71,10 +110,10 @@ class _TaskMenuSheetState extends State<TaskMenuSheet> {
                 context: context,
                 builder: (context) => ConfirmDialog(
                   title: l10n.deleteTask,
-                  message: l10n.deleteTaskConfirm(widget.task.title),
+                  message: l10n.deleteTaskConfirm(currentTask.title),
                   confirmLabel: l10n.delete,
                   confirmColor: Colors.red,
-                  onConfirm: () => viewModel.deleteTask(widget.task.id),
+                  onConfirm: () => viewModel.deleteTask(currentTask.id),
                 ),
               );
             },

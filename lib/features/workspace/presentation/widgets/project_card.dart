@@ -38,95 +38,102 @@ class ProjectCard extends StatelessWidget {
     
     final double currentBorderWidth = isSelected ? 2.0 : 1.0;
 
-    return GestureDetector(
-      onTap: onTap,
-      onLongPress: () => _showMenu(context),
-      child: Container(
-        width: width ?? double.infinity,
-        padding: const EdgeInsets.all(AppSpacing.md),
-        decoration: BoxDecoration(
-          color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.white,
-          borderRadius: BorderRadius.circular(AppRadius.xl),
-          border: Border.all(
-            color: currentBorderColor,
-            width: currentBorderWidth,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: isSelected 
-                  ? projectColor.withValues(alpha: 0.25) 
-                  : Colors.black.withValues(alpha: isDark ? 0.3 : 0.02),
-              blurRadius: isSelected ? 20 : 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
+    return Container(
+      width: width ?? double.infinity,
+      decoration: BoxDecoration(
+        color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.white,
+        borderRadius: BorderRadius.circular(AppRadius.xl),
+        border: Border.all(
+          color: currentBorderColor,
+          width: currentBorderWidth,
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        boxShadow: [
+          BoxShadow(
+            color: isSelected 
+                ? projectColor.withValues(alpha: 0.25) 
+                : Colors.black.withValues(alpha: isDark ? 0.3 : 0.02),
+            blurRadius: isSelected ? 20 : 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(AppRadius.xl),
+          onTap: onTap,
+          onLongPress: () => _showMenu(context),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: projectGradient,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: projectGradient,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: projectColor.withValues(alpha: 0.4),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          )
+                        ],
+                      ),
+                      child: const Icon(
+                        Icons.rocket_launch_rounded, 
+                        color: Colors.white,
+                        size: 16,
+                      ),
                     ),
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: projectColor.withValues(alpha: 0.4),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      )
-                    ],
-                  ),
-                  child: const Icon(
-                    Icons.rocket_launch_rounded, 
-                    color: Colors.white,
-                    size: 16,
-                  ),
+                    IconButton(
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      icon: Icon(
+                        Icons.more_horiz_rounded,
+                        size: 20,
+                        color: isDark ? Colors.white60 : Colors.black45,
+                      ),
+                      onPressed: () => _showMenu(context),
+                    ),
+                  ],
                 ),
-                IconButton(
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                  icon: Icon(
-                    Icons.more_horiz_rounded,
-                    size: 20,
-                    color: isDark ? Colors.white60 : Colors.black45,
+                const SizedBox(height: AppSpacing.md),
+                Text(
+                  project.name, 
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w900, 
+                    fontSize: 16,
+                    color: isDark ? Colors.white : theme.colorScheme.onSurface,
+                    letterSpacing: -0.2,
                   ),
-                  onPressed: () => _showMenu(context),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  project.description,
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    fontSize: 12,
+                    color: isDark ? Colors.white60 : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
+                    height: 1.2,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
-            const SizedBox(height: AppSpacing.md),
-            Text(
-              project.name, 
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w900, 
-                fontSize: 16,
-                color: isDark ? Colors.white : theme.colorScheme.onSurface,
-                letterSpacing: -0.2,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              project.description,
-              style: theme.textTheme.labelSmall?.copyWith(
-                fontSize: 12,
-                color: isDark ? Colors.white60 : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-                height: 1.2,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+          ),
         ),
       ),
     );

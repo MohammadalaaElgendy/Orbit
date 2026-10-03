@@ -163,7 +163,14 @@ class DashboardViewModel extends ChangeNotifier {
   void _initTasks() {
     _taskSub = _taskRepository.watchAllTasks().listen((data) {
       _allTasks = data;
-      _recentTasks = data.take(5).toList();
+      final sorted = List<Task>.from(data);
+      sorted.sort((a, b) {
+        final aDone = a.status == TaskStatus.done ? 1 : 0;
+        final bDone = b.status == TaskStatus.done ? 1 : 0;
+        if (aDone != bDone) return aDone.compareTo(bDone);
+        return b.createdAt.compareTo(a.createdAt);
+      });
+      _recentTasks = sorted.take(5).toList();
       if (data.isEmpty) {
         _overallProgress = 0.0;
       } else {

@@ -8,6 +8,7 @@ import 'package:orbit/core/constants/app_constants.dart';
 import 'package:orbit/shared/widgets/timeline_indicator.dart';
 import 'package:orbit/shared/widgets/orbit_avatar.dart';
 import 'package:orbit/features/dashboard/presentation/view_models/dashboard_view_model.dart';
+import 'package:orbit/features/dashboard/presentation/view_models/task_view_model.dart';
 import 'task_menu_sheet.dart';
 import 'package:orbit/l10n/app_localizations.dart';
 
@@ -34,10 +35,8 @@ class TaskCard extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final l10n = AppLocalizations.of(context)!;
+    final isCompleted = task.status == TaskStatus.done;
 
-    // Use context.select to listen specifically to the assignee's data in the member map.
-    // This allows the card to rebuild if the task changes (passed via constructor)
-    // OR if the assignee's profile data in the workspace member map changes.
     final (assignee, canManage) = context.select<DashboardViewModel, (User?, bool)>((vm) {
       final workspaceMembers = vm.workspaceMembersMap[task.workspaceId] ?? [];
       final assignee = workspaceMembers.where((u) => u.id == task.assigneeId).firstOrNull;
@@ -45,7 +44,6 @@ class TaskCard extends StatelessWidget {
       final currentUserId = Supabase.instance.client.auth.currentUser?.id;
       final currentMember = workspaceMembers.where((u) => u.id == currentUserId).firstOrNull;
       
-      // Check if user is owner
       final workspace = vm.workspaces.where((w) => w.id == task.workspaceId).firstOrNull;
       final isOwner = workspace?.ownerId == currentUserId;
       
@@ -57,13 +55,16 @@ class TaskCard extends StatelessWidget {
     });
 
     Widget card = Container(
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.white,
+        color: isCompleted
+            ? (isDark ? Colors.white.withValues(alpha: 0.04) : Colors.grey.shade50)
+            : (isDark ? Colors.white.withValues(alpha: 0.08) : Colors.white),
         borderRadius: BorderRadius.circular(AppRadius.xl),
         border: Border.all(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.12)
-              : theme.colorScheme.outlineVariant.withValues(alpha: 0.4),
+          color: isCompleted
+              ? (isDark ? Colors.white.withValues(alpha: 0.06) : theme.colorScheme.outlineVariant.withValues(alpha: 0.2))
+              : (isDark ? Colors.white.withValues(alpha: 0.12) : theme.colorScheme.outlineVariant.withValues(alpha: 0.4)),
         ),
         boxShadow: [
           BoxShadow(
@@ -83,8 +84,33 @@ class TaskCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // Removed redundant status indicator as it's now on the timeline
+                  // Quick Toggle Button
+                  Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: () => _toggleStatus(context),
+                      child: Padding(
+                        padding: const EdgeInsets.all(4.0),
+                        child: Icon(
+                          isCompleted
+                              ? Icons.check_circle_rounded
+                              : (task.status == TaskStatus.inProgress
+                                  ? Icons.pending_rounded
+                                  : Icons.radio_button_unchecked_rounded),
+                          size: 20,
+                          color: isCompleted
+                              ? Colors.green
+                              : (task.status == TaskStatus.inProgress
+                                  ? Colors.orange
+                                  : theme.colorScheme.outline),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.xs),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -94,28 +120,37 @@ class TaskCard extends StatelessWidget {
                           style: theme.textTheme.titleSmall?.copyWith(
                             fontWeight: FontWeight.w800,
                             letterSpacing: -0.2,
+                            decoration: isCompleted ? TextDecoration.lineThrough : null,
+                            color: isCompleted
+                                ? theme.colorScheme.onSurface.withValues(alpha: 0.45)
+                                : null,
                           ),
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          task.description,
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7),
-                            fontSize: 11,
+                        if (task.description.isNotEmpty) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            task.description,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant.withValues(alpha: isCompleted ? 0.4 : 0.7),
+                              fontSize: 11,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
+                        ],
                       ],
                     ),
                   ),
                   const SizedBox(width: 8),
-                  if (assignee != null)
+                  if (assignee != null) ...[
                     OrbitAvatar(
                       radius: 10,
                       imageUrl: assignee.avatarUrl,
                     ),
-                  const SizedBox(width: 8),
+                    const SizedBox(width: 6),
+                  ],
+                  _buildStatusBadge(task.status, l10n),
+                  const SizedBox(width: 6),
                   _buildPriorityBadge(task.priority, l10n),
                 ],
               ),
@@ -130,7 +165,11 @@ class TaskCard extends StatelessWidget {
                 Row(
                   children: [
                     if (task.dueDate != null) ...[
-                      Icon(Icons.access_time_rounded, size: 12, color: _getDeadlineColor(task.dueDate!)),
+                      Icon(
+                        isCompleted ? Icons.check_circle_outline_rounded : Icons.access_time_rounded,
+                        size: 12,
+                        color: _getDeadlineColor(task.dueDate!),
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         'Due ${DateFormat('MMM dd').format(task.dueDate!)}',
@@ -168,7 +207,23 @@ class TaskCard extends StatelessWidget {
                       ),
                     ],
                     const Spacer(),
-                    if (task.dueDate != null && _isOverdue(task.dueDate!))
+                    if (isCompleted)
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.green.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(AppRadius.xs),
+                        ),
+                        child: Text(
+                          l10n.statusDone.toUpperCase(),
+                          style: const TextStyle(
+                            color: Colors.green,
+                            fontSize: 8,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      )
+                    else if (task.dueDate != null && _isOverdue(task.dueDate!))
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
@@ -202,7 +257,7 @@ class TaskCard extends StatelessWidget {
             TimelineIndicator(
               isFirst: isFirst,
               isLast: isLast,
-              lineColor: task.status == TaskStatus.done 
+              lineColor: isCompleted
                   ? Colors.green 
                   : theme.colorScheme.primary,
               nodeSize: 24,
@@ -210,7 +265,7 @@ class TaskCard extends StatelessWidget {
                 width: 12,
                 height: 12,
                 decoration: BoxDecoration(
-                  color: task.status == TaskStatus.done ? Colors.green : Colors.grey,
+                  color: isCompleted ? Colors.green : Colors.grey,
                   shape: BoxShape.circle,
                   border: Border.all(color: theme.scaffoldBackgroundColor, width: 2),
                 ),
@@ -234,8 +289,17 @@ class TaskCard extends StatelessWidget {
     );
   }
 
-  // حساب الـ Overdue بناءً على الأيام لتجنب فروق الساعات والدقائق الخفية
+  void _toggleStatus(BuildContext context) {
+    final newStatus = task.status == TaskStatus.done ? TaskStatus.todo : TaskStatus.done;
+    final updatedTask = task.copyWith(
+      status: newStatus,
+      updatedAt: DateTime.now(),
+    );
+    context.read<TaskViewModel>().updateTask(context, updatedTask);
+  }
+
   bool _isOverdue(DateTime deadline) {
+    if (task.status == TaskStatus.done) return false;
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
     final deadlineDay = DateTime(deadline.year, deadline.month, deadline.day);
@@ -243,6 +307,7 @@ class TaskCard extends StatelessWidget {
   }
 
   Color _getDeadlineColor(DateTime deadline) {
+    if (task.status == TaskStatus.done) return Colors.green;
     if (_isOverdue(deadline)) return Colors.red;
 
     final now = DateTime.now();
@@ -254,6 +319,36 @@ class TaskCard extends StatelessWidget {
     return Colors.green;
   }
 
+  Widget _buildStatusBadge(TaskStatus status, AppLocalizations l10n) {
+    Color color;
+    switch (status) {
+      case TaskStatus.todo:
+        color = Colors.blue;
+        break;
+      case TaskStatus.inProgress:
+        color = Colors.orange;
+        break;
+      case TaskStatus.done:
+        color = Colors.green;
+        break;
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(AppRadius.xs),
+      ),
+      child: Text(
+        status.getLabel(l10n),
+        style: TextStyle(
+          color: color,
+          fontSize: 8,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    );
+  }
+
   Widget _buildPriorityBadge(TaskPriority priority, AppLocalizations l10n) {
     Color color;
     switch (priority) {
@@ -262,7 +357,7 @@ class TaskCard extends StatelessWidget {
       case TaskPriority.high: color = Colors.red; break;
     }
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(AppRadius.full),

@@ -161,13 +161,16 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                     padding: EdgeInsets.zero,
                     borderRadius: AppRadius.lg,
                     blur: 10,
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () => Navigator.pop(context),
-                        borderRadius: BorderRadius.circular(AppRadius.lg),
-                        child: const Center(
-                          child: Icon(Icons.arrow_back_ios_new, size: 18),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(AppRadius.lg),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () => Navigator.pop(context),
+                          borderRadius: BorderRadius.circular(AppRadius.lg),
+                          child: const Center(
+                            child: Icon(Icons.arrow_back_ios_new, size: 18),
+                          ),
                         ),
                       ),
                     ),
@@ -181,15 +184,18 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                       padding: EdgeInsets.zero,
                       borderRadius: AppRadius.lg,
                       blur: 10,
-                      child: Material(
-                        color: Colors.transparent,
-                        child: InkWell(
-                          onTap: _showWorkspaceMenu,
-                          borderRadius: BorderRadius.circular(AppRadius.lg),
-                          child: const SizedBox(
-                            width: 40,
-                            height: 40,
-                            child: Icon(Icons.more_vert_rounded, size: 20),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(AppRadius.lg),
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: _showWorkspaceMenu,
+                            borderRadius: BorderRadius.circular(AppRadius.lg),
+                            child: const SizedBox(
+                              width: 40,
+                              height: 40,
+                              child: Icon(Icons.more_vert_rounded, size: 20),
+                            ),
                           ),
                         ),
                       ),
@@ -390,6 +396,41 @@ class _WorkspaceDetailsScreenState extends State<WorkspaceDetailsScreen> {
                       : _buildProjectsGrid(projects, theme),
                     const SizedBox(height: AppSpacing.xl),
                     _buildSectionHeader(theme, l10n.projectMilestones, onAdd: (viewModel.isAdmin && selectedProjectId != null) ? _showMilestoneDialog : null),
+                    if (selectedProjectId != null) ...[
+                      const SizedBox(height: AppSpacing.xs),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(AppRadius.md),
+                              border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.3)),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(Icons.filter_list_rounded, size: 14, color: theme.colorScheme.primary),
+                                const SizedBox(width: 6),
+                                Text(
+                                  projects.where((p) => p.id == selectedProjectId).firstOrNull?.name ?? '',
+                                  style: TextStyle(
+                                    color: theme.colorScheme.primary,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                GestureDetector(
+                                  onTap: () => _onProjectSelected(null),
+                                  child: Icon(Icons.cancel, size: 16, color: theme.colorScheme.primary),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                     const SizedBox(height: AppSpacing.md),
                     if (_milestones.isEmpty)
                       _buildEmptyMilestones(theme, l10n, viewModel.isAdmin)

@@ -58,7 +58,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
           viewModel.createTask(
             context: context,
             milestoneId: currentTask.milestoneId,
-            workspaceId: currentTask.workspaceId, // تمرير معرف مساحة العمل
+            workspaceId: currentTask.workspaceId,
             parentTaskId: currentTask.id,
             title: title,
             description: description,
@@ -68,6 +68,38 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             dueDate: dueDate,
           );
         },
+      ),
+    );
+  }
+
+  void _showStatusPicker(Task currentTask) {
+    final l10n = AppLocalizations.of(context)!;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => GlassBottomSheet(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: TaskStatus.values.map((s) => ListTile(
+            leading: Icon(
+              s == TaskStatus.done
+                  ? Icons.check_circle_rounded
+                  : (s == TaskStatus.inProgress ? Icons.pending_rounded : Icons.radio_button_unchecked_rounded),
+              color: s == TaskStatus.done
+                  ? Colors.green
+                  : (s == TaskStatus.inProgress ? Colors.orange : Colors.grey),
+            ),
+            title: Text(s.getLabel(l10n)),
+            trailing: currentTask.status == s ? const Icon(Icons.check_circle_rounded, color: Colors.green) : null,
+            onTap: () {
+              Navigator.pop(context);
+              context.read<TaskViewModel>().updateTask(context, currentTask.copyWith(
+                status: s,
+                updatedAt: DateTime.now(),
+              ));
+            },
+          )).toList(),
+        ),
       ),
     );
   }
@@ -142,11 +174,8 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     final subtasks = viewModel.subtasks;
     final l10n = AppLocalizations.of(context)!;
     
-    // Permission check
     final currentUserId = Supabase.instance.client.auth.currentUser?.id;
     
-    // Check if user is Admin or Owner
-    // We use context.select on DashboardViewModel for the owner check and admin check
     final (isAdminOrOwner, isAssignee) = context.select<DashboardViewModel, (bool, bool)>((dvm) {
        final workspace = dvm.workspaces.where((w) => w.id == currentTask.workspaceId).firstOrNull;
        final isOwner = workspace?.ownerId == currentUserId;
@@ -172,22 +201,51 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
             padding: EdgeInsets.zero,
             borderRadius: AppRadius.lg,
             blur: 10,
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new, size: 18),
-              onPressed: () {
-                // Ensure we pop the current screen
-                if (Navigator.of(context).canPop()) {
-                  Navigator.of(context).pop();
-                }
-              },
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(AppRadius.lg),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
+                  onTap: () {
+                    if (Navigator.of(context).canPop()) {
+                      Navigator.of(context).pop();
+                    }
+                  },
+                  child: const Center(
+                    child: Icon(Icons.arrow_back_ios_new, size: 18),
+                  ),
+                ),
+              ),
             ),
           ),
         ),
         actions: [
           if (canManage)
-            IconButton(
-              icon: const Icon(Icons.more_vert_rounded),
-              onPressed: _showTaskMenu,
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: GlassCard(
+                padding: EdgeInsets.zero,
+                borderRadius: AppRadius.lg,
+                blur: 10,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(AppRadius.lg),
+                      onTap: _showTaskMenu,
+                      child: const SizedBox(
+                        width: 40,
+                        height: 40,
+                        child: Center(
+                          child: Icon(Icons.more_vert_rounded, size: 20),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ),
           const SizedBox(width: AppSpacing.sm),
         ],
@@ -202,7 +260,11 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                 const SizedBox(height: AppSpacing.md),
                 Align(
                   alignment: AlignmentDirectional.centerStart,
-                  child: _buildBadge(theme, currentTask.status, l10n),
+                  child: InkWell(
+                    onTap: canManage ? () => _showStatusPicker(currentTask) : null,
+                    borderRadius: BorderRadius.circular(AppRadius.full),
+                    child: _buildBadge(theme, currentTask.status, l10n, canManage: canManage),
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.md),
                 Text(
@@ -293,7 +355,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
     );
   }
 
-  Widget _buildBadge(ThemeData theme, TaskStatus status, AppLocalizations l10n) {
+  Widget _buildBadge(ThemeData theme, TaskStatus status, AppLocalizations l10n, {bool canManage = false}) {
     Color color;
     switch (status) {
       case TaskStatus.todo: color = Colors.grey; break;
@@ -308,9 +370,18 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
         borderRadius: BorderRadius.circular(AppRadius.full),
         border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
-      child: Text(
-        status.getLabel(l10n).toUpperCase(),
-        style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 0.5),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            status.getLabel(l10n).toUpperCase(),
+            style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 0.5),
+          ),
+          if (canManage) ...[
+            const SizedBox(width: 4),
+            Icon(Icons.arrow_drop_down_rounded, size: 16, color: color),
+          ],
+        ],
       ),
     );
   }
@@ -368,7 +439,7 @@ class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
                 color: task.dueDate!.isBefore(DateTime.now()) && task.status != TaskStatus.done ? Colors.red : null,
               ),
               const SizedBox(width: AppSpacing.md),
-              const Spacer(), // Keeps the date card at half width to match the ones above
+              const Spacer(),
             ],
           ),
         ],
